@@ -132,6 +132,10 @@ if (NOT WIN32)
    add_definitions(-DUNIX)
 endif(NOT WIN32)
 
+list( APPEND ATOOL_HEADERS 
+   Timer/Timer.h
+)
+
 include_directories( Timer )
 set(Timer_SRC
    Timer/Timer.cpp
@@ -147,16 +151,38 @@ set(Thread_SRC
    Thread/Thread.cpp
 )
 
+list( APPEND ATOOL_HEADERS
+   Thread/Thread.h
+   Thread/MultiThread.h
+   Thread/ThreadPool.h
+   Thread/TaskManager.tcc
+)
+
 include_directories( DataTypes )
 set( DataTypes_SRC
    DataTypes/LruCache.cpp
    DataTypes/TSMap.cpp
    DataTypes/TSQueue.cpp
 )
+list( APPEND ATOOL_HEADERS
+   DataTypes/LruCache.tcc
+   DataTypes/TSMap.tcc
+   DataTypes/TSQueue.tcc
+)
+
+
+include_directories( Mutex )
+set( Mutex_SRC
+   Mutex/shared_mutex.cpp
+)
+list(APPEND ATOOL_HEADERS
+   Mutex/shared_mutex.h
+)
 
 add_library( aquetitools STATIC  
    ${Timer_SRC}
    ${Thread_SRC}
+   ${Mutex_SRC}
 )
 
 target_link_libraries( aquetitools
@@ -190,4 +216,6 @@ install( TARGETS
    INCLUDES DESTINATION include/aqueti
    PUBLIC_HEADER DESTINATION include/aqueti
 )
+
+install( FILES ${ATOOL_HEADERS} DESTINATION include/AquetiTools)
 

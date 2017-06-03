@@ -1,0 +1,11 @@
+#include <iostream>
+#pragma once
+
+namespace AquetiTOols
+{
+#define VERSION "@MAJOR_VERSION@.@MINOR_VERSION@.@PATCH_VERSION@.@TWEAK_VERSION@_@VERSION_TAG@"
+#define GIT_BRANCH "@GIT_BRANCH@"
+#define GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
+#define BUILD_DATE "@BUILD_DATE@_@BUILD_TIME@"
+}
+
