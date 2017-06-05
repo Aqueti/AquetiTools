@@ -11,7 +11,7 @@
 #include <thread>
 #include <mutex>
 
-namespace atl
+namespace aqt
 {
 //************************************************************
 /**

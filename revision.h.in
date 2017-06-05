@@ -1,7 +1,7 @@
 #include <iostream>
 #pragma once
 
-namespace AquetiTOols
+namespace aqt
 {
 #define VERSION "@MAJOR_VERSION@.@MINOR_VERSION@.@PATCH_VERSION@.@TWEAK_VERSION@_@VERSION_TAG@"
 #define GIT_BRANCH "@GIT_BRANCH@"

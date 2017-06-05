@@ -14,17 +14,16 @@ set(cmake_common_args
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
 )
 
-#JsonBox
-if(GIT_HTTPS)
-    set(JsonBox_REPO "https://github.com/anhero/JsonBox.git")
-else()
-    set(JsonBox_REPO "git@github.com:anhero/JsonBox.git")
-endif()
-
+##JsonBox
+#if(GIT_HTTPS)
+#    set(JsonBox_REPO "https://github.com/anhero/JsonBox.git")
+#else()
+#    set(JsonBox_REPO "git@github.com:anhero/JsonBox.git")
+#endif()
+#
 ExternalProject_Add(
   JsonBox
-  GIT_REPOSITORY ${JsonBox_REPO}
-  GIT_TAG "0.6.2"
+  SOURCE_DIR "${CMAKE_SOURCE_DIR}/JsonBox"
   CMAKE_ARGS
     -DCMAKE_C_COMPILER:PATH=${CMAKE_C_COMPILER}
     -DCMAKE_CXX_COMPILER:PATH=${CMAKE_CXX_COMPILER}

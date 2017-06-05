@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace atl
+namespace aqt
 {
 
 template<typename Key, typename ReturnType>

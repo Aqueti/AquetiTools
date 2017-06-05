@@ -14,7 +14,7 @@
 
 #include "shared_mutex.h"
 
-namespace atl
+namespace aqt
 {
 
     /*

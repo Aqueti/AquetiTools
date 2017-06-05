@@ -6,7 +6,7 @@
 
 #include "shared_mutex.h"
 
-namespace atl
+namespace aqt
 {
     /////////////////////////////////
     // shared_mutex implementation //

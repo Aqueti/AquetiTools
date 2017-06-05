@@ -85,7 +85,7 @@ int main(int argc, char** argv)
           if(valgrind) {
               cout << "Timer will not be tested" << endl;
           } else {
-             if( !atl::testTimer() ) {
+             if( !aqt::testTimer() ) {
                 cout << "Timer Unit Test Failed!" << endl;
                 return 0;
             }

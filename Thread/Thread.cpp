@@ -23,7 +23,7 @@
 
 std::ofstream threadTest;
 
-namespace atl
+namespace aqt
 {
 
 /**
