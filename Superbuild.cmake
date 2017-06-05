@@ -41,7 +41,9 @@ ExternalProject_Add(
 ExternalProject_Add(
   AquetiTools
   SOURCE_DIR "${CMAKE_SOURCE_DIR}"
-  CMAKE_ARGS ${cmake_common_args} 
+  CMAKE_ARGS 
+    ${cmake_common_args} 
+    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}
   BUILD_ALWAYS 1
   INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
   LOG_INSTALL 1

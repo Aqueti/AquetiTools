@@ -207,9 +207,10 @@ list(APPEND TARGET_LIST ${LIB_LIST})
 # This sections initiates the build of the  components in th TARGET_LIST. 
 # Each component
 #############################################
+message("installing: ${TARGET_LIST}")
 install( TARGETS 
    ${TARGET_LIST}
-   ${LIB_LIST}
+#   ${LIB_LIST}
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION lib${LIB_SUFFIX}
    ARCHIVE DESTINATION lib${LIB_SUFFIX}
@@ -217,5 +218,5 @@ install( TARGETS
    PUBLIC_HEADER DESTINATION include/aqueti
 )
 
-install( FILES ${ATOOL_HEADERS} DESTINATION include/AquetiTools)
+install( FILES ${ATOOL_HEADERS} DESTINATION include/aquetitools)
 
