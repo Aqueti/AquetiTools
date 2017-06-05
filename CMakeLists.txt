@@ -55,6 +55,7 @@ if(USE_SUPERBUILD )
    return()
 endif(USE_SUPERBUILD)
 
+message("INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 include_directories(${CMAKE_INSTALL_PREFIX}/include ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
