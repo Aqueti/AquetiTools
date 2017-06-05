@@ -20,7 +20,7 @@ std::vector<std::string> testList{"Timer", "Thread", "MultiThread", "ThreadPool"
 bool printHelp(void)
 {
     cout << "ATLTest" << endl;
-    AquetiTool::printVersion();
+    //AquetiTool::printVersion();
     cout << endl;
     cout << "Usage: ./ATLTest <options>" << endl;
     cout << "Options: " << endl;
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
             printHelp();
             return 1;
         } else if (!strcmp( argv[i], "--version")) {
-            AquetiTool::printVersion();
+            //AquetiTool::printVersion();
             return 1;
         }
 
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         }
     }
 
-    AquetiTool::printVersion();
+    //AquetiTool::printVersion();
 
     for(std::vector<std::string>::iterator it = testList.begin(); it != testList.end(); ++it ) {
        if( !it->compare("Timer")) {
