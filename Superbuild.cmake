@@ -35,14 +35,14 @@ ExternalProject_Add(
   INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
 )
 
-#AquetiTools
-ExternalProject_Add(
-  AquetiTools
-  SOURCE_DIR "${CMAKE_SOURCE_DIR}"
-  CMAKE_ARGS 
-    ${cmake_common_args} 
-  BUILD_ALWAYS 1
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  LOG_INSTALL 1
-  DEPENDS JsonBox
-)
+##AquetiTools
+#ExternalProject_Add(
+#  AquetiTools
+#  SOURCE_DIR "${CMAKE_SOURCE_DIR}"
+#  CMAKE_ARGS 
+#    ${cmake_common_args} 
+#  BUILD_ALWAYS 1
+#  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+#  LOG_INSTALL 1
+#  DEPENDS JsonBox
+#)

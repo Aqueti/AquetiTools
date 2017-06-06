@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
+
+
 cmake_policy(SET CMP0048 NEW)
 
 project(AquetiTools VERSION "0.0.0.1" )
@@ -7,11 +9,11 @@ project(AquetiTools VERSION "0.0.0.1" )
 ############################################################
 #set default build location if a project has not been defined. After the
 #project below, the PROJECT_SOURCE_DIR should be defined
-if(NOT DEFINED PROJECT_SOURCE_DIR )
-   set(CMAKE_INSTALL_PREFIX "$ENV{PWD}/INSTALL" CACHE PATH "Install directory")
-endif()
+#if(NOT DEFINED PROJECT_SOURCE_DIR )
+#endif()
 
-
+#set( CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory")
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory" FORCE )
 
 #General build options
 option( MAKE_STATIC_LIB "Compile the library statically (off for dynamic)" ON )
@@ -42,18 +44,19 @@ if( USE_CLANG)
    endif(NOT WIN32)
 endif(USE_CLANG)
 
-#############################################
-# Build dependencies
-#############################################
-#Superbuild comes first. If USE_SUPERBUILD is set or not defined, only this following conditional wil
-#be executed in this pass. The superbuild file will recursively call this CMakeLists.txt
-#with USE_SUPERBUILD set to off to skip the SUPERBUILD part
+##############################################
+## Build dependencies
+##############################################
+##Superbuild comes first. If USE_SUPERBUILD is set or not defined, only this following conditional wil
+##be executed in this pass. The superbuild file will recursively call this CMakeLists.txt
+##with USE_SUPERBUILD set to off to skip the SUPERBUILD part
 if(USE_SUPERBUILD )
    set(GIT_HTTPS ON CACHE BOOL "Clone git repositories with HTTPS")
    include(ExternalProject)
    include(Superbuild.cmake)
-   return()
+#   return()
 endif(USE_SUPERBUILD)
+
 
 message("INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
