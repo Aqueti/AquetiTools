@@ -9,11 +9,13 @@ project(AquetiTools VERSION "0.0.0.1" )
 ############################################################
 #set default build location if a project has not been defined. After the
 #project below, the PROJECT_SOURCE_DIR should be defined
+#set(CMAKE_INSTALL_PREFIX "$PROJECT_DEST" CACHE PATH "Install Directory" FORCE )
+
 #if(NOT DEFINED PROJECT_SOURCE_DIR )
 #endif()
 
 #set( CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory")
-set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory" FORCE )
+#set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory" FORCE )
 
 #General build options
 option( MAKE_STATIC_LIB "Compile the library statically (off for dynamic)" ON )
@@ -58,9 +60,12 @@ if(USE_SUPERBUILD )
 endif(USE_SUPERBUILD)
 
 
-message("INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+message("------------------------------INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
-include_directories(${CMAKE_INSTALL_PREFIX}/include ${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(
+   ${CMAKE_INSTALL_PREFIX}/include 
+   ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 
 #include( ${CMAKE_INSTALL_PREFIX}/include)
