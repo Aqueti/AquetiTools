@@ -118,13 +118,21 @@ execute_process(
    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+
+#set the version tag
+if( "${GIT_BRANCH}" MATCHES "master" )
+   set(VERSION_TAG "dev")
+else()
+   set(VERSION_TAG "${GIT_BRANCH}")
+endif()
+
 #############################################
 # Generate the revision.h file to integrate version
 # information.
 #############################################
 configure_file( 
    "${PROJECT_SOURCE_DIR}/revision.h.in"
-   "${CMAKE_CURRENT_BINARY_DIR}/revision.h"
+   "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
 )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR})

@@ -6,9 +6,8 @@
 
 //   http://www.boost.org/LICENSE_1_0.txt)
 
-#include <revision.h>
+#include <aquetitools/revision.h>
 #include <iostream>
-#include <revision.h>
 #include "AquetiToolTest.h"
 #include <string.h>
 
