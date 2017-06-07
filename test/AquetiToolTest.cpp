@@ -6,9 +6,8 @@
 
 //   http://www.boost.org/LICENSE_1_0.txt)
 
-#include <revision.h>
+#include <aquetitools/revision.h>
 #include <iostream>
-#include <revision.h>
 #include "AquetiToolTest.h"
 #include <string.h>
 
@@ -85,7 +84,7 @@ int main(int argc, char** argv)
           if(valgrind) {
               cout << "Timer will not be tested" << endl;
           } else {
-             if( !atl::testTimer() ) {
+             if( !aqt::testTimer() ) {
                 cout << "Timer Unit Test Failed!" << endl;
                 return 0;
             }

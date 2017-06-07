@@ -15,7 +15,7 @@
 #include <Timer.h>
 #include <fstream>
 
-using namespace atl;
+using namespace aqt;
 std::ofstream qTest;
 
 /**

@@ -14,36 +14,37 @@ set(cmake_common_args
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
 )
 
-#JsonBox
-if(GIT_HTTPS)
-    set(JsonBox_REPO "https://github.com/anhero/JsonBox.git")
-else()
-    set(JsonBox_REPO "git@github.com:anhero/JsonBox.git")
-endif()
-
+##JsonBox
+#if(GIT_HTTPS)
+#    set(JsonBox_REPO "https://github.com/anhero/JsonBox.git")
+#else()
+#    set(JsonBox_REPO "git@github.com:anhero/JsonBox.git")
+#endif()
+#
 ExternalProject_Add(
   JsonBox
-  GIT_REPOSITORY ${JsonBox_REPO}
-  GIT_TAG "0.6.2"
+  SOURCE_DIR "${CMAKE_SOURCE_DIR}/JsonBox"
   CMAKE_ARGS
     -DCMAKE_C_COMPILER:PATH=${CMAKE_C_COMPILER}
     -DCMAKE_CXX_COMPILER:PATH=${CMAKE_CXX_COMPILER}
     -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
     -DLIB_SUFFIX:STRING=${LIB_SUFFIX}
+#    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/INSTALL
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}
-    -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/INSTALL
     -DCMAKE_INSTALL_RPATH:PATH=${CMAKE_BINARY_DIR}/INSTALL/lib${LIB_SUFFIX}
     -DCMAKE_INSTALL_LIBDIR:PATH=lib
   INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
 )
 
-#AquetiTools
-ExternalProject_Add(
-  AquetiTools
-  SOURCE_DIR "${CMAKE_SOURCE_DIR}"
-  CMAKE_ARGS ${cmake_common_args} 
-  BUILD_ALWAYS 1
-  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-  LOG_INSTALL 1
-  DEPENDS JsonBox
-)
+
+##AquetiTools
+#ExternalProject_Add(
+#  AquetiTools
+#  SOURCE_DIR "${CMAKE_SOURCE_DIR}"
+#  CMAKE_ARGS 
+#    ${cmake_common_args} 
+#  BUILD_ALWAYS 1
+#  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+#  LOG_INSTALL 1
+#  DEPENDS JsonBox
+#)

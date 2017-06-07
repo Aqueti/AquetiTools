@@ -15,7 +15,7 @@
 #include <thread>
 #include <string>
 
-using namespace atl;
+using namespace aqt;
 
 // Test threads
 bool find_random_from_map( TSMap<std::string, int>& map, int iter, int max, bool print )

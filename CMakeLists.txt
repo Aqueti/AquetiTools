@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
+
+
 cmake_policy(SET CMP0048 NEW)
 
 project(AquetiTools VERSION "0.0.0.1" )
@@ -7,11 +9,13 @@ project(AquetiTools VERSION "0.0.0.1" )
 ############################################################
 #set default build location if a project has not been defined. After the
 #project below, the PROJECT_SOURCE_DIR should be defined
-if(NOT DEFINED PROJECT_SOURCE_DIR )
-   set(CMAKE_INSTALL_PREFIX "$ENV{PWD}/INSTALL" CACHE PATH "Install directory")
-endif()
+#set(CMAKE_INSTALL_PREFIX "$PROJECT_DEST" CACHE PATH "Install Directory" FORCE )
 
+#if(NOT DEFINED PROJECT_SOURCE_DIR )
+#endif()
 
+#set( CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory")
+#set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory" FORCE )
 
 #General build options
 option( MAKE_STATIC_LIB "Compile the library statically (off for dynamic)" ON )
@@ -42,21 +46,26 @@ if( USE_CLANG)
    endif(NOT WIN32)
 endif(USE_CLANG)
 
-#############################################
-# Build dependencies
-#############################################
-#Superbuild comes first. If USE_SUPERBUILD is set or not defined, only this following conditional wil
-#be executed in this pass. The superbuild file will recursively call this CMakeLists.txt
-#with USE_SUPERBUILD set to off to skip the SUPERBUILD part
+##############################################
+## Build dependencies
+##############################################
+##Superbuild comes first. If USE_SUPERBUILD is set or not defined, only this following conditional wil
+##be executed in this pass. The superbuild file will recursively call this CMakeLists.txt
+##with USE_SUPERBUILD set to off to skip the SUPERBUILD part
 if(USE_SUPERBUILD )
    set(GIT_HTTPS ON CACHE BOOL "Clone git repositories with HTTPS")
    include(ExternalProject)
    include(Superbuild.cmake)
-   return()
+#   return()
 endif(USE_SUPERBUILD)
 
+
+message("------------------------------INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
-include_directories(${CMAKE_INSTALL_PREFIX}/include ${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(
+   ${CMAKE_INSTALL_PREFIX}/include 
+   ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 
 #include( ${CMAKE_INSTALL_PREFIX}/include)
@@ -109,16 +118,25 @@ execute_process(
    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+
+#set the version tag
+if( "${GIT_BRANCH}" MATCHES "master" )
+   set(VERSION_TAG "dev")
+else()
+   set(VERSION_TAG "${GIT_BRANCH}")
+endif()
+
 #############################################
 # Generate the revision.h file to integrate version
 # information.
 #############################################
 configure_file( 
    "${PROJECT_SOURCE_DIR}/revision.h.in"
-   "${CMAKE_CURRENT_BINARY_DIR}/revision.h"
+   "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
 )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR})
+
 #If we use clang, set up parameters
 #############################################
 #Specify local compiler options
@@ -207,9 +225,10 @@ list(APPEND TARGET_LIST ${LIB_LIST})
 # This sections initiates the build of the  components in th TARGET_LIST. 
 # Each component
 #############################################
+message("installing: ${TARGET_LIST}")
 install( TARGETS 
    ${TARGET_LIST}
-   ${LIB_LIST}
+#   ${LIB_LIST}
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION lib${LIB_SUFFIX}
    ARCHIVE DESTINATION lib${LIB_SUFFIX}
@@ -217,5 +236,5 @@ install( TARGETS
    PUBLIC_HEADER DESTINATION include/aqueti
 )
 
-install( FILES ${ATOOL_HEADERS} DESTINATION include/AquetiTools)
+install( FILES ${ATOOL_HEADERS} DESTINATION include/aquetitools)
 

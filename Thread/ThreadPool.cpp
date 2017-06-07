@@ -1,6 +1,6 @@
 #include "ThreadPool.h"
 
-namespace atl
+namespace aqt
 {
 
 ThreadPool::ThreadPool(int numThreads, int maxJobLength, double timeout): MultiThread(numThreads), TSQueue<std::function<void()>>()

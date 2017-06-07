@@ -10,7 +10,7 @@
 #include <mutex>
 #include <atomic>
 
-namespace atl
+namespace aqt
 {
     class shared_mutex
     {
