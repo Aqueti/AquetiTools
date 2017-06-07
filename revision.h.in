@@ -3,16 +3,9 @@
 
 namespace aqt
 {
-<<<<<<< HEAD
    const std::string VERSION = "@AquetiTools_VERSION@_@VERSION_TAG@";
    const std::string GIT_BRANCH = "@GIT_BRANCH@";
    const std::string GIT_COMMIT_HASH = "@GIT_COMMIT_HASH@";
    const std::string BUILD_DATE = "@BUILD_DATE@_@BUILD_TIME@";
-=======
-#define VERSION "@AquetiTools_VERSION@_@VERSION_TAG@"
-#define GIT_BRANCH "@GIT_BRANCH@"
-#define GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
-#define BUILD_DATE "@BUILD_DATE@_@BUILD_TIME@"
->>>>>>> e86fd128b4fb5f3a1f055550151440953e76ad91
 }
 
