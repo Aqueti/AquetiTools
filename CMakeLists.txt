@@ -206,6 +206,7 @@ add_library( aquetitools STATIC
 
 target_link_libraries( aquetitools
    libJsonBox.a
+   pthread
 )
 
 LIST( APPEND LIB_LIST aquetitools )

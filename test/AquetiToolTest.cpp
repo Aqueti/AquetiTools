@@ -51,6 +51,7 @@ int main(int argc, char** argv)
 
     bool valgrind = false;
 
+    //command line options
     int argCount = 0;
     int i;
     for(i = 1; i < argc; i++) {
@@ -65,14 +66,14 @@ int main(int argc, char** argv)
             //AquetiTool::printVersion();
             return 1;
         }
-
         else if(!strcmp(argv[i], "-t")) {
             if(testAll ) {
-                testList.empty();
+                testList.clear();
                 testAll = false;
             }
             argCount++;
             i++;
+
             testList.push_back( argv[i]);
         }
     }
@@ -81,15 +82,58 @@ int main(int argc, char** argv)
 
     for(std::vector<std::string>::iterator it = testList.begin(); it != testList.end(); ++it ) {
        if( !it->compare("Timer")) {
-          if(valgrind) {
-              cout << "Timer will not be tested" << endl;
-          } else {
-             if( !aqt::testTimer() ) {
-                cout << "Timer Unit Test Failed!" << endl;
-                return 0;
+         	if(valgrind) {
+              	cout << "Timer will not be tested" << endl;
+          	} 
+          	else {
+             	if( !aqt::testTimer() ) {
+                	cout << "Timer Unit Test Failed!" << endl;
+                	return 1;
+            	}
+         	}
+       	}
+       	else if(!it->compare("Thread")) {
+            if( !aqt::testThread() ) {
+                cout << "C11Thread Unit Test Failed!" << endl;
+                return 1;
             }
-         }
-       }
+		}
+       	else if(!it->compare("MultiThread")) {
+            if( !aqt::testMultiThread() ) {
+                cout << "MultiThread Unit Test Failed!" << endl;
+                return 1;
+            }
+		}
+		/* ask cameron
+       	else if(!it->compare("ThreadPool")) {
+            if( !testThreadPool() ) {
+                cout << "ThreadPool Unit Test Failed!" << endl;
+                return 1;
+			}
+		}
+		*/
+       	else if(!it->compare("LruCache")) {
+            int threads = 100;
+            cout << "Testing LruCache with " << threads << " threads" << endl;
+            if( !atl::test_LruCache(threads, true, false)) {
+                std::cout <<"LruCache test failed!"<<std::endl;
+                return 1;
+            }
+        } 
+        else if(!it->compare("TSMap")) {
+            if( !testTSMap( true, valgrind )) {
+                cout << "TSMap Test Failed!" << endl;
+                return 1;
+            }
+		}
+		/*
+        else if(!it->compare("TSQueue")) {
+            if( !aqt::testTSQueue(20, true, false)) {
+                std::cout <<"TSQueue test failed!"<<std::endl;
+                return 1;
+        	}
+      	}
+      	*/
     }
 
     cout << "All tests completed successfully!" << endl;
