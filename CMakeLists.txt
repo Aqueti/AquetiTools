@@ -56,9 +56,18 @@ if(USE_SUPERBUILD )
    set(GIT_HTTPS ON CACHE BOOL "Clone git repositories with HTTPS")
    include(ExternalProject)
    include(Superbuild.cmake)
-#   return()
+   return()
 endif(USE_SUPERBUILD)
 
+
+#############################################
+# Generate the revision.h file to integrate version
+# information.
+#############################################
+configure_file( 
+   "${CMAKE_SOURCE_DIR}/revision.h.in"
+   "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
+)
 
 message("------------------------------INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
@@ -126,14 +135,6 @@ else()
    set(VERSION_TAG "${GIT_BRANCH}")
 endif()
 
-#############################################
-# Generate the revision.h file to integrate version
-# information.
-#############################################
-configure_file( 
-   "${PROJECT_SOURCE_DIR}/revision.h.in"
-   "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
-)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR})
 
