@@ -6,10 +6,7 @@
 
 //   http://www.boost.org/LICENSE_1_0.txt)
 
-#include <aquetitools/revision.h>
-#include <iostream>
 #include "AquetiToolTest.h"
-#include <string.h>
 
 using namespace std;
 
@@ -120,12 +117,14 @@ int main(int argc, char** argv)
                 return 1;
             }
         } 
+        /*
         else if(!it->compare("TSMap")) {
             if( !testTSMap( true, valgrind )) {
                 cout << "TSMap Test Failed!" << endl;
                 return 1;
             }
 		}
+		*/
 		/*
         else if(!it->compare("TSQueue")) {
             if( !aqt::testTSQueue(20, true, false)) {
@@ -134,6 +133,7 @@ int main(int argc, char** argv)
         	}
       	}
       	*/
+      	
     }
 
     cout << "All tests completed successfully!" << endl;

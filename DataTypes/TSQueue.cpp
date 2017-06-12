@@ -131,7 +131,7 @@ bool pop_from_queue(TSQueue<int>& q, bool print)
     return true;
 }
 
-namespace atl
+namespace aqt
 {
 
 /**
@@ -276,9 +276,9 @@ bool testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
         case 5:
             t[i] = std::thread(pop_from_queue, std::ref(q), print);
             break;
-        case 6:
-            t[i] = std::thread(print_size, std::ref(q), print);
-            break;
+        //case 6:
+          //  t[i] = std::thread(print_size, std::ref(q), print);
+            //break;
         default:
             break;
         }

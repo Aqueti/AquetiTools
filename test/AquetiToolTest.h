@@ -8,7 +8,10 @@
 #include <LruCache.cpp>
 #include <TSMap.cpp>
 #include <TSMap.tcc>
-//#include <TSQueue.cpp>
+#include <aquetitools/revision.h>
+#include <iostream>
+#include <string.h>
+#include <TSQueue.cpp>
 
 
 /*
