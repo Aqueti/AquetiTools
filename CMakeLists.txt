@@ -160,9 +160,15 @@ set(Timer_SRC
    Timer/Timer.cpp
 )
 
-include_directories( CRC ) 
-set( CRC_SRC
-   CRC/CRC.cpp
+list( APPEND ATOOL_HEADERS 
+   I2C/CRC.hpp
+   I2C/I2CControl.hpp
+)
+include_directories( I2C ) 
+
+set( I2C_SRC
+   I2C/CRC.cpp
+   I2C/I2CControl.cpp
 )
 
 include_directories( Thread )
@@ -205,7 +211,7 @@ list(APPEND ATOOL_HEADERS
 
 add_library( aquetitools STATIC  
    ${Timer_SRC}
-   ${CRC_SRC}
+   ${I2C_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
 )
@@ -220,10 +226,19 @@ if(MAKE_TESTS)
    add_executable( AquetiToolTest 
       test/AquetiToolTest.cpp
    )
-
    target_link_libraries( AquetiToolTest ${LIB_LIST})
    LIST( APPEND TARGET_LIST AquetiToolTest )
+
+   #i2C Test application
+   add_executable( i2CControl
+      test/testI2CControl.cpp
+   )
+   target_link_libraries( i2CControl ${LIB_LIST})
+   LIST( APPEND TARGET_LIST i2CControl)
+
 endif()
+
+
 
 list(APPEND TARGET_LIST ${LIB_LIST})
 
@@ -235,7 +250,7 @@ list(APPEND TARGET_LIST ${LIB_LIST})
 message("installing: ${TARGET_LIST}")
 install( TARGETS 
    ${TARGET_LIST}
-#   ${LIB_LIST}
+   ${LIB_LIST}
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION lib${LIB_SUFFIX}
    ARCHIVE DESTINATION lib${LIB_SUFFIX}
