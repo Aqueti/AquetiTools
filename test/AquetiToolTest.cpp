@@ -14,7 +14,7 @@
 using namespace std;
 
 
-std::vector<std::string> testList{"Timer", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"};
+std::vector<std::string> testList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"};
 
 bool printHelp(void)
 {
@@ -89,6 +89,13 @@ int main(int argc, char** argv)
                 return 0;
             }
          }
+       }
+       else if( !it->compare("CRC")) {
+          std::cout << "Testing CRC"<<std::endl;
+          if( !aqt::testCRC() ) {
+                cout << "CRC Test Failed!" << endl;
+                return 0;
+          }
        }
     }
 

@@ -160,6 +160,11 @@ set(Timer_SRC
    Timer/Timer.cpp
 )
 
+include_directories( CRC ) 
+set( CRC_SRC
+   CRC/CRC.cpp
+)
+
 include_directories( Thread )
 set(Thread_SRC
    Thread/Thread.cpp
@@ -200,6 +205,7 @@ list(APPEND ATOOL_HEADERS
 
 add_library( aquetitools STATIC  
    ${Timer_SRC}
+   ${CRC_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
 )

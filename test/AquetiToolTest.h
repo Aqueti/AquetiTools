@@ -5,6 +5,7 @@
 #include <Thread.h>
 #include <MultiThread.h>
 #include "ThreadPool.h"
+#include <CRC.hpp>
 /*
 #include <BaseContainerMetadata.h>
 #include <BaseContainerArrayMetadata.h>
