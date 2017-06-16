@@ -25,7 +25,7 @@
 #include <sstream>
 #include <JsonBox.h>
 
-namespace aqt
+namespace atl
 {
 #define TIMER_STEP   1e6                             //!< Resolution of the timer
 #define STEP_SIZE (int)((double)TIMER_STEP/65535) //!< Steps per m_step unit

@@ -83,7 +83,7 @@ int main(int argc, char** argv)
               	cout << "Timer will not be tested" << endl;
           	} 
           	else {
-             	if( !aqt::testTimer() ) {
+             	if( !atl::testTimer() ) {
                 	cout << "Timer Unit Test Failed!" << endl;
                 	return 1;
             	}
@@ -101,14 +101,12 @@ int main(int argc, char** argv)
                 return 1;
             }
 		}
-		/* ask cameron
        	else if(!it->compare("ThreadPool")) {
-            if( !testThreadPool() ) {
+            if( !aqt::testThreadPool() ) {
                 cout << "ThreadPool Unit Test Failed!" << endl;
                 return 1;
 			}
 		}
-		*/
        	else if(!it->compare("LruCache")) {
             int threads = 100;
             cout << "Testing LruCache with " << threads << " threads" << endl;

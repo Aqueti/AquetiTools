@@ -43,7 +43,7 @@ using namespace std;
 ofstream timerTest;
 ofstream timerJson;
 
-namespace aqt
+namespace atl
 {
 //************************************************************
 /*!\brief Timer constructor
