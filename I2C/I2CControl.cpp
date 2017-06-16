@@ -13,7 +13,9 @@
 namespace aqt
 {
    /**
-    *
+    * \brief Destructor
+    * 
+    * On exit, the destructor closes all open files
     **/
    I2CControl::~I2CControl()
    {
@@ -25,9 +27,16 @@ namespace aqt
    
    /**
     * \brief Constructor
+    * \param [in] deviceId unique id provided by the application
     * \param [in] filename i2c device file to connect to
     * \param [in] addr i2c device address to connect to
     * \return true on success, false on failure
+    *
+    * This function establishes an i2c connection for a given device. Each I2C device
+    * is acessible via a file interface. If the file specified by filename is already
+    * open, the constructor creates a mapping between the deviceId and the file/address
+    * pair. If the file is not opened, then it is opened prior to creating the mapping.
+    * All file descriptors are closed on exit.
     **/
    bool I2CControl::connect( std::string deviceId, std::string filename, uint16_t addr )
    {
@@ -74,6 +83,11 @@ namespace aqt
     * \brief reads the specified number of bytes from the bus
     * \param [in] deviceId application provided id for the device
     * \param [in] nbytes number of bytes to read (default = 1)
+    * \return vector of received bytes. The vector will have no elements on failure
+    *
+    * This function reads data from the device specified by the deviceId. This
+    * function strips the header and crc bytes from the incoming packets and returns
+    * the packet payload.
     **/
    std::vector<uint8_t> I2CControl::readData( std::string deviceId, int nbytes )
    {
@@ -160,7 +174,9 @@ namespace aqt
     * \param [in] deviceId application provided id for the device
     * \param [in] nbytes number of bytes to read (default = 1)
     *
-    * This function automatically calculate the CRC and creates the packet
+    * This function writes the payload specified data buffer to the i2c device specified
+    * by deviceId. The i2C packet including CRC calculations are handled internally and 
+    * should not be included in the buffer to be sent.
     **/
    bool I2CControl::writeData( std::string deviceId, uint8_t * buffer, int nbytes )
    {
@@ -199,6 +215,9 @@ namespace aqt
     * \brief Function to set the file offset to the correct address
     * \param [in] deviceId component unique id
     * \param [in] address 16bit address to move to
+    *
+    * This function aligns the file pointer to the appropriate address for 
+    * reading and writing. It is called prior to any reads or writes.
     **/
    bool I2CControl::setPointer( int fd, uint16_t address )
    {
