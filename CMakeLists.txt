@@ -144,9 +144,9 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR})
 #############################################
 #Determine Compiler options
 if (NOT WIN32)
-   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-parameter -std=c++14 -fPIC -O0") #Compile faster on debug, with warnings
-   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++14 -fPIC") #Optimize compilation, no warnings
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14 -fPIC -O2") #Else slightly optimize, with warnings
+   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-parameter -std=c++11 -fPIC -O0") #Compile faster on debug, with warnings
+   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++11 -fPIC") #Optimize compilation, no warnings
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -fPIC -O2") #Else slightly optimize, with warnings
 
    add_definitions(-DUNIX)
 endif(NOT WIN32)
