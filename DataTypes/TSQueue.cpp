@@ -24,7 +24,7 @@ std::ofstream qTest;
 * @param q The queue
 * @param print False suppresses output
 */
-void print_size(TSQueue<int>& q, bool print)
+void print_queue_size(TSQueue<int>& q, bool print)
 {
     if(print) {
         qTest << "Queue length: " << q.size() << std::endl;
@@ -276,9 +276,9 @@ bool testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
         case 5:
             t[i] = std::thread(pop_from_queue, std::ref(q), print);
             break;
-        //case 6:
-          //  t[i] = std::thread(print_size, std::ref(q), print);
-            //break;
+        case 6:
+            t[i] = std::thread(print_queue_size, std::ref(q), print);
+            break;
         default:
             break;
         }
@@ -308,7 +308,11 @@ bool testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
         std::cout <<"TSQueue Test Complete"<<std::endl;
     }
 
-    std::system("rm TSQueueTest.log");
+    result = std::system("rm TSQueueTest.log");
+    if(result != 0){
+        std::cout << "Failed to remove log" << std::endl;
+        return false;
+    }
     return true;
 }
 }
