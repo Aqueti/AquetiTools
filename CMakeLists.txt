@@ -46,6 +46,15 @@ if( USE_CLANG)
    endif(NOT WIN32)
 endif(USE_CLANG)
 
+#If Doxygen is installed, make it an option. Default to OFF so it's not built
+#as a SubProject of a superbuild
+find_package( Doxygen )
+if( DOXYGEN_FOUND )
+   option( USE_DOXYGEN "Build Documentation" OFF )
+endif( DOXYGEN_FOUND )
+
+
+
 ##############################################
 ## Build dependencies
 ##############################################
@@ -72,17 +81,6 @@ include_directories(
    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-
-#include( ${CMAKE_INSTALL_PREFIX}/include)
-#If Doxygen is installed, make it an option. Default to OFF so it's not built
-#as a SubProject of a superbuild
-find_package( Doxygen)
-if( DOXYGEN_FOUND )
-   option( USE_DOXYGEN "Build Documentation" OFF )
-   if( USE_DOXYGEN)
-       set( DOXYGEN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/Documentation" CACHE PATH "Directory to install documentation")
-   endif( USE_DOXYGEN)
-endif( DOXYGEN_FOUND )
 
 #############################################################
 # From here on is the build component (SUPERBUILD is disabled)
@@ -138,6 +136,32 @@ configure_file(
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR})
 
+
+if( USE_DOXYGEN )
+   set( DOXYGEN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/Documentation)
+   file(MAKE_DIRECTORY ${DOXYGEN_INSTALL_DIR})
+   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+   add_custom_target( doc ALL
+      COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      COMMENT "Generating API documentation with Doxygen" 
+   )
+endif( USE_DOXYGEN )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #If we use clang, set up parameters
 #############################################
 #Specify local compiler options
@@ -160,9 +184,15 @@ set(Timer_SRC
    Timer/Timer.cpp
 )
 
-include_directories( CRC ) 
-set( CRC_SRC
-   CRC/CRC.cpp
+list( APPEND ATOOL_HEADERS 
+   I2C/CRC.hpp
+   I2C/I2CControl.hpp
+)
+include_directories( I2C ) 
+
+set( I2C_SRC
+   I2C/CRC.cpp
+   I2C/I2CControl.cpp
 )
 
 include_directories( Thread )
@@ -205,7 +235,7 @@ list(APPEND ATOOL_HEADERS
 
 add_library( aquetitools STATIC  
    ${Timer_SRC}
-   ${CRC_SRC}
+   ${I2C_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
 )
@@ -214,18 +244,27 @@ target_link_libraries( aquetitools
    libJsonBox.a
 )
 
-LIST( APPEND LIB_LIST aquetitools )
-
 if(MAKE_TESTS)
    add_executable( AquetiToolTest 
       test/AquetiToolTest.cpp
    )
-
-   target_link_libraries( AquetiToolTest ${LIB_LIST})
+   target_link_libraries( AquetiToolTest 
+      aquetitools
+   )
    LIST( APPEND TARGET_LIST AquetiToolTest )
+
+   #i2C Test application
+   add_executable( i2CControl
+      test/testI2CControl.cpp
+   )
+   target_link_libraries( i2CControl 
+      aquetitools
+   )
+   LIST( APPEND TARGET_LIST i2CControl)
+
 endif()
 
-list(APPEND TARGET_LIST ${LIB_LIST})
+
 
 #############################################
 #install library files
@@ -235,7 +274,6 @@ list(APPEND TARGET_LIST ${LIB_LIST})
 message("installing: ${TARGET_LIST}")
 install( TARGETS 
    ${TARGET_LIST}
-#   ${LIB_LIST}
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION lib${LIB_SUFFIX}
    ARCHIVE DESTINATION lib${LIB_SUFFIX}
