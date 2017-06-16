@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <CRC.hpp>
 #include "I2CControl.hpp"
+#include <sys/ioctl.h>
 
 #include <string.h>
 
