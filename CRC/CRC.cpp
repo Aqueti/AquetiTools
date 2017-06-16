@@ -5,7 +5,7 @@
 #include <iostream>
 #include "CRC.hpp"
 
-namespace aqt
+namespace atl
 {
 
    CRC16::CRC16( uint16_t initial, uint16_t poly ) 

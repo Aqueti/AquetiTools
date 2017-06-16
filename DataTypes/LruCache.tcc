@@ -3,7 +3,7 @@
 #include "TSQueue.tcc"
 #include <map>
 
-namespace aqt
+namespace atl
 {
 
 /**

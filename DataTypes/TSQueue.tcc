@@ -11,7 +11,7 @@
 
 #define DEFAULT_MAX_SIZE SIZE_MAX
 
-namespace aqt
+namespace atl
 {
 
 /**

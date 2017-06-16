@@ -82,28 +82,32 @@ int main(int argc, char** argv)
          	if(valgrind) {
               	cout << "Timer will not be tested" << endl;
           	} 
-          	else {
+          else {
+              std::cout << "Testing Timer" <<std::endl;
              	if( !atl::testTimer() ) {
-                	cout << "Timer Unit Test Failed!" << endl;
+                	cout << "Timer test failed!" << endl;
                 	return 1;
             	}
          	}
        	}
        	else if(!it->compare("Thread")) {
-            if( !aqt::testThread() ) {
-                cout << "C11Thread Unit Test Failed!" << endl;
+            std::cout << "Testing Thread" <<std::endl;
+            if( !atl::testThread() ) {
+                cout << "C11Thread test failed!" << endl;
                 return 1;
             }
 		}
        	else if(!it->compare("MultiThread")) {
-            if( !aqt::testMultiThread() ) {
-                cout << "MultiThread Unit Test Failed!" << endl;
+            std::cout << "Testing MultiThread" <<std::endl;
+            if( !atl::testMultiThread() ) {
+                cout << "MultiThread test failed!" << endl;
                 return 1;
             }
 		}
        	else if(!it->compare("ThreadPool")) {
-            if( !aqt::testThreadPool() ) {
-                cout << "ThreadPool Unit Test Failed!" << endl;
+            std::cout << "Testing ThreadPool" <<std::endl;
+            if( !atl::testThreadPool() ) {
+                cout << "ThreadPool test failed!" << endl;
                 return 1;
 			}
 		}
@@ -117,29 +121,30 @@ int main(int argc, char** argv)
         } 
         /*
         else if(!it->compare("TSMap")) {
+            std::cout << "Testing TSMap" <<std::endl;
             if( !testTSMap( true, valgrind )) {
-                cout << "TSMap Test Failed!" << endl;
+                cout << "TSMap test failed!" << endl;
                 return 1;
             }
 		}
 		*/
 		/*
         else if(!it->compare("TSQueue")) {
-            if( !aqt::testTSQueue(20, true, false)) {
+            std::cout << "Testing TSQueue" <<std::endl;
+            if( !atl::testTSQueue(20, true, false)) {
                 std::cout <<"TSQueue test failed!"<<std::endl;
                 return 1;
         	}
       	}
       	*/
-      	/*
+      	
        	else if( !it->compare("CRC")) {
-        	std::cout << "Testing CRC"<<std::endl;
-        	if( !aqt::testCRC() ) {
-            	cout << "CRC Test Failed!" << endl;
+          	std::cout << "Testing CRC" <<std::endl;
+          	if( !atl::testCRC() ) {
+            	cout << "CRC test failed!" << endl;
             	return 0;
           	}
        	}
-       */
     }
 
     cout << "All tests completed successfully!" << endl;

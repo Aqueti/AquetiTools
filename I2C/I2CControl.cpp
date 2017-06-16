@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-namespace aqt
+namespace atl
 {
    /**
     * \brief Destructor

@@ -2,7 +2,7 @@
  * \file CRC.hpp
  **/
 
-namespace aqt
+namespace atl
 {
    /**
     * \brief class for calculating 16 bit CRC codes

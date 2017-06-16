@@ -1,7 +1,7 @@
 #include <iostream>
 #pragma once
 
-namespace aqt
+namespace atl
 {
    const std::string VERSION = "@AquetiTools_VERSION@_@VERSION_TAG@";
    const std::string GIT_BRANCH = "@GIT_BRANCH@";

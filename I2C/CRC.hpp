@@ -6,7 +6,7 @@
 
 #include <map>
 
-namespace aqt
+namespace atl
 {
    /**
     * \brief Union to make crc easily accessible as uint16 or as bytes

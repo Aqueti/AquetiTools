@@ -3,7 +3,7 @@
 #include "Thread.h"
 #include <vector>
 
-namespace aqt
+namespace atl
 {
 
 class MultiThread : public Thread

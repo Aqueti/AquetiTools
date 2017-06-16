@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <CRC.hpp>
 
-namespace aqt
+namespace atl
 {
 
    class I2CControl

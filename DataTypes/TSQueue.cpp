@@ -15,7 +15,7 @@
 #include <Timer.h>
 #include <fstream>
 
-using namespace aqt;
+using namespace atl;
 std::ofstream qTest;
 
 /**
@@ -131,7 +131,7 @@ bool pop_from_queue(TSQueue<int>& q, bool print)
     return true;
 }
 
-namespace aqt
+namespace atl
 {
 
 /**

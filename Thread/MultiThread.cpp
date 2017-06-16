@@ -12,7 +12,7 @@
 
 std::ofstream multiThreadTest;
 
-namespace aqt
+namespace atl
 {
 
 /**

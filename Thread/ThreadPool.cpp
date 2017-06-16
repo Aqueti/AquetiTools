@@ -1,6 +1,6 @@
 #include "ThreadPool.h"
 
-namespace aqt
+namespace atl
 {
 
 	ThreadPool::ThreadPool(int numThreads, int maxJobLength, double timeout): MultiThread(numThreads), TSQueue<std::function<void()>>()
@@ -30,14 +30,14 @@ namespace aqt
 	bool doThreadPoolThing(int threads)
 	{
 	    std::cout << threads << " threads: ";
-	    aqt::ThreadPool tp(threads, 1000);
+	    atl::ThreadPool tp(threads, 1000);
 	    std::atomic_int i(0);
 	    auto fun = [&](){
 	            i++;
-	            aqt::sleep(0.001);
+	            atl::sleep(0.001);
 	    };
 
-	    aqt::Timer t;
+	    atl::Timer t;
 	    tp.Start();
 
 	    for(int j = 0; j < 1000; j++) {

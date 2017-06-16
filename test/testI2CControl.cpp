@@ -7,7 +7,7 @@
 void printHelp()
 {
    std::cout << "I2C Controller"<<std::endl;
- //  std::cout << "AQT VERSION: "<<aqt::VERSION<<", Commit: "<<aqt::GIT_COMMIT_HASH<<", Date: "<<aqt::BUILD_DATE<<std::endl;
+ //  std::cout << "atl VERSION: "<<atl::VERSION<<", Commit: "<<atl::GIT_COMMIT_HASH<<", Date: "<<atl::BUILD_DATE<<std::endl;
    std::cout << "Options:"<<std::endl;
    std::cout << "\t-a device address"<<std::endl;
    std::cout << "\t-c command to send (start with 0x to make hex)"<<std::endl;
@@ -110,7 +110,7 @@ int main( int argc, char * argv[])
    std::cout << "Filename: "<<filename<<std::endl;
    printf("Device Address: 0x%hx\n", address );
    //Connect to the i2c device
-   aqt::I2CControl i2c;
+   atl::I2CControl i2c;
 
    bool rc= i2c.connect( device1, filename, address );
 

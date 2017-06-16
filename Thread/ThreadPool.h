@@ -12,7 +12,7 @@
 
 #pragma once
 
-namespace aqt
+namespace atl
 {
 
     class ThreadPool: public MultiThread, protected TSQueue<std::function<void()>>
