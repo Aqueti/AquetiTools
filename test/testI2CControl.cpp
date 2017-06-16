@@ -63,7 +63,7 @@ int main( int argc, char * argv[])
                 std::cout << "-f must provide a filename " << std::endl;
                 exit(1);
             }
-            filename.assign( argv[i]);
+            filename = std::string( argv[i]);
         } else if( !strcmp(argv[i], "-c" )) {
             argCount++;
             i++;
@@ -107,6 +107,8 @@ int main( int argc, char * argv[])
         }
    }
 
+   std::cout << "Filename: "<<filename<<std::endl;
+   printf("Device Address: 0x%hx\n", address );
    //Connect to the i2c device
    aqt::I2CControl i2c;
 

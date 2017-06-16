@@ -187,7 +187,7 @@ namespace aqt
       }
       
       int fd = m_mCamToDeviceMap[deviceId].first;
-      if( write(fd, message, messageSize) != messageSize ) { 
+      if( write(fd, message, messageSize) != (int)messageSize ) { 
          std::cout << "Failed to write "<<messageSize<<" bytes to device "<<deviceId<<std::endl;
          return false;
       }
