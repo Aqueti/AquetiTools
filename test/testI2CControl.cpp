@@ -29,6 +29,7 @@ int main( int argc, char * argv[])
    buffer[2] = 1;
    buffer[3] = 6;
    buffer[4] = 0;
+//   buffer[4] = 0x10;
 
    std::string device1("device");
    std::string filename=("/dev/i2c-7");
@@ -78,14 +79,24 @@ int main( int argc, char * argv[])
             if((arglen < 2 )||( argv[i][1] != 'x')) {
                for( size_t j = 0; j < arglen; j++ ) {
                   buffer[j] = argv[i][j] - '0';
+                  printf("Int: %c => %02x\n", argv[i][j], argv[i][j]-'0');
                }
                byteCount = arglen;
             }
             //We are hex
             else {
                for( size_t j = 2; j < arglen; j++ ) {
-                  char c = argv[i][j];
-                  buffer[j] = aqt::charToHexMap[c];
+                  if(( argv[i][j] >= '0' )&&(argv[i][j] <= '9'))
+                     buffer[j-2] = argv[i][j] - '0';
+                  else if(( argv[i][j] >= 'A' )&&(argv[i][j] <= 'F')) 
+                     buffer[j-2] = argv[i][j] - 'A'+ 10;
+                  else if(( argv[i][j] >= 'a' )&&(argv[i][j] <= 'f')) 
+                     buffer[j-2] = argv[i][j] - 'a'+ 10;
+                  else {
+                     std::cout << "Invalid command: "<<argv[i][j] << std::endl;
+                     printHelp();
+                     exit(1);
+                  }
                }
                byteCount = arglen-2;
             }
@@ -96,9 +107,7 @@ int main( int argc, char * argv[])
         }
    }
 
-
-
-
+   //Connect to the i2c device
    aqt::I2CControl i2c;
 
    bool rc= i2c.connect( device1, filename, address );

@@ -220,27 +220,27 @@ target_link_libraries( aquetitools
    libJsonBox.a
 )
 
-LIST( APPEND LIB_LIST aquetitools )
-
 if(MAKE_TESTS)
    add_executable( AquetiToolTest 
       test/AquetiToolTest.cpp
    )
-   target_link_libraries( AquetiToolTest ${LIB_LIST})
+   target_link_libraries( AquetiToolTest 
+      aquetitools
+   )
    LIST( APPEND TARGET_LIST AquetiToolTest )
 
    #i2C Test application
    add_executable( i2CControl
       test/testI2CControl.cpp
    )
-   target_link_libraries( i2CControl ${LIB_LIST})
+   target_link_libraries( i2CControl 
+      aquetitools
+   )
    LIST( APPEND TARGET_LIST i2CControl)
 
 endif()
 
 
-
-list(APPEND TARGET_LIST ${LIB_LIST})
 
 #############################################
 #install library files
@@ -250,7 +250,6 @@ list(APPEND TARGET_LIST ${LIB_LIST})
 message("installing: ${TARGET_LIST}")
 install( TARGETS 
    ${TARGET_LIST}
-   ${LIB_LIST}
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION lib${LIB_SUFFIX}
    ARCHIVE DESTINATION lib${LIB_SUFFIX}
