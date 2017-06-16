@@ -64,10 +64,6 @@ endif(USE_SUPERBUILD)
 # Generate the revision.h file to integrate version
 # information.
 #############################################
-configure_file( 
-   "${CMAKE_SOURCE_DIR}/revision.h.in"
-   "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
-)
 
 message("------------------------------INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 link_directories(${CMAKE_INSTALL_PREFIX}/lib)
@@ -135,6 +131,10 @@ else()
    set(VERSION_TAG "${GIT_BRANCH}")
 endif()
 
+configure_file( 
+   "${CMAKE_SOURCE_DIR}/revision.h.in"
+   "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
+)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -158,6 +158,17 @@ list( APPEND ATOOL_HEADERS
 include_directories( Timer )
 set(Timer_SRC
    Timer/Timer.cpp
+)
+
+list( APPEND ATOOL_HEADERS 
+   I2C/CRC.hpp
+   I2C/I2CControl.hpp
+)
+include_directories( I2C ) 
+
+set( I2C_SRC
+   I2C/CRC.cpp
+   I2C/I2CControl.cpp
 )
 
 include_directories( Thread )
@@ -200,6 +211,7 @@ list(APPEND ATOOL_HEADERS
 
 add_library( aquetitools STATIC  
    ${Timer_SRC}
+   ${I2C_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
 )
@@ -209,18 +221,27 @@ target_link_libraries( aquetitools
    pthread
 )
 
-LIST( APPEND LIB_LIST aquetitools )
-
 if(MAKE_TESTS)
    add_executable( AquetiToolTest 
       test/AquetiToolTest.cpp
    )
-
-   target_link_libraries( AquetiToolTest ${LIB_LIST})
+   target_link_libraries( AquetiToolTest 
+      aquetitools
+   )
    LIST( APPEND TARGET_LIST AquetiToolTest )
+
+   #i2C Test application
+   add_executable( i2CControl
+      test/testI2CControl.cpp
+   )
+   target_link_libraries( i2CControl 
+      aquetitools
+   )
+   LIST( APPEND TARGET_LIST i2CControl)
+
 endif()
 
-list(APPEND TARGET_LIST ${LIB_LIST})
+
 
 #############################################
 #install library files
@@ -230,7 +251,6 @@ list(APPEND TARGET_LIST ${LIB_LIST})
 message("installing: ${TARGET_LIST}")
 install( TARGETS 
    ${TARGET_LIST}
-#   ${LIB_LIST}
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION lib${LIB_SUFFIX}
    ARCHIVE DESTINATION lib${LIB_SUFFIX}

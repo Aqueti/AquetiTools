@@ -14,6 +14,8 @@
 #include <TSQueue.cpp>
 
 
+#include "ThreadPool.h"
+#include <CRC.hpp>
 /*
 #include <BaseContainerMetadata.h>
 #include <BaseContainerArrayMetadata.h>
