@@ -46,6 +46,15 @@ if( USE_CLANG)
    endif(NOT WIN32)
 endif(USE_CLANG)
 
+#If Doxygen is installed, make it an option. Default to OFF so it's not built
+#as a SubProject of a superbuild
+find_package( Doxygen )
+if( DOXYGEN_FOUND )
+   option( USE_DOXYGEN "Build Documentation" OFF )
+endif( DOXYGEN_FOUND )
+
+
+
 ##############################################
 ## Build dependencies
 ##############################################
@@ -72,17 +81,6 @@ include_directories(
    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-
-#include( ${CMAKE_INSTALL_PREFIX}/include)
-#If Doxygen is installed, make it an option. Default to OFF so it's not built
-#as a SubProject of a superbuild
-find_package( Doxygen)
-if( DOXYGEN_FOUND )
-   option( USE_DOXYGEN "Build Documentation" OFF )
-   if( USE_DOXYGEN)
-       set( DOXYGEN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/Documentation" CACHE PATH "Directory to install documentation")
-   endif( USE_DOXYGEN)
-endif( DOXYGEN_FOUND )
 
 #############################################################
 # From here on is the build component (SUPERBUILD is disabled)
@@ -137,6 +135,32 @@ configure_file(
 )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR})
+
+
+if( USE_DOXYGEN )
+   set( DOXYGEN_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/Documentation)
+   file(MAKE_DIRECTORY ${DOXYGEN_INSTALL_DIR})
+   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+   add_custom_target( doc ALL
+      COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+      COMMENT "Generating API documentation with Doxygen" 
+   )
+endif( USE_DOXYGEN )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #If we use clang, set up parameters
 #############################################
