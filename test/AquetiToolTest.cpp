@@ -18,6 +18,8 @@ JsonBox::Value testAquetiTools(bool testSubmodules, int i)
     JsonBox::Value jsonReturn;
     JsonBox::Value jsonUnits;
     JsonBox::Value jsonValue;
+    JsonBox::Value subJson1;
+    JsonBox::Value subJson2;
 
     //Get type
     jsonReturn["type"] = "unit_tests";
@@ -27,6 +29,24 @@ JsonBox::Value testAquetiTools(bool testSubmodules, int i)
 
     //Get date/time
     jsonReturn["date"] = atl::getDateAsString();
+
+    //Get /etc/quid
+    std::string guid;
+    std::ifstream nameFileout;
+    nameFileout.open("/etc/guid");
+    if (nameFileout.good()) {
+        getline(nameFileout, guid);
+    }
+    nameFileout.close();
+    jsonReturn["hardwareId"] = guid;
+
+    //Get commit hash ID and version
+    jsonReturn["commit"] = atl::GIT_COMMIT_HASH;
+    jsonReturn["version"] = atl::VERSION;
+    std::string softwareId1 = atl::VERSION;
+    std::string softwareId2 = atl::GIT_COMMIT_HASH;
+    std::string softwareId = softwareId1 + ":" + softwareId2;
+    jsonReturn["softwareId"] = softwareId;
 
     //Get test results from all classes (units)
     jsonValue = atl::testTimer(true, false);
@@ -49,6 +69,12 @@ JsonBox::Value testAquetiTools(bool testSubmodules, int i)
         default:
             break;
     } */
+
+    //Get submodules
+    subJson2["version"] = atl::VERSION;
+    subJson2["commit"] = atl::GIT_COMMIT_HASH;
+    subJson1["AquetiTools"] = subJson2;
+    jsonReturn["submodules"] = subJson1;
 
     return jsonReturn;
 }

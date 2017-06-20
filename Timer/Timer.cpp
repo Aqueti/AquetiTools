@@ -606,7 +606,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     timer.setFPS(STARTING_FPS);
 
     //Check ObjectId size
-    objectIDSizeTest(printFlag, assertFlag);
+    objectIDSizeTest(printFlag, assertFlag, resultString);
 
     //Test sleep time
     timer.start();
@@ -633,7 +633,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
         timerTest << "Current timestamp: " << tstamp << endl;
     }
 
-    resultString["current timestamp"] = (double) tstamp;
+    resultString["timestamp"] = (double) tstamp;
 
     //Get elapsed timestamp
     timer.start();
@@ -763,7 +763,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     return resultString;
 }
 
-void objectIDSizeTest(bool printFlag, bool assertFlag) 
+void objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString) 
 {
     if (sizeof(uint64_t) != sizeof(ObjectId)) {
         if (printFlag) {
@@ -777,6 +777,7 @@ void objectIDSizeTest(bool printFlag, bool assertFlag)
             assert(false);
         };
 
+        resultString["pass"] = "false";
         return;
     }
 }
@@ -809,10 +810,12 @@ void sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElaps
     	};
 
     	resultString[currTest]["status"] = "fail";
+    	resultString["pass"] = "false";
     	return;
     }
 
-    resultString[currTest]["status"] = "pass";
+    resultString[currTest]["sleep test status"] = "pass";
+    resultString["pass"] = "true";
 }
 
 }
