@@ -7,11 +7,51 @@
 //   http://www.boost.org/LICENSE_1_0.txt)
 
 #include "AquetiToolTest.h"
+#include "Timer.h"
 
 using namespace std;
 
-
 std::vector<std::string> testList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"};
+
+JsonBox::Value testAquetiTools(bool testSubmodules, int i)
+{
+    JsonBox::Value jsonReturn;
+    JsonBox::Value jsonUnits;
+    JsonBox::Value jsonValue;
+
+    //Get type
+    jsonReturn["type"] = "unit_tests";
+
+    //Get repository
+    jsonReturn["component"] = "AquetiTools";
+
+    //Get date/time
+    jsonReturn["date"] = atl::getDateAsString();
+
+    //Get test results from all classes (units)
+    jsonValue = atl::testTimer(true, false);
+    jsonUnits["Timer"] = jsonValue;
+    jsonReturn["units"] = jsonUnits;
+
+    /*switch(i) {
+        case 1: 
+            jsonValue = atl::testTimer(true, false);
+            jsonUnits["Timer"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            break;
+        case 2: 
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        default:
+            break;
+    } */
+
+    return jsonReturn;
+}
 
 bool printHelp(void)
 {
@@ -37,37 +77,79 @@ bool printHelp(void)
     return 1;
 }
 
+void runTests(bool valgrind) {
+    JsonBox::Value result;
+    std::vector<std::string>::iterator it;
+
+    for (it = testList.begin(); it != testList.end(); ++it) {
+        if (!it->compare("Timer")) {
+            if (valgrind) {
+                cout << "Timer will not be tested!" << endl;
+            }
+            std::cout << "Testing Timer" << std::endl;
+            result = testAquetiTools(true, 1);
+            std::cout << result << std::endl;
+        } /*else if (!it->compare("CRC")) {
+            std::cout << "Testing CRC" << std::endl;
+            result = testAquetiTools(true, 2);
+            std::cout << result << std::endl;
+        } else if (!it->compare("Thread")) {
+            std::cout << "Testing Thread" << std::endl;
+            result = testAquetiTools(true, 3);
+            std::cout << result << std::endl;
+        } else if (!it->compare("MultiThread")) {
+            std::cout << "Testing MultiThread" << std::endl;
+            result = testAquetiTools(true, 4);
+            std::cout << result << std::endl;
+        } else if (!it->compare("ThreadPool")) {
+            std::cout << "Testing ThreadPool" << std::endl;
+            result = testAquetiTools(true, 5);
+            std::cout << result << std::endl;
+        } else if (!it->compare("LruCache")) {
+            std::cout << "Testing LruCache" << std::endl;
+            result = testAquetiTools(true, 6);
+            std::cout << result << std::endl;
+        } else if (!it->compare("TSMap")) {
+            std::cout << "Testing TSMap" << std::endl;
+            result = testAquetiTools(true, 7);
+            std::cout << result << std::endl;
+        } else if (!it->compare("TSQueue")) {
+            std::cout << "Testing TSQueue" << std::endl;
+            result = testAquetiTools(true, 8);
+            std::cout << result << std::endl;
+        } */
+    }
+}
+
 /**
  * Main test function
  **/
-int main(int argc, char** argv)
+int main(int argc, char *argv[])
 {
     bool testAll = true;
-
-    std::cout << "Testing ATL"<<std::endl;
-
+    std::cout << "Testing ATL" << std::endl;
     bool valgrind = false;
 
     //command line options
     int argCount = 0;
     int i;
-    for(i = 1; i < argc; i++) {
 
-        if(!strcmp(argv[i], "-v")) {
+    for(i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "-v")) {
             argCount++;
             valgrind = true;
-        } else if(!strcmp(argv[i], "-h")) {
+        } else if (!strcmp(argv[i], "-h")) {
             printHelp();
             return 1;
-        } else if (!strcmp( argv[i], "--version")) {
+        } else if (!strcmp(argv[i], "--version")) {
             //AquetiTool::printVersion();
             return 1;
-        }
-        else if(!strcmp(argv[i], "-t")) {
-            if(testAll ) {
+        } else if(!strcmp(argv[i], "-t")) {
+            if (testAll) {
                 testList.clear();
                 testAll = false;
             }
+
             argCount++;
             i++;
 
@@ -75,6 +157,12 @@ int main(int argc, char** argv)
         }
     }
 
+    runTests(valgrind);
+
+    //Testing
+
+
+    /*
     //AquetiTool::printVersion();
 
     for(std::vector<std::string>::iterator it = testList.begin(); it != testList.end(); ++it ) {
@@ -119,7 +207,7 @@ int main(int argc, char** argv)
                 return 1;
             }
         } 
-        /*
+        
         else if(!it->compare("TSMap")) {
             std::cout << "Testing TSMap" <<std::endl;
             if( !testTSMap( true, valgrind )) {
@@ -127,7 +215,7 @@ int main(int argc, char** argv)
                 return 1;
             }
         }
-        */
+        
         else if(!it->compare("TSQueue")) {
             std::cout << "Testing TSQueue" <<std::endl;
             if( !atl::testTSQueue(20, true, false)) {
@@ -142,7 +230,7 @@ int main(int argc, char** argv)
               	return 0;
           	}
         }
-    }
+    }*/
 
     cout << "All tests completed successfully!" << endl;
     return 0;

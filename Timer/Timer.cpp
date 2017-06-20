@@ -43,6 +43,8 @@ using namespace std;
 ofstream timerTest;
 ofstream timerJson;
 
+const double STARTING_FPS = 30.0;
+
 namespace atl
 {
 //************************************************************
@@ -69,7 +71,7 @@ Timer::~Timer()
 /*!\brief Sets the number of fps in timer
  */
 //************************************************************
-void Timer::setFPS( double rate )
+void Timer::setFPS(double rate)
 {
     m_fps = rate;
 }
@@ -78,7 +80,7 @@ void Timer::setFPS( double rate )
 /*!\brief returns the number of fps in timer
  */
 //************************************************************
-double Timer::getFPS( )
+double Timer::getFPS()
 {
     return m_fps;
 }
@@ -92,14 +94,15 @@ double Timer::getFPS( )
  * frame rate and other information
  **/
 //************************************************************
-SMPTETime Timer::getTimeCode( )
+SMPTETime Timer::getTimeCode()
 {
     double now = getTime() + m_timeCodeOffset;
 
-    if( m_fps == 0 ) {
+    if(m_fps == 0) {
         timerTest <<"Timer::getTimeCode unknown fps."<<std::endl;
     }
-    return( convertDoubleToSMPTE( now, m_fps ));
+
+    return(convertDoubleToSMPTE(now, m_fps));
 }
 
 
@@ -107,7 +110,7 @@ SMPTETime Timer::getTimeCode( )
 /*!\brief returns the timeCode offset to match system time with global time
  */
 //************************************************************
-void Timer::updateTimeCodeOffset( int64_t refTime )
+void Timer::updateTimeCodeOffset(int64_t refTime)
 {
     /*
     //Get current time
@@ -139,9 +142,7 @@ int64_t Timer::getTimeCodeOffset()
 //************************************************************/
 void Timer::start()
 {
-
     m_startTime = getTime();
-
     return;
 }
 
@@ -161,20 +162,20 @@ double Timer::elapsed()
 /*!\brief converts a timeval struct to double
  */
 //************************************************************/
-double convertTimeValToDouble( timeval tv )
+double convertTimeValToDouble(timeval tv)
 {
-    return (double)tv.tv_sec + (double)((int)tv.tv_usec)/double(TIMER_STEP);
+    return (double)tv.tv_sec + (double)((int)tv.tv_usec) / double(TIMER_STEP);
 }
 
 //***********************************************************
 /*!\brief converts a double to a timeval struct
  */
 //************************************************************/
-timeval convertDoubleToTimeVal( double dTime )
+timeval convertDoubleToTimeVal(double dTime)
 {
     timeval tv;
     tv.tv_sec = dTime;
-    tv.tv_usec = (dTime-tv.tv_sec)*1e6;
+    tv.tv_usec = (dTime-tv.tv_sec) * 1e6;
 
     return tv;
 }
@@ -188,10 +189,10 @@ timeval convertDoubleToTimeVal( double dTime )
  *
  **/
 //***********************************************************
-SMPTETime convertDoubleToSMPTE( double dTime , double fps )
+SMPTETime convertDoubleToSMPTE(double dTime, double fps)
 {
-    timeval tv = convertDoubleToTimeVal( dTime );
-    SMPTETime smpte = convertTimeValToSMPTE( tv, fps );
+    timeval tv = convertDoubleToTimeVal(dTime);
+    SMPTETime smpte = convertTimeValToSMPTE(tv, fps);
 
     return smpte;
 }
@@ -200,7 +201,7 @@ SMPTETime convertDoubleToSMPTE( double dTime , double fps )
 /*!\brief converts a SMPTE to Timecode (hhmmssff)
  */
 //************************************************************/
-int64_t convertSMPTEToTimeCode( SMPTETime smpte )
+int64_t convertSMPTEToTimeCode(SMPTETime smpte)
 {
     return smpte.hour*1e6 + smpte.minute*1e4+smpte.second*1e2+smpte.frame;
 }
@@ -209,11 +210,11 @@ int64_t convertSMPTEToTimeCode( SMPTETime smpte )
 /*!\brief converts a timeval structure to Timecode (hhmmssff)
  */
 //************************************************************/
-int64_t convertTimeValToTimeCode( timeval tv, double fps )
+int64_t convertTimeValToTimeCode(timeval tv, double fps)
 {
-    SMPTETime smpte = convertTimeValToSMPTE( tv, fps );
+    SMPTETime smpte = convertTimeValToSMPTE(tv, fps);
 
-    return convertSMPTEToTimeCode( smpte );
+    return convertSMPTEToTimeCode(smpte);
 }
 
 //***********************************************************
@@ -225,12 +226,12 @@ int64_t convertTimeValToTimeCode( timeval tv, double fps )
  *
  **/
 //***********************************************************
-SMPTETime convertTimeValToSMPTE( timeval tv, double fps )
+SMPTETime convertTimeValToSMPTE(timeval tv, double fps)
 {
     SMPTETime smpte;
-    memset( &smpte, 0, sizeof( SMPTETime ));
+    memset(&smpte, 0, sizeof(SMPTETime));
     //Convert timestamp to current time
-    struct tm* tmptr = localtime( (time_t*)&tv.tv_sec );
+    struct tm* tmptr = localtime((time_t*)&tv.tv_sec);
 
     if (tmptr != nullptr) {
       smpte.hour = tmptr->tm_hour;
@@ -247,13 +248,13 @@ SMPTETime convertTimeValToSMPTE( timeval tv, double fps )
  * \brief Converts the given timeval and int into a a string
  **/
 //***********************************************************
-std::string convertTimeValToString( timeval tv, int fps )
+std::string convertTimeValToString(timeval tv, double fps)
 {
     char buffer[256];
 
-    SMPTETime smpte = convertTimeValToSMPTE( tv, fps );
+    SMPTETime smpte = convertTimeValToSMPTE(tv, fps);
 
-    sprintf( buffer, "%02d:%02d:%02d:%02d\n"
+    sprintf( buffer, "%02d:%02d:%02d:%02d"
              , smpte.hour
              , smpte.minute
              , smpte.second
@@ -261,7 +262,7 @@ std::string convertTimeValToString( timeval tv, int fps )
            );
 
     std::string result;
-    result.assign( buffer );
+    result.assign(buffer);
 
     return result;
 }
@@ -271,11 +272,10 @@ std::string convertTimeValToString( timeval tv, int fps )
  * \brief Converts the given double into a string with fps
  **/
 //***********************************************************
-std::string convertDoubleToString( double dTime,  int fps )
+std::string convertDoubleToString(double dTime,  double fps)
 {
-    timeval tv = convertDoubleToTimeVal( dTime );
-
-    return convertTimeValToString( tv, fps ) ;
+    timeval tv = convertDoubleToTimeVal(dTime);
+    return convertTimeValToString(tv, fps);
 }
 
 
@@ -284,9 +284,10 @@ std::string convertDoubleToString( double dTime,  int fps )
  * \brief Converts a double to a TimeCode
  **/
 //***********************************************************
-int64_t convertDoubleToTimeCode( double dTime,  int fps )
+int64_t convertDoubleToTimeCode(double dTime, int fps)
 {
-    return convertTimeValToTimeCode( convertDoubleToTimeVal( dTime ), fps) ;
+	timeval tv = convertDoubleToTimeVal(dTime);
+    return convertTimeValToTimeCode(tv, fps);
 }
 
 //***********************************************************
@@ -296,7 +297,7 @@ int64_t convertDoubleToTimeCode( double dTime,  int fps )
 //***********************************************************
 double getTime()
 {
-    return (double)getUsecTime()/(double)1e6;
+    return (double)getUsecTime() / (double)1e6;
 }
 
 /**
@@ -319,6 +320,7 @@ uint64_t getTimestamp()
 {
     ObjectId id;
     id.m_value = 0;
+
     auto now = std::chrono::system_clock::now();
     auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
     auto now_seconds = std::chrono::time_point_cast<std::chrono::seconds>(now);
@@ -339,7 +341,7 @@ uint64_t getTimestamp()
  * frame rate and other information
  */
 //************************************************************/
-uint64_t convertDoubleToTimeStamp( double dTime )
+uint64_t convertDoubleToTimeStamp(double dTime)
 {
     return (uint64_t)(dTime * 1e8);
 }
@@ -354,8 +356,7 @@ uint64_t convertDoubleToTimeStamp( double dTime )
  *
  * borrowed copiously from vrpn (thanks Russell )
  **/
-timeval TimevalSum(const timeval& tv1, const timeval& tv2)
-{
+/*{
     timeval tvSum = tv1;
 
     tvSum.tv_sec += tv2.tv_sec;
@@ -391,29 +392,29 @@ timeval TimevalSum(const timeval& tv1, const timeval& tv2)
     }
 
     return tvSum;
-}
+}*/
 
 /**
  *!\brief perform normalization of a timeval
  * XXX this still needs to be checked for errors if the timeval
  * or the rate is negative
  **/
-static inline void timevalNormalizeInPlace(timeval& in_tv)
+/*static inline void timevalNormalizeInPlace(timeval& in_tv)
 {
     const long div_77777 = (in_tv.tv_usec / 1000000);
     in_tv.tv_sec += div_77777;
     in_tv.tv_usec -= (div_77777 * 1000000);
-}
+}*/
 
 /**
  *!\brief perform normalization of a timeval
  **/
-timeval TimevalNormalize(const timeval& in_tv)
+/*timeval TimevalNormalize(const timeval& in_tv)
 {
     timeval out_tv = in_tv;
     timevalNormalizeInPlace(out_tv);
     return out_tv;
-}
+}*/
 
 /**
  *!\brief Calcs the diff between tv1 and tv2.
@@ -422,7 +423,7 @@ timeval TimevalNormalize(const timeval& in_tv)
  * Calcs negative times properly, with the appropriate sign on both tv_sec
  * and tv_usec (these signs will match unless one of them is 0)
  **/
-timeval TimevalDiff(const timeval& tv1, const timeval& tv2)
+/*timeval TimevalDiff(const timeval& tv1, const timeval& tv2)
 {
     timeval tv;
 
@@ -430,12 +431,12 @@ timeval TimevalDiff(const timeval& tv1, const timeval& tv2)
     tv.tv_usec = -tv2.tv_usec;
 
     return TimevalSum(tv1, tv);
-}
+}*/
 
 /**
  *!\brief multiplies the timevale by the given structure
  **/
-timeval TimevalScale(const timeval& tv, double scale)
+/*timeval TimevalScale(const timeval& tv, double scale)
 {
     timeval result;
     result.tv_sec = (long)(tv.tv_sec * scale);
@@ -443,13 +444,13 @@ timeval TimevalScale(const timeval& tv, double scale)
         (long)(tv.tv_usec * scale + fmod(tv.tv_sec * scale, 1.0) * 1000000.0);
     timevalNormalizeInPlace(result);
     return result;
-}
+}*/
 
 /**
  *!\brief compares two time values
  *\return 1 if tv1 is greater than tv2;  0 otherwise
  **/
-bool TimevalGreater(const timeval& tv1, const timeval& tv2)
+/*bool TimevalGreater(const timeval& tv1, const timeval& tv2)
 {
     if (tv1.tv_sec > tv2.tv_sec) {
         return 1;
@@ -458,29 +459,25 @@ bool TimevalGreater(const timeval& tv1, const timeval& tv2)
         return 1;
     }
     return 0;
-}
+}*/
 
 /**
  *!\brief checks if two timevals are equal
  *
  *\return 1 if tv1 is equal to tv2; 0 otherwise
  **/
-bool TimevalEqual(const timeval& tv1, const timeval& tv2)
+/*bool TimevalEqual(const timeval& tv1, const timeval& tv2)
 {
-    if (tv1.tv_sec == tv2.tv_sec && tv1.tv_usec == tv2.tv_usec) {
-        return true;
-    } else {
-        return false;
-    }
-}
+	return (tv1.tv_sec == tv2.tv_sec && tv1.tv_usec == tv2.tv_usec);
+}*/
 
 /**
  *\brief converts the ObjectId time into a double. the m_id field is lost
  **/
-double convertObjectIdTimeToDouble(ObjectId id)
+/*double convertObjectIdTimeToDouble(ObjectId id)
 {
-    return (double)id.m_utc + (double)id.m_step * STEP_SIZE/TIMER_STEP;
-}
+    return (double)id.m_utc + (double) (id.m_step * STEP_SIZE) / TIMER_STEP;
+}*/
 
 /**
  *\brief converts a double time to an ObjectId time. The m_id field is set to 0
@@ -489,7 +486,7 @@ double convertObjectIdTimeToDouble(ObjectId id)
  *
  * **NOTE** - There is a potential for a rounding error to have the step off by 1
  **/
-ObjectId convertDoubleToObjectIdTime( double value )
+/*ObjectId convertDoubleToObjectIdTime(double value)
 {
     ObjectId result;
     uint64_t utc = value;
@@ -500,7 +497,7 @@ ObjectId convertDoubleToObjectIdTime( double value )
     result.m_utc = utc;
     result.m_step = step;
     return result;
-}
+}*/
 
 /**
  * @brief This function will convert millisecond time to our standard frameTime timestep
@@ -510,14 +507,14 @@ ObjectId convertDoubleToObjectIdTime( double value )
  *
  * @return
  */
-uint64_t convertUsecsToFrameTime(uint64_t usecs, double fps)
+/*uint64_t convertUsecsToFrameTime(uint64_t usecs, double fps)
 {
     FrameTime time;
     time.m_utc = usecs / 1e6;
     unsigned subseconds = round((usecs - time.m_utc * 1e6) / 1.0e6);
     time.m_step = UINT32_MAX / fps * subseconds;
     return time.m_value;
-}
+}*/
 
 
 /**
@@ -527,7 +524,7 @@ uint64_t convertUsecsToFrameTime(uint64_t usecs, double fps)
  *
  * @return
  */
-std::string convertUsecsToDate(uint64_t usecs)
+/*std::string convertUsecsToDate(uint64_t usecs)
 {
     // using namespace std;
     // using namespace std::chrono;
@@ -546,22 +543,22 @@ std::string convertUsecsToDate(uint64_t usecs)
     //    << setw(2) << m.count() << "m:"
     //    << setw(2) << s.count() << 's';
     // os.fill(fill);
-     return "";
+    return "";
  
-}
+}*/
 
 /**
  * \brief Sleeps for the given amount of time
  *
  * \param [in] double time to sleep in seconds (supports millisecond resolution)
  **/
-void sleep( double time )
+void sleep(double time)
 {
-    if( time <= 0 ) {
+    if(time <= 0) {
         return;
     }
-    size_t msec = time*1e3;
-//      std::cout << "Sleeping for "<<std::fixed<<msec<<" milliseconds "<<std::endl;
+
+    size_t msec = time * 1e3;
     std::this_thread::sleep_for(std::chrono::milliseconds(msec));
 }
 
@@ -590,148 +587,104 @@ std::string getDateAsString() {
 /*!\brief functional test for this class
  */
 //***********************************************************
-bool testTimer( bool printFlag, bool assertFlag )
+JsonBox::Value testTimer(bool printFlag, bool assertFlag)
 {
     //create file to redirect output
     timerTest.open("TimerTest.log");
     timerJson.open("timerTest.json");
 
     JsonBox::Value resultString;
-
-    double allowedDelay = .005;
-    double timeVariance = (double)2.0 / 1e3;
-    if(printFlag) {
-        // printf("\n\nRegression test for Timer class\n");
-        timerTest << "\nRegression test for Timer class" << endl;
-    }
     Timer timer;
-    timer.setFPS(30.0);
+
+    double timeVariance = (double) 2.0 / 1e3;
+    double currTime = getTime();
+
+    if (printFlag) {
+        timerTest << "Regression test for Timer class" << endl;
+    }
+
+    timer.setFPS(STARTING_FPS);
 
     //Check ObjectId size
-    if( sizeof(uint64_t) != sizeof( ObjectId )) {
-        if(printFlag) {
-            timerTest <<"size uint64_t:"<<sizeof(uint64_t)<<"!= ObjectId:"<<sizeof(ObjectId)<<"!\n"
-                      <<"Check variable alignment in ObjectId structure"<<std::endl;
+    objectIDSizeTest(printFlag, assertFlag);
 
-            cout << "Timer test failed. See TimerTest.log" << endl;
-
-
-        }
-        if (assertFlag) {
-            assert(false);
-        };
-        return false;
-    }
-
-
-    //Check elapsed time
+    //Test sleep time
     timer.start();
     double delayTime = 10.0 / 1e3;
     sleep(delayTime);
-    double result = timer.elapsed();
+    double sleepElapsed = timer.elapsed();
 
-    resultString["elapsedTime1"]["delayTime"].setDouble(delayTime);
-    resultString["elapsedTime1"]["value"].setDouble(result);
+    sleepTest(resultString, delayTime, sleepElapsed, timeVariance, 
+    			printFlag, assertFlag, 1);
 
-    if (result-delayTime>timeVariance) {
-        if (printFlag) {
-            timerTest << "sleep time1: "<<std::fixed<<delayTime<<" failed: " << result << ">" << delayTime+timeVariance << std::endl;
-
-            cout << "Timer test failed. See TimerTest.log" << endl;
-        }
-        if (assertFlag) {
-            assert(false);
-        };
-	resultString["elapsedTime1"]["result"].setString("fail");
-        return false;
-    } else if(delayTime-result > timeVariance) {
-        if(printFlag) {
-            timerTest << "sleep time2 failed: "<<std::fixed<<delayTime-result<<" > "<<timeVariance<<std::endl;
-            cout << "Timer test failed. See TimerTest.log" << endl;
-        }
-        if (assertFlag) {
-            assert(false);
-        };
-
-	resultString["Elapsedime1"]["result"].setString("fail");
-        return false;
-    }
-    resultString["elapsedTime1"]["result"].setString("pass");
-
-     //Test a longer sleep
+    //Test a longer sleep time
     timer.start();
+   	delayTime = 1.0;
+   	sleep(delayTime);
+   	sleepElapsed = timer.elapsed();
 
-    delayTime = 1.0;
-    sleep(delayTime);
-    result = timer.elapsed();
-
-    resultString["elapsedTime2"]["delayTime"].setDouble(delayTime);
-    resultString["elapsedTime2"]["value"].setDouble(result);
-
-    if (result-delayTime>timeVariance) {
-	resultString["elapsedTime2"]["result"].setString("fail");
-        if(printFlag) {
-            timerTest << "sleep time3: "<<std::fixed<<delayTime<<" failed: " << result << ">" << delayTime+timeVariance << std::endl;
-
-            cout << "Timer test failed. See TimerTest.log" << endl;
-        }
-        if (assertFlag) {
-            assert(false);
-        };
-        return false;
-    } else if(delayTime-result > timeVariance) {
-	resultString["elapsedTime2"]["result"].setString("fail");
-        if(printFlag) {
-            timerTest << "sleep time4 failed("<<std::fixed<<result<<"): "<<delayTime-result<<" > "<<timeVariance<<std::endl;
-            cout << "Timer test failed. See TimerTest.log" << endl;
-        }
-        if (assertFlag) {
-            assert(false);
-        };
-        return false;
-    }
-    resultString["elapsedTime2"]["result"].setString("pass");
-
+	sleepTest(resultString, delayTime, sleepElapsed, timeVariance, 
+				printFlag, assertFlag, 2);
  
-   //Get timestamp
-    int64_t tstamp = convertDoubleToTimeStamp( getTime());
-    if(printFlag) {
+   	//Get current timestamp
+    int64_t tstamp = convertDoubleToTimeStamp(currTime);
 
+    if (printFlag) {
         timerTest << "Current timestamp: " << tstamp << endl;
     }
 
+    resultString["current timestamp"] = (double) tstamp;
+
+    //Get elapsed timestamp
     timer.start();
-    result = timer.elapsed();
-    if(printFlag) {
+    double tElapsed = timer.elapsed();
+    int64_t tstampElapsed = convertDoubleToTimeStamp(tElapsed);
 
-        timerTest << "Timer since second start (can be 0 if less than 1 msec): " << result << endl;
+    if (printFlag) {
+    	timerTest << "Timer since second start (can be 0 if <1msec)" 
+    				<< tstampElapsed << endl;
     }
 
-    double dTime = getTime();
-    SMPTETime smpte = convertDoubleToSMPTE( dTime, 30 );
-    if(printFlag) {
+    resultString["updated timestamp"] = (double) tstampElapsed;
 
-        //freopen("timerTest.log", "a+", stdout);
-        printf( "SMPTETme: %2d:%2d:%2d, frame: %d\n"
-                , smpte.hour
-                , smpte.minute
-                , smpte.second
-                , smpte.frame
+    //Get SMPTE time
+    SMPTETime currsmpte = convertDoubleToSMPTE(currTime, timer.getFPS());
+
+    if (printFlag) {
+    	printf( "SMPTETime: %2d:%2d:%2d, frame: %d\n"
+                , currsmpte.hour
+                , currsmpte.minute
+                , currsmpte.second
+                , currsmpte.frame
               );
-
-    }
-    std::string timeStr = convertTimeValToString( convertDoubleToTimeVal( dTime ), 30 );
-    if(printFlag) {
-        timerTest << "StringTime: " << timeStr.c_str() << endl;
-
     }
 
-    int64_t timecode = convertTimeValToTimeCode( convertDoubleToTimeVal( dTime ), 30);
-    if(printFlag) {
-        timerTest << "TimeCode: " << timecode << endl;
+    resultString["smpte hour"] = currsmpte.hour;
+    resultString["smpte minute"] = currsmpte.minute;
+    resultString["smpte second"] = currsmpte.second;
+    resultString["smpte frame"] = currsmpte.frame;
+
+    //Get string time
+    timeval tempStr = convertDoubleToTimeVal(currTime);
+    std::string timeStr = convertTimeValToString(tempStr, timer.getFPS());
+
+    if (printFlag) {
+    	timerTest << "String time: " << timeStr.c_str() << endl;
     }
 
-    ObjectId t1;
+    resultString["string time"] = timeStr;
+
+    //Get time code
+    timeval tempCode = convertDoubleToTimeVal(currTime);
+    int64_t timeCode = convertTimeValToTimeCode(tempCode, timer.getFPS());
+
+    if (printFlag) {
+    	timerTest << "Time code: " << timeCode << endl;
+    }
+
+    resultString["time code"] = (double) timeCode;
+
+    /*ObjectId t1;
     ObjectId t2;
     t1.m_value = getTimestamp();
     sleep(1);
@@ -805,8 +758,61 @@ bool testTimer( bool printFlag, bool assertFlag )
 
     timerJson << resultString << std::endl;
 
-    std::system("rm TimerTest.log");
+    //std::system("rm TimerTest.log"); */
 
-    return true;
+    return resultString;
 }
+
+void objectIDSizeTest(bool printFlag, bool assertFlag) 
+{
+    if (sizeof(uint64_t) != sizeof(ObjectId)) {
+        if (printFlag) {
+            timerTest << "size uint64_t: " << sizeof(uint64_t) << "!= ObjectId: " << sizeof(ObjectId) << "!\n"
+                      << "Check variable alignment in ObjectId structure." << std::endl;
+
+            cout << "Timer test failed. See TimerTest.log" << endl;
+        }
+
+        if (assertFlag) {
+            assert(false);
+        };
+
+        return;
+    }
+}
+
+void sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
+				double timeVariance, bool printFlag, bool assertFlag, int testno) 
+{
+	string currTest = "sleep time " + std::to_string(testno);
+
+	resultString[currTest] = sleepElapsed;
+    double variance = delayTime - sleepElapsed;
+
+    if (variance < 0) {
+    	variance = -variance;
+    }
+
+    resultString[currTest]["variance"].setDouble(variance);
+    resultString[currTest]["delay time"].setDouble(delayTime);
+    resultString[currTest]["elapsed time"].setDouble(sleepElapsed);
+
+    if (variance > timeVariance) {
+    	if (printFlag) {
+    		timerTest << currTest << ": " << std::fixed << delayTime << "failed: " 
+    					<< sleepElapsed << ">" << delayTime + timeVariance << std::endl;
+    		cout << "Timer test failed. See TimerTest.log" << endl;
+    	}
+
+    	if (assertFlag) {
+    		assert(false);
+    	};
+
+    	resultString[currTest]["status"] = "fail";
+    	return;
+    }
+
+    resultString[currTest]["status"] = "pass";
+}
+
 }

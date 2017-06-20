@@ -92,21 +92,21 @@ private:
 public:
     Timer();
     ~Timer();
-    SMPTETime getTimeCode();
-    void updateTimeCodeOffset( int64_t refTimeCode);
-    int64_t getTimeCodeOffset();
-    void    setFPS( double rate );
-    double     getFPS( void );
+    SMPTETime   getTimeCode();
+    void        updateTimeCodeOffset( int64_t refTimeCode);
+    int64_t     getTimeCodeOffset();
+    void        setFPS( double rate );
+    double      getFPS( void );
 
-    void    start();
-    double  elapsed();
+    void        start();
+    double      elapsed();
 };
 
 //Support functions
-double getTime();
+double      getTime();
 uint64_t    getUsecTime();
 uint64_t    getTimestamp();
-double convertTimeValToDouble( timeval tv );
+double      convertTimeValToDouble( timeval tv );
 SMPTETime   convertTimeValToSMPTE( timeval tv, double fps );
 timeval     convertDoubleToTimeVal( double dTime );
 SMPTETime   convertDoubleToSMPTE( double dTime, double fps );
@@ -116,22 +116,28 @@ int64_t     convertTimeValToTimeCode( timeval tv, double fps );
 int64_t     convertDoubleToTimeCode( double dTime, double fps );
 uint64_t    convertDoubleToTimeStamp( double dTime );
 
+/* Not currently used in testing
 timeval TimevalSum(const timeval& tv1, const timeval& tv2);
 bool TimevalGreater(const timeval& tv1, const timeval& tv2);
 bool TimevalEqual(const timeval& tv1, const timeval& tv2);
 timeval TimevalScale(const timeval& tv, double scale);
 timeval TimevalDiff(const timeval& tv1, const timeval& tv2);
 timeval TimevalNormalize(const timeval& in_tv);
-//   static inline void timevalNormalizeInPlace(timeval &in_tv);
+*/
 
-void   sleep(double time );
-double convertObjectIdTimeToDouble(ObjectId id);
-ObjectId convertDoubleToObjectIdTime( double value );
-uint64_t convertUsecsToFrameTime(uint64_t usecs, double fps);
+void        sleep(double time );
+double      convertObjectIdTimeToDouble(ObjectId id);
+ObjectId    convertDoubleToObjectIdTime( double value );
+uint64_t    convertUsecsToFrameTime(uint64_t usecs, double fps);
 // std::string convertUsecsToDate(uint64_t usecs);
 std::string getDateAsString();
 
 //Functional test for the timer
-bool testTimer(bool printFlag = true, bool assertFlag = false);
+JsonBox::Value testTimer(bool printFlag = true, bool assertFlag = false);
+
+//Timer test helper functions
+void sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
+                double timeVariance, bool printFlag, bool assertFlag, int testno);
+void objectIDSizeTest(bool printFlag, bool assertFlag);
 }
 
