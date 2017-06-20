@@ -651,7 +651,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     SMPTETime currsmpte = convertDoubleToSMPTE(currTime, timer.getFPS());
 
     if (printFlag) {
-    	printf( "SMPTETime: %2d:%2d:%2d, frame: %d\n"
+    	printf("SMPTETime: %2d:%2d:%2d, frame: %d\n"
                 , currsmpte.hour
                 , currsmpte.minute
                 , currsmpte.second
