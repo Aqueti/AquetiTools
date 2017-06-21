@@ -238,6 +238,7 @@ add_library( aquetitools STATIC
    ${I2C_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
+   ${DataTypes_SRC}
 )
 
 target_link_libraries( aquetitools
@@ -246,17 +247,27 @@ target_link_libraries( aquetitools
 )
 
 if(MAKE_TESTS)
-   add_executable( AquetiToolTest 
-      test/AquetiToolTest.cpp
+   #Make a dedicated test library
+   add_library( aquetitools_test STATIC
+      test/AquetiToolsTest.cpp
    )
-   target_link_libraries( AquetiToolTest 
+   target_link_libraries( aquetitools_test
       aquetitools
    )
-   LIST( APPEND TARGET_LIST AquetiToolTest )
+   list(APPEND TARGET_LIST aquetitools )
+
+   #Add AquetiTools test as an executavble
+   add_executable( testAquetiTools
+      test/testAquetiTools.cpp 
+   )
+   TARGET_LINK_LIBRARIES(testAquetiTools
+      aquetitools_test
+   )
+   list(APPEND TARGET_LIST testAquetiTools )
 
    #i2C Test application
    add_executable( i2CControl
-      test/testI2CControl.cpp
+     test/testI2CControl.cpp
    )
    target_link_libraries( i2CControl 
       aquetitools
