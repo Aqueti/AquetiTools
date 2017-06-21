@@ -57,7 +57,7 @@ typedef struct ObjectIdStruct {
  * where step = (2^32-1) / fps * frame#
  */
 union FrameTime {
-    uint64_t m_value;
+    uint64_t m_value;                       //!< Value of timestamp
     struct {
         uint32_t m_utc;
         uint32_t m_step;
@@ -92,7 +92,7 @@ public:
     Timer();
     ~Timer();
     SMPTETime   getTimeCode();
-    void        updateTimeCodeOffset(int64_t refTimeCode);
+    //void        updateTimeCodeOffset(int64_t refTimeCode);
     int64_t     getTimeCodeOffset();
     void        setFPS(double rate);
     double      getFPS(void);

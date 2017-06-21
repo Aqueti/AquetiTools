@@ -7,8 +7,13 @@
 
 namespace atl
 {
-
-   CRC16::CRC16( uint16_t initial, uint16_t poly ) 
+  /**
+  * \brief sets initial value and polynomial
+  *
+  * \param [in] initial the initial value of the CRC
+  * \param [in] poly the polynomial used for encoding
+  **/
+   CRC16::CRC16(uint16_t initial, uint16_t poly) 
    {
       m_initialValue = initial;
       m_polynomial = poly;
@@ -18,6 +23,7 @@ namespace atl
 
    /** 
     * \brief generates a lookup table for quick crc calculations
+    *
     * \return true on success, false on failure
     **/
    bool CRC16::generateTable() 
@@ -45,11 +51,13 @@ namespace atl
 
   /**
    * \brief Function to generate a crc code
+   *
    * \param [in] array byte array to operate on
    * \param [in] length number of bytes
+   * \return 64-bit calculated CRC 
    *
    * The data in the table constructed by running the algorithmic CRC
-   * with inital CRC (crc & 0xFF00), and the input data 0x00. The
+   * with initial CRC (crc & 0xFF00), and the input data 0x00. The
    * resulting CRC can be found in the table at (crc >> 8).
    *
    * Since the operation is performed on a zero rightmost half of the
@@ -85,6 +93,8 @@ namespace atl
 
    /**
     * \brief CRC unit test
+    *
+    * \return whether or not the test succeeded
     **/
    bool testCRC()
    {
@@ -113,9 +123,10 @@ namespace atl
                     << std::hex << result 
                     << " expected " << std::hex
                     << expected <<std::endl;
+        return false;
       }
 
-        return true;
+      return true;
     }
 }
 
