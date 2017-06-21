@@ -682,7 +682,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     int64_t tstampElapsed = convertDoubleToTimeStamp(tElapsed);
 
     if (printFlag) {
-    	cout << "Timer since second start (can be 0 if <1msec)" 
+    	cout << "Timer since second start (can be 0 if <1msec): " 
     				<< tstampElapsed << endl;
     }
 
