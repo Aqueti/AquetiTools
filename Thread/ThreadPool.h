@@ -15,7 +15,10 @@
 namespace atl
 {
 
-    class ThreadPool: public MultiThread, protected TSQueue<std::function<void()>>
+    /**
+    * \brief class to run thread pool
+    **/
+    class ThreadPool: public MultiThread, private TSQueue<std::function<void()>>
     {
     public:
         ThreadPool(int numThreads = 1, int maxJobLength = 50, double timeout = 1);
@@ -29,8 +32,8 @@ namespace atl
         using TSQueue<std::function<void()>>::get_max_size;
         using TSQueue<std::function<void()>>::wait_until_empty;
 
-    protected:
-        std::atomic<double> m_timeout;
+    private:
+        std::atomic<double> m_timeout;                  //!< Timeout value of the thread pool
         virtual void mainLoop();
     };
 

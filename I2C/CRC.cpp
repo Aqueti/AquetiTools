@@ -66,7 +66,7 @@ namespace atl
    * the byte as the leftmost half. We then XOR this construction with
    * the contents of the table at position (crc >> 8). 
    **/
-   uint16_t CRC16::calculate( uint8_t * array, size_t length ) 
+   uint16_t CRC16::calculate(uint8_t * array, size_t length) 
    {
       CRCMap value;
       value.crc = m_initialValue;

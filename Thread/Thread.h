@@ -26,14 +26,10 @@ namespace atl
 //************************************************************
 class Thread
 {
-protected:
-    std::mutex    m_threadMutex;         //!< Mutex to signal closure
-    std::thread   m_threadObj;           //!< Thread variable
-    bool*         m_running = nullptr;   //!< Flag to stop running by a shared pointer
-    bool          m_deletePtr = false;   //!< If true, delete pointer on destruction
+private:
 
-    virtual void  Execute(void);
-    virtual void  mainLoop(void);
+    
+
 
 public:
     virtual       ~Thread();
@@ -42,6 +38,14 @@ public:
     virtual void  Stop(void);
     virtual bool  Join(void);
     virtual bool  isRunning(void);
+
+    virtual void  Execute(void);
+    virtual void  mainLoop(void);
+
+    bool*         m_running = nullptr;   //!< Flag to stop running by a shared pointer
+    bool          m_deletePtr = false;   //!< If true, delete pointer on destruction
+    std::mutex    m_threadMutex;         //!< Mutex to signal closure
+    std::thread   m_threadObj;           //!< Thread variable
 };
 
 bool testThread(bool printFlag = true);

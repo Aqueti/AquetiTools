@@ -90,6 +90,9 @@ bool MultiThread::setNumThreads(unsigned numThreads)
 
 /**
 * \brief Test function
+* 
+* \param [in] printFlag boolean (true prints info to console)
+* \return true if the test succeeded
 **/
 bool testMultiThread(bool printFlag)
 {
@@ -133,7 +136,7 @@ bool testMultiThread(bool printFlag)
     running = true;
     std::vector<Thread> threadVect(threadCount);
 
-    std::system("rm MultiThreadTest.log");
+    //std::system("rm MultiThreadTest.log");
     return true;
 
 }
