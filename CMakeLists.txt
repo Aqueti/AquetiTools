@@ -33,7 +33,7 @@ if( USE_CLANG)
 
       #See if the AddressSanitizer(ASAN) is installed. If so, make it an option
       find_program(ASAN asan_symbolize DOC "ASAN executable")
-      string( COMPARE EQUAL ${ASAN} "ASAN-NOTFOUND" ASAN_NOTFOUND )
+      #string( COMPARE EQUAL ${ASAN} "ASAN-NOTFOUND" ASAN_NOTFOUND )
       if(NOT ASAN_NOTFOUND )
          option(USE_ASAN "Enable Address sanitizer" OFF)
          if(USE_ASAN)

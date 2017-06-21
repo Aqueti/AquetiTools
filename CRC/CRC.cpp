@@ -8,7 +8,7 @@
 namespace atl
 {
 
-   CRC16::CRC16( uint16_t initial, uint16_t poly ) 
+   CRC16::CRC16(uint16_t initial, uint16_t poly) 
    {
       m_initialValue = initial;
       m_polynomial = poly;
@@ -59,7 +59,7 @@ namespace atl
    * the byte as the leftmost half. We then XOR this construction with
    * the contents of the table at position (crc >> 8). 
    **/
-   uint16_t CRC16::calculate( uint8_t * array, size_t length ) 
+   uint16_t CRC16::calculate(uint8_t * array, size_t length) 
    {
       uint16_t crc = m_initialValue;
       std::cout  << "Calculating with initial value "<<std::hex<<m_initialValue<<std::endl;
