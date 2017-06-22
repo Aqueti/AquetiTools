@@ -81,11 +81,5 @@ JsonBox::Value testAquetiTools(bool testSubmodules, int i)
             break;
     } */
 
-    //Get submodules
-    subJson2["version"] = atl::VERSION;
-    subJson2["commit"] = atl::GIT_COMMIT_HASH;
-    subJson1["AquetiTools"] = subJson2;
-    jsonReturn["submodules"] = subJson1;
-
     return jsonReturn;
 }
