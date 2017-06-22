@@ -44,7 +44,7 @@ Thread::~Thread()
  * \param [in] runFlag boolean pointer to terminate thread execution
  * \return std::thread object for this threads
  **/
-bool Thread::Start( bool* runFlag )
+bool Thread::Start(bool* runFlag)
 {
     if( (m_running && *m_running) || m_threadObj.joinable() ) {
         std::cout << "WARNING: Thread threadObject already running" << std::endl;
@@ -207,8 +207,6 @@ bool testThread(bool printFlag)
         threadVect[i].Stop();
     }
 
-
-    std::system("rm ThreadTest.log");
     return true;
 
 }

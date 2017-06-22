@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/example1.dir/examples/main.cpp.o  -o example1 -rdynamic libJsonBox.a 

@@ -40,12 +40,8 @@
 
 using namespace std;
 
-ofstream timerTest;
-ofstream timerJson;
-
-const double STARTING_FPS = 30.0;
-
 namespace atl
+
 {
 //************************************************************
 /*!\brief Timer constructor
@@ -69,6 +65,8 @@ Timer::~Timer()
 
 //***********************************************************
 /*!\brief Sets the number of fps in timer
+ *
+ * \param [in] rate to set as FPS
  */
 //************************************************************
 void Timer::setFPS(double rate)
@@ -90,6 +88,8 @@ double Timer::getFPS()
 /**
  *!\brief returns the current timecode
  *
+ * \return SMPTETime conversion of time code
+ *
  * This is an internal function since it will eventually calculate
  * frame rate and other information
  **/
@@ -99,7 +99,7 @@ SMPTETime Timer::getTimeCode()
     double now = getTime() + m_timeCodeOffset;
 
     if(m_fps == 0) {
-        timerTest <<"Timer::getTimeCode unknown fps."<<std::endl;
+        cout <<"Timer::getTimeCode unknown fps."<<std::endl;
     }
 
     return(convertDoubleToSMPTE(now, m_fps));
@@ -110,22 +110,24 @@ SMPTETime Timer::getTimeCode()
 /*!\brief returns the timeCode offset to match system time with global time
  */
 //************************************************************
-void Timer::updateTimeCodeOffset(int64_t refTime)
+/*void Timer::updateTimeCodeOffset(int64_t refTime)
 {
-    /*
+    
     //Get current time
     timeval tv;
     gettimeofday(&tv, NULL);
 
     timeCodeOffset = refTime - convertTimeValToTimeCode( tv, fps );
-    */
+
 
     return;
-}
+}*/
 
 
 //***********************************************************
 /*!\brief returns the timeCode offset to match system time with global time
+ *
+ * \return 64-bit time code offset
  */
 //************************************************************
 int64_t Timer::getTimeCodeOffset()
@@ -149,6 +151,8 @@ void Timer::start()
 //***********************************************************
 /*!\brief starts timer
  *
+ * \return double elapsed time
+ *
  * Resets the start time and becomes the new point of reference
  */
 //************************************************************/
@@ -160,6 +164,9 @@ double Timer::elapsed()
 
 //***********************************************************
 /*!\brief converts a timeval struct to double
+ *
+ * \param [in] tv timeval to be converted to double
+ * \return double conversion of timeval
  */
 //************************************************************/
 double convertTimeValToDouble(timeval tv)
@@ -169,6 +176,9 @@ double convertTimeValToDouble(timeval tv)
 
 //***********************************************************
 /*!\brief converts a double to a timeval struct
+ *
+ * \param [in] dTime double to be converted to timeval
+ * \return timeval conversion of double
  */
 //************************************************************/
 timeval convertDoubleToTimeVal(double dTime)
@@ -184,9 +194,9 @@ timeval convertDoubleToTimeVal(double dTime)
 /**
  *!\brief converts a double to an SMPTE time.
  *
- * \param [in] dTime time to convert
+ * \param [in] dTime double to convert
  * \param [in] fps number of frames per second (used to convert decimal time to a frame)
- *
+ * \return SMPTETime conversion of double
  **/
 //***********************************************************
 SMPTETime convertDoubleToSMPTE(double dTime, double fps)
@@ -199,6 +209,9 @@ SMPTETime convertDoubleToSMPTE(double dTime, double fps)
 
 //***********************************************************
 /*!\brief converts a SMPTE to Timecode (hhmmssff)
+ *
+ * \param [in] smpte value to be converted to time code
+ * \return 64-bit time code
  */
 //************************************************************/
 int64_t convertSMPTEToTimeCode(SMPTETime smpte)
@@ -208,7 +221,11 @@ int64_t convertSMPTEToTimeCode(SMPTETime smpte)
 
 //***********************************************************
 /*!\brief converts a timeval structure to Timecode (hhmmssff)
- */
+ *
+ * \param [in] tv timeval to be converted to time code
+ * \param [in] fps number of frames per second (used to convert time val to SMPTE)
+ * \return 64-bit time code
+ **/
 //************************************************************/
 int64_t convertTimeValToTimeCode(timeval tv, double fps)
 {
@@ -223,7 +240,7 @@ int64_t convertTimeValToTimeCode(timeval tv, double fps)
  *
  * \param [in] tv time  to convert
  * \param [in] fps number of frames per second (used to convert decimal time to a frame)
- *
+ * \return SMPTETime conversion of timeval
  **/
 //***********************************************************
 SMPTETime convertTimeValToSMPTE(timeval tv, double fps)
@@ -246,6 +263,10 @@ SMPTETime convertTimeValToSMPTE(timeval tv, double fps)
 //***********************************************************
 /**
  * \brief Converts the given timeval and int into a a string
+ *
+ * \param [in] tv timeval to be converted to string
+ * \param [in] fps number of frames per second (used to convert time val to SMPTE)
+ * \return std::string conversion of timeval
  **/
 //***********************************************************
 std::string convertTimeValToString(timeval tv, double fps)
@@ -270,9 +291,13 @@ std::string convertTimeValToString(timeval tv, double fps)
 //***********************************************************
 /**
  * \brief Converts the given double into a string with fps
+ *
+ * \param [in] dTime double to be converted to string
+ * \param [in] fps number of frames per second (used to convert time val to string)
+ * \return std::string conversion of double
  **/
 //***********************************************************
-std::string convertDoubleToString(double dTime,  double fps)
+std::string convertDoubleToString(double dTime, double fps)
 {
     timeval tv = convertDoubleToTimeVal(dTime);
     return convertTimeValToString(tv, fps);
@@ -282,9 +307,13 @@ std::string convertDoubleToString(double dTime,  double fps)
 //***********************************************************
 /**
  * \brief Converts a double to a TimeCode
+ * 
+ * \param [in] dTime double to be converted to time code
+ * \param [in] fps number of frams per second (used to convert time val to time code)
+ * \return 64-bit time code
  **/
 //***********************************************************
-int64_t convertDoubleToTimeCode(double dTime, int fps)
+int64_t convertDoubleToTimeCode(double dTime, double fps)
 {
 	timeval tv = convertDoubleToTimeVal(dTime);
     return convertTimeValToTimeCode(tv, fps);
@@ -293,6 +322,8 @@ int64_t convertDoubleToTimeCode(double dTime, int fps)
 //***********************************************************
 /**
  * \brief Gets the current time as a double
+ *
+ * \return double time
  **/
 //***********************************************************
 double getTime()
@@ -302,6 +333,8 @@ double getTime()
 
 /**
  * @brief Gets the number of microseconds since the epoch
+ *
+ * \return 64-bit microsecond time
  */
 uint64_t getUsecTime()
 {
@@ -315,6 +348,8 @@ uint64_t getUsecTime()
 
 /**
  * \brief Returns the current time as utc with 2^16 sub second steps
+ *
+ * \return 64-bit timestamp
  **/
 uint64_t getTimestamp()
 {
@@ -335,7 +370,8 @@ uint64_t getTimestamp()
 //***********************************************************
 /*!\brief Returns the current timestamp
  *
- * \return 64bit timestamp
+ * \param [in] dTime double to be converted to timestamp
+ * \return 64-bit timestamp
  *
  * This is an internal function since it will eventually calculate
  * frame rate and other information
@@ -346,7 +382,8 @@ uint64_t convertDoubleToTimeStamp(double dTime)
     return (uint64_t)(dTime * 1e8);
 }
 
-/**
+/*
+
  *!\brief calculates the sum of two time values
  &
  * Calcs the sum of tv1 and tv2.  Returns the sum in a timeval struct.
@@ -355,8 +392,8 @@ uint64_t convertDoubleToTimeStamp(double dTime)
  * NOTE: both abs(tv_usec)'s must be < 1000000 (ie, normal timeval format)
  *
  * borrowed copiously from vrpn (thanks Russell )
- **/
-/*{
+ *
+{
     timeval tvSum = tv1;
 
     tvSum.tv_sec += tv2.tv_sec;
@@ -392,38 +429,38 @@ uint64_t convertDoubleToTimeStamp(double dTime)
     }
 
     return tvSum;
-}*/
+}
 
-/**
+
  *!\brief perform normalization of a timeval
  * XXX this still needs to be checked for errors if the timeval
  * or the rate is negative
- **/
-/*static inline void timevalNormalizeInPlace(timeval& in_tv)
+ *
+static inline void timevalNormalizeInPlace(timeval& in_tv)
 {
     const long div_77777 = (in_tv.tv_usec / 1000000);
     in_tv.tv_sec += div_77777;
     in_tv.tv_usec -= (div_77777 * 1000000);
-}*/
+}
 
-/**
+
  *!\brief perform normalization of a timeval
- **/
-/*timeval TimevalNormalize(const timeval& in_tv)
+ 
+timeval TimevalNormalize(const timeval& in_tv)
 {
     timeval out_tv = in_tv;
     timevalNormalizeInPlace(out_tv);
     return out_tv;
-}*/
+}
 
-/**
+
  *!\brief Calcs the diff between tv1 and tv2.
  *
  *\return the diff in a timeval struct.
  * Calcs negative times properly, with the appropriate sign on both tv_sec
  * and tv_usec (these signs will match unless one of them is 0)
- **/
-/*timeval TimevalDiff(const timeval& tv1, const timeval& tv2)
+ 
+timeval TimevalDiff(const timeval& tv1, const timeval& tv2)
 {
     timeval tv;
 
@@ -431,12 +468,12 @@ uint64_t convertDoubleToTimeStamp(double dTime)
     tv.tv_usec = -tv2.tv_usec;
 
     return TimevalSum(tv1, tv);
-}*/
+}
 
-/**
+
  *!\brief multiplies the timevale by the given structure
- **/
-/*timeval TimevalScale(const timeval& tv, double scale)
+ 
+timeval TimevalScale(const timeval& tv, double scale)
 {
     timeval result;
     result.tv_sec = (long)(tv.tv_sec * scale);
@@ -444,13 +481,13 @@ uint64_t convertDoubleToTimeStamp(double dTime)
         (long)(tv.tv_usec * scale + fmod(tv.tv_sec * scale, 1.0) * 1000000.0);
     timevalNormalizeInPlace(result);
     return result;
-}*/
+}
 
-/**
+
  *!\brief compares two time values
  *\return 1 if tv1 is greater than tv2;  0 otherwise
- **/
-/*bool TimevalGreater(const timeval& tv1, const timeval& tv2)
+ 
+bool TimevalGreater(const timeval& tv1, const timeval& tv2)
 {
     if (tv1.tv_sec > tv2.tv_sec) {
         return 1;
@@ -459,34 +496,34 @@ uint64_t convertDoubleToTimeStamp(double dTime)
         return 1;
     }
     return 0;
-}*/
+}
 
-/**
+
  *!\brief checks if two timevals are equal
  *
  *\return 1 if tv1 is equal to tv2; 0 otherwise
- **/
-/*bool TimevalEqual(const timeval& tv1, const timeval& tv2)
+ 
+bool TimevalEqual(const timeval& tv1, const timeval& tv2)
 {
 	return (tv1.tv_sec == tv2.tv_sec && tv1.tv_usec == tv2.tv_usec);
-}*/
+}
 
-/**
+/
  *\brief converts the ObjectId time into a double. the m_id field is lost
  **/
 /*double convertObjectIdTimeToDouble(ObjectId id)
 {
     return (double)id.m_utc + (double) (id.m_step * STEP_SIZE) / TIMER_STEP;
-}*/
+}
 
-/**
+/
  *\brief converts a double time to an ObjectId time. The m_id field is set to 0
  *\param [in] value time value to set to the object
  *\return ObjectId with the m_utc and m_step set appropriately.
  *
  * **NOTE** - There is a potential for a rounding error to have the step off by 1
- **/
-/*ObjectId convertDoubleToObjectIdTime(double value)
+ *
+ObjectId convertDoubleToObjectIdTime(double value)
 {
     ObjectId result;
     uint64_t utc = value;
@@ -497,34 +534,34 @@ uint64_t convertDoubleToTimeStamp(double dTime)
     result.m_utc = utc;
     result.m_step = step;
     return result;
-}*/
+}
 
-/**
+/
  * @brief This function will convert millisecond time to our standard frameTime timestep
  *
  * @param usecs Microseconds since the epoch
  * @param fps The current fps of the camera
  *
  * @return
- */
-/*uint64_t convertUsecsToFrameTime(uint64_t usecs, double fps)
+ 
+uint64_t convertUsecsToFrameTime(uint64_t usecs, double fps)
 {
     FrameTime time;
     time.m_utc = usecs / 1e6;
     unsigned subseconds = round((usecs - time.m_utc * 1e6) / 1.0e6);
     time.m_step = UINT32_MAX / fps * subseconds;
     return time.m_value;
-}*/
+}
 
 
-/**
+
  * @brief This function will convert usecs time to standard date time
  *
  * @param usecs Microseconds since the epoch
  *
  * @return
- */
-/*std::string convertUsecsToDate(uint64_t usecs)
+ 
+std::string convertUsecsToDate(uint64_t usecs)
 {
     // using namespace std;
     // using namespace std::chrono;
@@ -550,7 +587,7 @@ uint64_t convertDoubleToTimeStamp(double dTime)
 /**
  * \brief Sleeps for the given amount of time
  *
- * \param [in] double time to sleep in seconds (supports millisecond resolution)
+ * \param [in] time double to sleep in seconds (supports millisecond resolution)
  **/
 void sleep(double time)
 {
@@ -564,6 +601,8 @@ void sleep(double time)
 
 /**
  * \brief Returns the current date and time as a string
+ *
+ * \return std::string conversion of date
  **/
 std::string getDateAsString() {
   auto now = std::chrono::system_clock::now();
@@ -585,13 +624,15 @@ std::string getDateAsString() {
 
 //***********************************************************
 /*!\brief functional test for this class
+ *
+ * \param [in] printFlag boolean (true prints info to console)
+ * \param [in] assertFlag boolean (true stops the program)
+ * \return JsonBox::Value containing test results
  */
 //***********************************************************
 JsonBox::Value testTimer(bool printFlag, bool assertFlag)
 {
     //create file to redirect output
-    timerTest.open("TimerTest.log");
-    timerJson.open("timerTest.json");
 
     JsonBox::Value resultString;
     Timer timer;
@@ -600,10 +641,10 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     double currTime = getTime();
 
     if (printFlag) {
-        timerTest << "Regression test for Timer class" << endl;
+        cout << "Regression test for Timer class" << endl;
     }
 
-    timer.setFPS(STARTING_FPS);
+    timer.setFPS(30.0);
 
     //Check ObjectId size
     objectIDSizeTest(printFlag, assertFlag, resultString);
@@ -630,7 +671,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     int64_t tstamp = convertDoubleToTimeStamp(currTime);
 
     if (printFlag) {
-        timerTest << "Current timestamp: " << tstamp << endl;
+        cout << "Current timestamp: " << tstamp << endl;
     }
 
     resultString["timestamp"] = (double) tstamp;
@@ -641,7 +682,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     int64_t tstampElapsed = convertDoubleToTimeStamp(tElapsed);
 
     if (printFlag) {
-    	timerTest << "Timer since second start (can be 0 if <1msec)" 
+    	cout << "Timer since second start (can be 0 if <1msec): " 
     				<< tstampElapsed << endl;
     }
 
@@ -669,7 +710,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     std::string timeStr = convertTimeValToString(tempStr, timer.getFPS());
 
     if (printFlag) {
-    	timerTest << "String time: " << timeStr.c_str() << endl;
+    	cout << "String time: " << timeStr.c_str() << endl;
     }
 
     resultString["string time"] = timeStr;
@@ -679,7 +720,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     int64_t timeCode = convertTimeValToTimeCode(tempCode, timer.getFPS());
 
     if (printFlag) {
-    	timerTest << "Time code: " << timeCode << endl;
+    	cout << "Time code: " << timeCode << endl;
     }
 
     resultString["time code"] = (double) timeCode;
@@ -763,11 +804,18 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     return resultString;
 }
 
+/**
+ * \brief Helper function to check the ObjectID size
+ *
+ * \param [in] printFlag boolean (true prints info to console)
+ * \param [in] assertFlag boolean (true stops the program)
+ * \param [in] resultString JsonBox value passed by reference, updated only if this test fails
+ **/
 void objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString) 
 {
     if (sizeof(uint64_t) != sizeof(ObjectId)) {
         if (printFlag) {
-            timerTest << "size uint64_t: " << sizeof(uint64_t) << "!= ObjectId: " << sizeof(ObjectId) << "!\n"
+            cout << "size uint64_t: " << sizeof(uint64_t) << "!= ObjectId: " << sizeof(ObjectId) << "!\n"
                       << "Check variable alignment in ObjectId structure." << std::endl;
 
             cout << "Timer test failed. See TimerTest.log" << endl;
@@ -782,6 +830,21 @@ void objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultStr
     }
 }
 
+/**
+ * \brief Helper function to test sleep
+ *
+ * \param [in] resultString JsonBox value passed by reference, updated with results of this test
+ * \param [in] delayTime double delay expected of sleep function
+ * \param [in] sleepElapsed double actual elapsed time of sleep function
+ * \param [in] timeVariance double acceptable variance between delayTime and sleepElapsed
+ * \param [in] printFlag boolean (true prints info to console)
+ * \param [in] assertFlag boolean (true stops the program)
+ * \param [in] testno int that keeps track of current test number (either 1 or 2)
+ *
+ *  Calculates the variance between the delay time passed in and the actual sleep time
+ *  elapsed, and checks this against an allowed time variance. Notifies user that the
+ *  test has been passed if actual variance is less than the time variance.
+ **/
 void sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
 				double timeVariance, bool printFlag, bool assertFlag, int testno) 
 {
@@ -800,7 +863,7 @@ void sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElaps
 
     if (variance > timeVariance) {
     	if (printFlag) {
-    		timerTest << currTest << ": " << std::fixed << delayTime << "failed: " 
+    		cout << currTest << ": " << std::fixed << delayTime << "failed: " 
     					<< sleepElapsed << ">" << delayTime + timeVariance << std::endl;
     		cout << "Timer test failed. See TimerTest.log" << endl;
     	}

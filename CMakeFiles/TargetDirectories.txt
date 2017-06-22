@@ -1,0 +1,4 @@
+/home/vkim70/src/AquetiTools/CMakeFiles/rebuild_cache.dir
+/home/vkim70/src/AquetiTools/CMakeFiles/edit_cache.dir
+/home/vkim70/src/AquetiTools/CMakeFiles/AquetiTools.dir
+/home/vkim70/src/AquetiTools/CMakeFiles/JsonBox.dir

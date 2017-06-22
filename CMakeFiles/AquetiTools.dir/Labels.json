@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/vkim70/src/AquetiTools/CMakeFiles/AquetiTools"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/CMakeFiles/AquetiTools.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/CMakeFiles/AquetiTools-complete.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-install.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-mkdir.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-download.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-update.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-patch.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-configure.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"AquetiTools"
+		],
+		"name" : "AquetiTools"
+	}
+}

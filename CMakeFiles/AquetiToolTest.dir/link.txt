@@ -1,0 +1,1 @@
+/usr/bin/c++    -Wall -std=c++14 -fPIC -O2   CMakeFiles/AquetiToolTest.dir/test/AquetiToolTest.cpp.o  -o AquetiToolTest  -L/home/vkim70/src/AquetiTools/INSTALL/lib -rdynamic libaquetitools.a -Wl,-Bstatic -lJsonBox -Wl,-Bdynamic -lpthread -Wl,-rpath,/home/vkim70/src/AquetiTools/INSTALL/lib: 

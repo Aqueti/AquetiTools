@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/vkim70/src/AquetiTools/CMakeFiles/JsonBox"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/CMakeFiles/JsonBox.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/CMakeFiles/JsonBox-complete.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-install.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-mkdir.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-download.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-update.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-patch.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-configure.rule"
+		},
+		{
+			"file" : "/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"JsonBox"
+		],
+		"name" : "JsonBox"
+	}
+}
