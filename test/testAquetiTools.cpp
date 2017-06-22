@@ -1,24 +1,3 @@
-
-
-#include <Timer.h>
-#include <Thread.h>
-#include <MultiThread.h>
-#include <ThreadPool.h>
-#include <LruCache.cpp>
-#include <TSMap.cpp>
-#include <TSMap.tcc>
-#include <aquetitools/revision.h>
-#include <iostream>
-#include <string.h>
-#include <TSQueue.cpp>
-#include <TSQueue.tcc>
-#include "JsonBox.h"
-
-
-#include "ThreadPool.h"
-#include <CRC.hpp>
-
-
 #include "AquetiToolsTest.h"
 
 using namespace std;
@@ -69,30 +48,6 @@ void runTests(bool valgrind) {
     }
 }
 
-bool printHelp(void)
-{
-    cout << "ATLTest" << endl;
-    //AquetiTool::printVersion();
-    cout << endl;
-    cout << "Usage: ./ATLTest <options>" << endl;
-    cout << "Options: " << endl;
-    cout << "\t-h    prints this help menu and exits" << endl;
-    cout << "\t-t    is followed by name of method to be tested, then performs test and exits" << endl;
-    cout << "\t-v    indicates that valgrind is being used" << endl;
-    cout << "\t--version prints ATL version information\n"<<std::endl;
-    cout << "Method names to follow t are: Timer, Thread, "
-         << "MultiThread, ThreadPool, TaskManager, TSQueue, BaseBuffer, "
-         << "ExtendedBuffer, BaseContainer, TSArray, "
-         << "Module BaseContainerArrayMetadata, BaseContainerArray, "
-         << "CamImage, HContainer, "
-         << "MapContainerMetadata, MapContainer, BaseSocket, SocketServer, "
-         << "ContainerSocket, CommandServer, MultiCommandClient, IntKey, "
-         << "StringKey, IntPairKey, JsonValidator, TSMap, Interrupt, Property, "
-         << "PropertyManager, StreamManager, PropertyTypes, Factory, Messages" << endl;
-    cout << endl;
-    return 1;
-}
-
 int main(int argc, char *argv[])
 {
     bool testAll = true;
@@ -107,9 +62,6 @@ int main(int argc, char *argv[])
         if (!strcmp(argv[i], "-v")) {
             argCount++;
             valgrind = true;
-        } else if (!strcmp(argv[i], "-h")) {
-            printHelp();
-            return 1;
         } else if (!strcmp(argv[i], "--version")) {
             //AquetiTool::printVersion();
             return 1;
