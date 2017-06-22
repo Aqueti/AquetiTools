@@ -1,0 +1,2 @@
+/usr/bin/ar qc libJsonBox.a  CMakeFiles/JsonBox.dir/src/JsonWritingError.cpp.o CMakeFiles/JsonBox.dir/src/Value.cpp.o CMakeFiles/JsonBox.dir/src/SolidusEscaper.cpp.o CMakeFiles/JsonBox.dir/src/Escaper.cpp.o CMakeFiles/JsonBox.dir/src/Indenter.cpp.o CMakeFiles/JsonBox.dir/src/IndentCanceller.cpp.o CMakeFiles/JsonBox.dir/src/JsonParsingError.cpp.o CMakeFiles/JsonBox.dir/src/Convert.cpp.o
+/usr/bin/ranlib libJsonBox.a

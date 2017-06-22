@@ -1,0 +1,19 @@
+# Hashes of file build rules.
+067b64dae51766c29ac5ccbb751119fa AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-build
+656b0bbe30a7eaa777f03b193c47754e AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-configure
+e0d156869de070251592be0f42ad94bd AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-download
+10beae3481a5ae456764fab2921c1e9b AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-install
+17229e655c49a5a89f170adf2ac5031a AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-mkdir
+e1ea7b490fd1531c77764ae5166df704 AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-patch
+cf2e3671293f57a35588780af8ab9110 AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-update
+ba9f9c6d4eb3a77d9ead934859b0d7dd CMakeFiles/AquetiTools
+acb653f76d88499808de495a2ba22552 CMakeFiles/AquetiTools-complete
+ba9f9c6d4eb3a77d9ead934859b0d7dd CMakeFiles/JsonBox
+8f983e1c5f4f8bd6cab07842612f047b CMakeFiles/JsonBox-complete
+a358458df574362aef05037293608057 JsonBox-prefix/src/JsonBox-stamp/JsonBox-build
+5d5c225caba28ab847927582badebd43 JsonBox-prefix/src/JsonBox-stamp/JsonBox-configure
+9bf9b0d11cbef51186a0db4d93238173 JsonBox-prefix/src/JsonBox-stamp/JsonBox-download
+dd46ed6cc6c6afda0da429a484c16b03 JsonBox-prefix/src/JsonBox-stamp/JsonBox-install
+60e11f7097241ba175717b7860e064ec JsonBox-prefix/src/JsonBox-stamp/JsonBox-mkdir
+da363452dc43d452d375da349af28fd8 JsonBox-prefix/src/JsonBox-stamp/JsonBox-patch
+d6c979cd5e5acd9381636494730c26d6 JsonBox-prefix/src/JsonBox-stamp/JsonBox-update

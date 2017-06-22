@@ -1,0 +1,1 @@
+/usr/bin/c++    -Wall -std=c++14 -fPIC -O2   CMakeFiles/i2CControl.dir/test/testI2CControl.cpp.o  -o i2CControl  -L/home/vkim70/src/AquetiTools/INSTALL/lib -rdynamic libaquetitools.a -Wl,-Bstatic -lJsonBox -Wl,-Bdynamic -lpthread -Wl,-rpath,/home/vkim70/src/AquetiTools/INSTALL/lib: 

@@ -1,0 +1,13 @@
+# Target labels
+ JsonBox
+# Source files and their labels
+/home/vkim70/src/AquetiTools/CMakeFiles/JsonBox
+/home/vkim70/src/AquetiTools/CMakeFiles/JsonBox.rule
+/home/vkim70/src/AquetiTools/CMakeFiles/JsonBox-complete.rule
+/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-install.rule
+/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-mkdir.rule
+/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-download.rule
+/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-update.rule
+/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-patch.rule
+/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-configure.rule
+/home/vkim70/src/AquetiTools/JsonBox-prefix/src/JsonBox-stamp/JsonBox-build.rule

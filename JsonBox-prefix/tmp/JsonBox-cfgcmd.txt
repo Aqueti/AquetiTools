@@ -1,0 +1,1 @@
+cmd='/usr/bin/cmake;-DCMAKE_C_COMPILER:PATH=/usr/bin/cc;-DCMAKE_CXX_COMPILER:PATH=/usr/bin/c++;-DCMAKE_CXX_FLAGS:STRING=;-DLIB_SUFFIX:STRING=;-DCMAKE_INSTALL_PREFIX:PATH=/home/vkim70/src/AquetiTools/INSTALL;-DCMAKE_INSTALL_RPATH:PATH=/home/vkim70/src/AquetiTools/INSTALL/lib;-DCMAKE_INSTALL_LIBDIR:PATH=lib;-GUnix Makefiles;/home/vkim70/src/AquetiTools/JsonBox'

@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/vkim70/src/AquetiTools/test/testI2CControl.cpp
+iostream
+-
+I2CControl.hpp
+/home/vkim70/src/AquetiTools/test/I2CControl.hpp
+string.h
+-
+CRC.hpp
+-
+
+I2C/CRC.hpp
+map
+-
+
+I2C/I2CControl.hpp
+linux/i2c-dev.h
+-
+string
+-
+vector
+-
+map
+-
+stdint.h
+-
+CRC.hpp
+-
+

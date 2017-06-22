@@ -1,0 +1,13 @@
+# Target labels
+ AquetiTools
+# Source files and their labels
+/home/vkim70/src/AquetiTools/CMakeFiles/AquetiTools
+/home/vkim70/src/AquetiTools/CMakeFiles/AquetiTools.rule
+/home/vkim70/src/AquetiTools/CMakeFiles/AquetiTools-complete.rule
+/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-install.rule
+/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-mkdir.rule
+/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-download.rule
+/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-update.rule
+/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-patch.rule
+/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-configure.rule
+/home/vkim70/src/AquetiTools/AquetiTools-prefix/src/AquetiTools-stamp/AquetiTools-build.rule

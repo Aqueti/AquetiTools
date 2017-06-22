@@ -1,0 +1,2 @@
+/usr/bin/ar qc libaquetitools.a  CMakeFiles/aquetitools.dir/Timer/Timer.cpp.o CMakeFiles/aquetitools.dir/I2C/CRC.cpp.o CMakeFiles/aquetitools.dir/I2C/I2CControl.cpp.o CMakeFiles/aquetitools.dir/Thread/Thread.cpp.o CMakeFiles/aquetitools.dir/Thread/MultiThread.cpp.o CMakeFiles/aquetitools.dir/Thread/ThreadPool.cpp.o CMakeFiles/aquetitools.dir/Mutex/shared_mutex.cpp.o
+/usr/bin/ranlib libaquetitools.a

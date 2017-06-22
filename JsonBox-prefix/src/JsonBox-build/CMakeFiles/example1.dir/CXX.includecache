@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/vkim70/src/AquetiTools/JsonBox/examples/main.cpp
+iostream
+-
+string
+-
+JsonBox.h
+/home/vkim70/src/AquetiTools/JsonBox/examples/JsonBox.h
+
+/home/vkim70/src/AquetiTools/JsonBox/include/JsonBox.h
+JsonBox/Value.h
+-
+
+/home/vkim70/src/AquetiTools/JsonBox/include/JsonBox/Value.h
+string
+-
+map
+-
+vector
+-
+iostream
+-
+Export.h
+/home/vkim70/src/AquetiTools/JsonBox/include/JsonBox/Export.h
+
+Export.h
+
