@@ -10,6 +10,7 @@
 #pragma once
 #include <thread>
 #include <mutex>
+#include "JsonBox.h"
 
 namespace atl
 {
@@ -27,8 +28,6 @@ namespace atl
 class Thread
 {
 private:
-
-    
 
 
 public:
@@ -48,5 +47,5 @@ public:
     std::thread   m_threadObj;           //!< Thread variable
 };
 
-bool testThread(bool printFlag = true);
+JsonBox::Value testThread(bool printFlag = true);
 }

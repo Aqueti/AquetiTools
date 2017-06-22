@@ -18,10 +18,9 @@
 #include <vector>
 #include <Timer.h>
 #include <fstream>
+#include "JsonBox.h"
 
 #include "Thread.h"
-
-std::ofstream threadTest;
 
 namespace atl
 {
@@ -46,12 +45,12 @@ Thread::~Thread()
  **/
 bool Thread::Start(bool* runFlag)
 {
-    if( (m_running && *m_running) || m_threadObj.joinable() ) {
+    if ((m_running && *m_running) || m_threadObj.joinable()) {
         std::cout << "WARNING: Thread threadObject already running" << std::endl;
         return false;
     }
 
-    if(!runFlag) {
+    if (!runFlag) {
         m_deletePtr = true;
         m_running = new bool(true);
     } else {
@@ -70,7 +69,7 @@ bool Thread::Start(bool* runFlag)
  **/
 void Thread::Execute()
 {
-    while(isRunning()) {
+    while (isRunning()) {
         mainLoop();
     }
 }
@@ -83,7 +82,7 @@ void Thread::Execute()
  **/
 void Thread::mainLoop(void)
 {
-    threadTest << m_threadObj.get_id() <<": Thread mainLoop"<<std::endl;
+    std::cout << m_threadObj.get_id() <<": Thread mainLoop"<<std::endl;
     std::cerr << "WARNING: thread mainLoop method not overridden" << std::endl;
     sleep(1);
 }
@@ -95,14 +94,14 @@ void Thread::mainLoop(void)
  **/
 bool Thread::Join()
 {
-    if( !m_threadObj.joinable() || m_threadObj.get_id() == std::this_thread::get_id()) { //Don't join yourself!
+    if (!m_threadObj.joinable() || m_threadObj.get_id() == std::this_thread::get_id()) { //Don't join yourself!
         return false;
     }
 
     m_threadObj.join();
 
     std::unique_lock<std::mutex> guard (m_threadMutex);
-    if(m_deletePtr && m_running) {
+    if (m_deletePtr && m_running) {
         delete m_running;
         m_running = nullptr;
     }
@@ -128,7 +127,7 @@ void Thread::Stop()
 bool Thread::isRunning()
 {
     std::lock_guard<std::mutex> guard (m_threadMutex);
-    if(m_running) {
+    if (m_running) {
         return *m_running;
     } else {
         return false;
@@ -138,41 +137,51 @@ bool Thread::isRunning()
 /**
  * \brief Test function
  **/
-bool testThread(bool printFlag)
+JsonBox::Value testThread(bool printFlag)
 {
-    //create file to redirect output to
-    threadTest.open("ThreadTest.log");
+    JsonBox::Value resultString;
 
     bool rc = true;
     Thread cThread;
 
-    if(printFlag) {
-        threadTest << "Test Stop function"<<std::endl;
+    if (printFlag) {
+        std::cout << "Test Stop function" << std::endl;
     }
+
     cThread.Start(NULL);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     cThread.Stop();
     cThread.Join();
 
-    if(printFlag) {
-        threadTest << "Test running flag"<<std::endl;
+    if (printFlag) {
+        std::cout << "Test running flag" << std::endl;
     }
+
     static bool running = true;
     cThread.Start(&running);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    if(printFlag) {
-        threadTest << "Running being set to false!" << std::endl;
+
+    if (printFlag) {
+        std::cout << "Running being set to false!" << std::endl;
     }
+
+    //Test join
     running = false;
     rc = cThread.Join();
-    if( !rc ) {
-        if(printFlag) {
-            threadTest << "Unable to join thread!"<<std::endl;
+
+    if (!rc) {
+        if (printFlag) {
+            std::cout << "Unable to join thread!"<<std::endl;
             std::cout << "Thread test error. See ThreadTest.log" << std::endl;
         }
+        resultString["Join"] = "fail";
+        resultString["pass"] = false;
+        return resultString;
     }
-    if(printFlag) {
-        threadTest << "Joined"<<std::endl;
+    resultString["Join"] = "pass";
+
+    if (printFlag) {
+        std::cout << "Joined" << std::endl;
     }
 
     //Vector tests (timed)
@@ -180,35 +189,35 @@ bool testThread(bool printFlag)
     running = true;
     std::vector<Thread> threadVect(threadCount);
 
-    if(printFlag) {
-        threadTest << "Testing vector "<<std::endl << std::endl;
-    }
-    //Spawn threadCount threads
-    for( uint16_t i = 0; i < threadCount; i++ ) {
-        threadVect[i].Start(&running);
+    if (printFlag) {
+        std::cout << "Testing vector "<<std::endl << std::endl;
     }
 
+    //Spawn threadCount threads
+    for (uint16_t i = 0; i < threadCount; i++) {
+        threadVect[i].Start(&running);
+    }
 
     //Stop running
     running = false;
 
     //Join all
-    for( uint16_t i = 0; i < threadCount; i++ ) {
+    for (uint16_t i = 0; i < threadCount; i++) {
         threadVect[i].Join();
     }
 
     //ReSpawn threadCount threads
-    for( uint16_t i = 0; i < threadCount; i++ ) {
+    for (uint16_t i = 0; i < threadCount; i++) {
         threadVect[i].Start(&running);
     }
 
     //Stop threadCount threads
-    for( unsigned int i = 0; i < threadCount; i++ ) {
+    for (unsigned int i = 0; i < threadCount; i++) {
         threadVect[i].Stop();
     }
 
-    return true;
-
+    resultString["pass"] = true;
+    return resultString;
 }
 }
 
