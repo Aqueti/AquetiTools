@@ -16,7 +16,6 @@
 #include <ctime>
 
 using namespace atl;
-std::ofstream cacheTest;
 std::mutex printMutex;
 
 /**
@@ -31,7 +30,7 @@ void print_size(LruCache<int,std::string>& cache, bool print, std::shared_future
 
     if(print) {
         std::lock_guard<std::mutex> l(printMutex);
-        cacheTest << "Queue length: " << cache.size() << std::endl;
+        std::cout << "Queue length: " << cache.size() << std::endl;
     } else {
         cache.size();
     }
@@ -49,9 +48,9 @@ void add_to_cache(LruCache<int,std::string>& cache, int num, std::string val, bo
 {
     start.wait();
 
-    if(print) {
+    if (print) {
         std::lock_guard<std::mutex> l(printMutex);
-        cacheTest << "Adding " << num << ": " << val << " to cache" << std::endl;
+        std::cout << "Adding " << num << ": " << val << " to cache" << std::endl;
     }
     cache.add_to_cache(num, val);
 }
@@ -66,19 +65,19 @@ bool retrieve_from_cache(LruCache<int,std::string>& cache, int key, bool print, 
 {
     start.wait();
 
-    if(print) {
+    if (print) {
         std::lock_guard<std::mutex> l(printMutex);
-        cacheTest<< "Retrieving from cache" << std::endl;
+        std::cout << "Retrieving from cache" << std::endl;
     }
     std::string result;
-    if( !cache.get_value(key, result)) {
+    if (!cache.get_value(key, result)) {
         std::lock_guard<std::mutex> l(printMutex);
-        cacheTest << "Failed to retrieve " << key << " from cache"<<std::endl;
+        std::cout << "Failed to retrieve " << key << " from cache" << std::endl;
         return false;
     }
-    if(print) {
+    if (print) {
         std::lock_guard<std::mutex> l(printMutex);
-        cacheTest << "Retrieved " << key << ": " << result << " from cache" << std::endl;
+        std::cout << "Retrieved " << key << ": " << result << " from cache" << std::endl;
     }
 
     return true;
@@ -94,17 +93,16 @@ bool clear_cache(LruCache<int,std::string>& cache, bool print, std::shared_futur
 {
     start.wait();
 
-    if(print) {
+    if (print) {
         std::lock_guard<std::mutex> l(printMutex);
-        cacheTest << "Emptying cache" << std::endl;
+        std::cout << "Emptying cache" << std::endl;
     }
     cache.empty_cache();
 
-    if(print) {
+    if (print) {
         std::lock_guard<std::mutex> l(printMutex);
-        cacheTest << "Cache empty" << std::endl;
+        std::cout << "Cache empty" << std::endl;
     }
-
     return true;
 }
 
@@ -138,7 +136,7 @@ JsonBox::Value test_LruCache(unsigned int numThreads, bool print, bool assertFla
         if (!cache.add_to_cache(value, "string " + std::to_string(i))) {
             if (print) {
                 std::lock_guard<std::mutex> l(printMutex);
-                cacheTest << "Failed to add index "<<i<<" to cache"<<std::endl;
+                std::cout << "Failed to add index "<<i<<" to cache"<<std::endl;
                 std::cout<<"LruCache test error. See LruCacheTest.log" << std::endl;
             }
             if (assertFlag) {
@@ -156,7 +154,7 @@ JsonBox::Value test_LruCache(unsigned int numThreads, bool print, bool assertFla
     if (size != 50) {
         if (print) {
             std::lock_guard<std::mutex> l(printMutex);
-            cacheTest << "Incorrect size(): " << size << " != 50"<<std::endl;
+            std::cout << "Incorrect size(): " << size << " != 50"<<std::endl;
             std::cout<<"LruCache test error. See LruCacheTest.log" << std::endl;
         }
         if (assertFlag) {
