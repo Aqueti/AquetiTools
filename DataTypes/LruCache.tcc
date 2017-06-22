@@ -46,8 +46,6 @@ protected:
     std::function<bool(K,V)> m_cleanupHandler;
 };
 
-bool test_LruCache(unsigned int numThreads, bool print, bool assertFlag);
-
 /*
  * @brief Destructor.  Calls empty_cache()
  */
@@ -265,3 +263,6 @@ push_to_back(std::shared_ptr<QNode> node)
     return true;
 }
 }
+
+
+bool test_LruCache(unsigned int numThreads, bool print = false, bool assertFlag = false);

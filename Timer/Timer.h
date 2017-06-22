@@ -135,8 +135,8 @@ std::string getDateAsString();
 JsonBox::Value testTimer(bool printFlag = true, bool assertFlag = false);
 
 //Timer test helper functions
-void sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
+bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
                 double timeVariance, bool printFlag, bool assertFlag, int testno);
-void objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString);
+bool objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString);
 }
 

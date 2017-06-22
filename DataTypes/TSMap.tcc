@@ -11,6 +11,7 @@
 #include <map>
 #include <mutex>
 #include <vector>
+#include "JsonBox.h"
 
 #include "shared_mutex.h"
 
@@ -392,4 +393,4 @@ namespace atl
     
 }
 
-bool testTSMap( bool printFlag=false, bool valgrind = false );
+JsonBox::Value testTSMap(bool printFlag = false, bool assertFlag = false, bool valgrind = false);

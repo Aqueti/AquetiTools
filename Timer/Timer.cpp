@@ -632,8 +632,6 @@ std::string getDateAsString() {
 //***********************************************************
 JsonBox::Value testTimer(bool printFlag, bool assertFlag)
 {
-    //create file to redirect output
-
     JsonBox::Value resultString;
     Timer timer;
 
@@ -647,7 +645,9 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     timer.setFPS(30.0);
 
     //Check ObjectId size
-    objectIDSizeTest(printFlag, assertFlag, resultString);
+    if (!objectIDSizeTest(printFlag, assertFlag, resultString)) {
+        return resultString;
+    }
 
     //Test sleep time
     timer.start();
@@ -655,8 +655,10 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
     sleep(delayTime);
     double sleepElapsed = timer.elapsed();
 
-    sleepTest(resultString, delayTime, sleepElapsed, timeVariance, 
-    			printFlag, assertFlag, 1);
+    if (!sleepTest(resultString, delayTime, sleepElapsed, timeVariance, 
+    			printFlag, assertFlag, 1)) {
+        return resultString;
+    }
 
     //Test a longer sleep time
     timer.start();
@@ -664,8 +666,10 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
    	sleep(delayTime);
    	sleepElapsed = timer.elapsed();
 
-	sleepTest(resultString, delayTime, sleepElapsed, timeVariance, 
-				printFlag, assertFlag, 2);
+	if (!sleepTest(resultString, delayTime, sleepElapsed, timeVariance, 
+				printFlag, assertFlag, 2)) {
+        return resultString;
+    }
  
    	//Get current timestamp
     int64_t tstamp = convertDoubleToTimeStamp(currTime);
@@ -801,6 +805,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
 
     //std::system("rm TimerTest.log"); */
 
+    resultString["pass"] = true;
     return resultString;
 }
 
@@ -811,7 +816,7 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
  * \param [in] assertFlag boolean (true stops the program)
  * \param [in] resultString JsonBox value passed by reference, updated only if this test fails
  **/
-void objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString) 
+bool objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString) 
 {
     if (sizeof(uint64_t) != sizeof(ObjectId)) {
         if (printFlag) {
@@ -825,9 +830,10 @@ void objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultStr
             assert(false);
         };
 
-        resultString["pass"] = "false";
-        return;
+        resultString["pass"] = false;
+        return false;
     }
+    return true;
 }
 
 /**
@@ -845,7 +851,7 @@ void objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultStr
  *  elapsed, and checks this against an allowed time variance. Notifies user that the
  *  test has been passed if actual variance is less than the time variance.
  **/
-void sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
+bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
 				double timeVariance, bool printFlag, bool assertFlag, int testno) 
 {
 	string currTest = "sleep time " + std::to_string(testno);
@@ -873,12 +879,11 @@ void sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElaps
     	};
 
     	resultString[currTest]["status"] = "fail";
-    	resultString["pass"] = "false";
-    	return;
+    	resultString["pass"] = false;
+    	return false;
     }
 
-    resultString[currTest]["sleep test status"] = "pass";
-    resultString["pass"] = "true";
+    return true;
 }
 
 }

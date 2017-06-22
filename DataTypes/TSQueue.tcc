@@ -6,6 +6,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <memory>
+#include "JsonBox.h"
 
 #pragma once
 
@@ -36,6 +37,7 @@ protected:
 
     virtual void enqueue(std::shared_ptr<QNode> node);   //<! Adds a QNode to the tail of the queue
 
+
 public:
     TSQueue();                                          //<! Constructor
     virtual ~TSQueue();                                 //<! Destructor.  Deletes all data in queue
@@ -54,7 +56,7 @@ public:
 //template<class K, class V> struct CacheNode;
 //template class TSQueue<CacheNode<int,int>>;
 
-bool testTSQueue(unsigned int numThreads=20, bool print=false, bool assertFlag = false);
+JsonBox::Value testTSQueue(unsigned int numThreads = 20, bool print = false, bool assertFlag = false);
 
 /**
 * @brief Node struct for linked list
