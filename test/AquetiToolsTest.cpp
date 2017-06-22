@@ -2,7 +2,7 @@
 
 using namespace std;
 
-JsonBox::Value testAquetiTools(bool testSubmodules, int i)
+JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmodules, bool valgrind)
 {
     JsonBox::Value jsonReturn;
     JsonBox::Value jsonUnits;
@@ -37,33 +37,78 @@ JsonBox::Value testAquetiTools(bool testSubmodules, int i)
     std::string softwareId = softwareId1 + ":" + softwareId2;
     jsonReturn["softwareId"] = softwareId;
 
-    //Get test results from all classes (units)
-    jsonValue = atl::testTimer(true, false);
-    jsonUnits["Timer"] = jsonValue;
-    jsonReturn["units"] = jsonUnits;
-
-    /*switch(i) {
-        case 1: 
-            jsonValue = atl::testTimer(true, false);
-            jsonUnits["Timer"] = jsonValue;
-            jsonReturn["units"] = jsonUnits;
-            break;
-        case 2: 
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        default:
-            break;
-    } */
-
-    //Get submodules
-    subJson2["version"] = atl::VERSION;
-    subJson2["commit"] = atl::GIT_COMMIT_HASH;
-    subJson1["AquetiTools"] = subJson2;
-    jsonReturn["submodules"] = subJson1;
+    //Get results from units
+    for(std::vector<std::string>::iterator it = testList.begin(); it != testList.end(); ++it ) {
+        if( !it->compare("Timer")) {
+              if(valgrind) {
+                cout << "Timer will not be tested." << endl;
+            } 
+            else {
+                std::cout << "Testing Timer..." <<std::endl;
+                jsonValue = atl::testTimer(true, false);
+                jsonUnits["Timer"] = jsonValue;
+                jsonReturn["units"] = jsonUnits;
+                // if(!jsonValue["pass"] ){
+                //     std::cout << "Timer passed successfully!" << std::endl;
+                // }
+                // else{
+                //     std::cout << "Timer failed to pass!"
+                // }
+            }
+        }/*
+        else if(!it->compare("Thread")) {
+            std::cout << "Testing Thread" <<std::endl;
+            if( !atl::testThread() ) {
+                cout << "C11Thread test failed!" << endl;
+                return 1;
+            }
+        }
+        else if(!it->compare("MultiThread")) {
+            std::cout << "Testing MultiThread" <<std::endl;
+            if( !atl::testMultiThread() ) {
+                cout << "MultiThread test failed!" << endl;
+                return 1;
+            }
+        }
+        else if(!it->compare("ThreadPool")) {
+            std::cout << "Testing ThreadPool" <<std::endl;
+            if( !atl::testThreadPool() ) {
+                cout << "ThreadPool test failed!" << endl;
+                return 1;
+            }
+        }
+        else if(!it->compare("LruCache")) {
+            int threads = 100;
+            cout << "Testing LruCache with " << threads << " threads" << endl;
+            if( !atl::test_LruCache(threads, true, false)) {
+                std::cout <<"LruCache test failed!"<<std::endl;
+                return 1;
+            }
+        } 
+        
+        else if(!it->compare("TSMap")) {
+            std::cout << "Testing TSMap" <<std::endl;
+            if( !testTSMap( true, valgrind )) {
+                cout << "TSMap test failed!" << endl;
+                return 1;
+            }
+        }
+        
+        else if(!it->compare("TSQueue")) {
+            std::cout << "Testing TSQueue" <<std::endl;
+            if( !atl::testTSQueue(20, true, false)) {
+                std::cout <<"TSQueue test failed!"<<std::endl;
+                return 1;
+            }
+        }
+        else if( !it->compare("CRC")) {
+            std::cout << "Testing CRC" <<std::endl;
+            if( !atl::testCRC() ) {
+                cout << "CRC test failed!" << endl;
+                return 0;
+            }
+        }*/
+    }
 
     return jsonReturn;
 }

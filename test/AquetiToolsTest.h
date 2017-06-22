@@ -21,89 +21,12 @@
 #include "ThreadPool.h"
 #include <CRC.hpp>
 
-
-
 /**
  * Perform unit tests for the aquetitools repository
  *
+ * @param testList The list of units to run tests on.
  * @param testSubmodules The boolean, if true run unit tests on submodules as well.
- * @param i The integer that denotes which units to run tests on.
+ * @param valgrind The boolean, if true run with valgrind settings.
  * @return JsonBox value with results
  */
-JsonBox::Value testAquetiTools(bool testSubmodules, int i);
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-#include <BaseContainerMetadata.h>
-#include <BaseContainerArrayMetadata.h>
-#include <BaseContainerArray.h>
-#include <BaseContainer.h>
-#include <HContainerMetadata.h>
-#include <HContainer.h>
-#include <MapContainerMetadata.h>
-#include <MapContainer.tcc>
-#include <ImageMetadata.h>
-#include <ImageContainer.h>
-#include <CamImage.h>
-#include <ViewMetadata.h>
-#include <BaseBuffer.h>
-#include <ExtendedBuffer.tcc>
-#include <BaseSocket.h>
-#include <SocketServer.h>
-#include <TSArray.tcc>
-#include <TSQueue.tcc>
-#include <LruCache.tcc>
-#include <ContainerSocket.h>
-#include <ContainerServer.h>
-#include <MultiCommandClient.h>
-#include <CommandServer.h>
-#include <IntKey.h>
-#include <IntPairKey.h>
-#include <StringKey.h>
-#include "Interrupt.tcc"
-#include "Property.tcc"
-#include "PropertyManager.h"
-#include "PropertyTypes.h"
-#include "Messages.h"
-#include "testFactory.h"
-#include <JsonValidator.h>
-#include <TSMap.tcc>
-#include "BaseModule.h"
-#include "RingBufferAllocator.tcc"
-#include "TaskManager.tcc"
-*/
-// Defines test functions
-/*
-bool test_PropertyManager(int numThreads);
-bool testBaseContainerThreadSafety( bool printFlag=false, bool valgrind=false );
-bool testImageContainerThreadSafety( bool printFlag=false, bool valgrind=false );
-bool testCamImageThreadSafety( bool printFlag=false, bool valgrind=false );
-bool testHContainerThreadSafety( bool printFlag=false, bool valgrind=false );
-bool testStreamManager( bool printFlag=false, bool valgrind=false );
-bool testContainerSocket( bool printFlag=false, bool valgrnd=false );
-bool testThreadPool();
-bool testMessages();
-bool testModule();
-bool testTaskManager(int threads);
-
-
-class TestModule: public atl::BaseModule
-{
-public:
-    TestModule(atl::PropertyManager& pm, atl::PropertyManager& logger);
-
-    void testWarning();
-};
-*/
-
+JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmodules = true, bool valgrind = false);
