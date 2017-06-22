@@ -5,6 +5,7 @@
 #define  CRC_HPP
 
 #include <map>
+#include "JsonBox.h"
 
 namespace atl
 {
@@ -35,6 +36,6 @@ namespace atl
          bool     generateTable();
    };
 
-   bool testCRC();
+   JsonBox::Value testCRC();
 }
 #endif

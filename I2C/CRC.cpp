@@ -28,8 +28,9 @@ namespace atl
     **/
    bool CRC16::generateTable() 
    {
-      for ( int i = 0; i < 256; i++) {
+      for (int i = 0; i < 256; i++) {
          uint16_t result = i << 8;
+
          for (int j = 0; j < 8; j++) {
             // Flag for XOR if leftmost bit is set 
             bool xor_flag = result & 0x8000;
@@ -71,16 +72,15 @@ namespace atl
       CRCMap value;
       value.crc = m_initialValue;
 
-      //Caclulate the raw crc
+      //Calculate the raw crc
       for(size_t i = 0; i < length; i++) {
         value.crc = ((value.crc << 8) | array[i]) ^ m_crcTable[value.crc >> 8];
       }
 
       // Augment 16 zero-bits 
-//      for ( size_t i = 0; i < 2; i++) {
-        value.crc = ((value.crc << 8) | 0 ) ^ m_crcTable[value.crc >> 8];
-        value.crc = ((value.crc << 8) | 0 ) ^ m_crcTable[value.crc >> 8];
-//     }
+      value.crc = ((value.crc << 8) | 0) ^ m_crcTable[value.crc >> 8];
+      value.crc = ((value.crc << 8) | 0) ^ m_crcTable[value.crc >> 8];
+//    
 
       //Flip the bytes
       uint8_t first = value.bytes[1];
@@ -96,8 +96,10 @@ namespace atl
     *
     * \return whether or not the test succeeded
     **/
-   bool testCRC()
+   JsonBox::Value testCRC()
    {
+      JsonBox::Value resultString;
+
       uint8_t buffer[256];
       uint16_t expected = 0x03d2;
 
@@ -118,16 +120,20 @@ namespace atl
 
       uint16_t result = crc.calculate( buffer, datalen);
 
-      if( result != expected ) { 
+      if (result != expected) { 
          std::cout  << "CRC Check failed. Received "
                     << std::hex << result 
                     << " expected " << std::hex
                     << expected <<std::endl;
-        return false;
+        resultString["CRC Check"] = "fail";
+        resultString["pass"] = false;
+        return resultString;
       }
-
-      return true;
-    }
+      
+      resultString["CRC Check"] = "pass";
+      resultString["pass"] = true;
+      return resultString;
+  }
 }
 
 
