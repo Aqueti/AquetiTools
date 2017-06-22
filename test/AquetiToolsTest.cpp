@@ -1,25 +1,4 @@
 
-
-
-#include <Timer.h>
-#include <Thread.h>
-#include <MultiThread.h>
-#include <ThreadPool.h>
-//#include <LruCache.cpp>
-//#include <TSMap.cpp>
-#include <TSMap.tcc>
-#include <aquetitools/revision.h>
-#include <iostream>
-#include <string.h>
-//#include <TSQueue.cpp>
-#include <TSQueue.tcc>
-#include "JsonBox.h"
-
-
-#include "ThreadPool.h"
-#include <CRC.hpp>
-
-
 #include "AquetiToolsTest.h"
 
 using namespace std;
@@ -80,12 +59,6 @@ JsonBox::Value testAquetiTools(bool testSubmodules, int i)
         default:
             break;
     } */
-
-    //Get submodules
-    subJson2["version"] = atl::VERSION;
-    subJson2["commit"] = atl::GIT_COMMIT_HASH;
-    subJson1["AquetiTools"] = subJson2;
-    jsonReturn["submodules"] = subJson1;
 
     return jsonReturn;
 }

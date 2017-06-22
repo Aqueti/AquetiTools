@@ -1,24 +1,4 @@
 
-
-#include <Timer.h>
-#include <Thread.h>
-#include <MultiThread.h>
-#include <ThreadPool.h>
-#include <LruCache.cpp>
-#include <TSMap.cpp>
-#include <TSMap.tcc>
-#include <aquetitools/revision.h>
-#include <iostream>
-#include <string.h>
-#include <TSQueue.cpp>
-#include <TSQueue.tcc>
-#include "JsonBox.h"
-
-
-#include "ThreadPool.h"
-#include <CRC.hpp>
-
-
 #include "AquetiToolsTest.h"
 
 using namespace std;
