@@ -33,7 +33,7 @@ bool ThreadPool::push_job(std::function<void()> f)
 void ThreadPool::mainLoop()
 {
     std::function<void()> f;
-    if(dequeue(f, m_timeout) && f) {
+    if (dequeue(f, m_timeout) && f) {
         f();
     }
 }
@@ -59,6 +59,7 @@ bool doThreadPoolThing(int threads)
     std::cout << threads << " threads: ";
     atl::ThreadPool tp(threads, 1000);
     std::atomic_int i(0);
+
     auto fun = [&](){
         i++;
         atl::sleep(0.001);
@@ -67,7 +68,7 @@ bool doThreadPoolThing(int threads)
 	atl::Timer t;
     tp.Start();
 
-    for(int j = 0; j < 1000; j++) {
+    for (int j = 0; j < 1000; j++) {
         tp.push_job(fun);
     }
 
@@ -84,15 +85,21 @@ bool doThreadPoolThing(int threads)
 *
 * \return true if the test passes
 **/
-bool testThreadPool()
+JsonBox::Value testThreadPool()
 {
+    JsonBox::Value resultString;
+
     bool ret = doThreadPoolThing(5);
     ret = doThreadPoolThing(1) && ret;
 
-    if(ret) {
-        std::cout << "Threadpool test passed!" << std::endl;
+    if (!ret) {
+        std::cout << "Threadpool test failed." << std::endl;
+        resultString["Threadpool"] = "fail";
+        resultString["pass"] = false;
+        return resultString;
     }
-    return ret;
-   	}
-
+    resultString["Threadpool"] = "pass";
+    resultString["pass"] = true;
+    return resultString;
+}
 }

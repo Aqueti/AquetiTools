@@ -9,6 +9,7 @@
 #include "ThreadPool.h"
 #include <thread>
 #include "Timer.h"
+#include "JsonBox.h"
 
 #pragma once
 
@@ -38,7 +39,7 @@ namespace atl
     };
 
     bool doThreadPoolThing(int threads);
-    bool testThreadPool();
+    JsonBox::Value testThreadPool();
 }
 
 #endif /* THREADPOOL_H_ */

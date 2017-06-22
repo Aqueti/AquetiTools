@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Thread.h"
+#include "JsonBox.h"
 #include <vector>
 
 namespace atl
@@ -22,5 +23,5 @@ private:
     std::vector<std::thread>    m_threads;      //!< Running threads
 };
 
-bool testMultiThread(bool printFlag = true);
+JsonBox::Value testMultiThread(bool printFlag = true);
 }
