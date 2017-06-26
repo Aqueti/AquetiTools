@@ -16,7 +16,6 @@
 #include <fstream>
 
 using namespace atl;
-std::ofstream qTest;
 
 /**
 * @brief Test: prints the size of the queue for debugging
@@ -26,8 +25,8 @@ std::ofstream qTest;
 */
 void print_queue_size(TSQueue<int>& q, bool print)
 {
-    if(print) {
-        qTest << "Queue length: " << q.size() << std::endl;
+    if (print) {
+        std::cout << "Queue length" << q.size() << std::endl;
     } else {
         q.size();
     }
@@ -42,8 +41,8 @@ void print_queue_size(TSQueue<int>& q, bool print)
 */
 void add_to_queue(TSQueue<int>& q, int num, bool print)
 {
-    if(print) {
-        qTest << "Adding " << num << " to queue" << std::endl;
+    if (print) {
+        std::cout << "Adding " << num << " to queue" << std::endl;
     }
     q.enqueue(num);
 }
@@ -56,16 +55,16 @@ void add_to_queue(TSQueue<int>& q, int num, bool print)
 */
 bool remove_from_queue(TSQueue<int>& q, bool print)
 {
-    if(print) {
-        qTest<< "Removing from queue" << std::endl;
+    if (print) {
+        std::cout << "Removing from queue" << std::endl;
     }
     int num;
-    if( !q.dequeue(num, 1000)) {
-        qTest << "Failed to remove from queue"<<std::endl;
+    if (!q.dequeue(num, 1000)) {
+        std::cout << "Failed to remove from queue" << std::endl;
         return false;
     }
     if(print) {
-        qTest << "Removed " << num << " from queue" << std::endl;
+        std::cout << "Removed " << num << " from queue" << std::endl;
     }
 
     return true;
@@ -80,14 +79,14 @@ bool remove_from_queue(TSQueue<int>& q, bool print)
 bool peek_at_queue(TSQueue<int>& q, bool print)
 {
     int num = 0;
-    if( !q.peek( num )) {
-        if(print) {
-            qTest << "Peek failed!"<<std::endl;
+    if (!q.peek(num)) {
+        if (print) {
+            std::cout << "Peek failed!" << std::endl;
         }
         return false;
     }
-    if(print) {
-        qTest << "Head: " << num << std::endl;
+    if (print) {
+        std::cout << "Head: " << num << std::endl;
     }
 
     return true;
@@ -101,8 +100,8 @@ bool peek_at_queue(TSQueue<int>& q, bool print)
 */
 bool push_to_queue(TSQueue<int>& q, int num, bool print)
 {
-    if(print) {
-        qTest << "Adding " << num << " to queue" << std::endl;
+    if (print) {
+        std::cout << "Adding " << num << " to queue" << std::endl;
     }
     q.push(num);
     return true;
@@ -116,18 +115,17 @@ bool push_to_queue(TSQueue<int>& q, int num, bool print)
 */
 bool pop_from_queue(TSQueue<int>& q, bool print)
 {
-    if(print) {
-        qTest << "Popping from queue" << std::endl;
+    if (print) {
+        std::cout << "Popping from queue" << std::endl;
     }
     int num;
-    if( ! q.pop(num, 0)) {
-        qTest <<"Failed to pop"<<std::endl;
+    if (!q.pop(num, 0)) {
+        std::cout << "Failed to pop" << std::endl;
         return false;
     }
-    if(print) {
-        qTest << "Popped " << num << " from queue" << std::endl;
+    if (print) {
+        std::cout << "Popped " << num << " from queue" << std::endl;
     }
-
     return true;
 }
 
@@ -142,125 +140,150 @@ namespace atl
 *
 * @return true on success
 */
-bool testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
+JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
 {
-
-    //create file to redirect output to
-    qTest.open("TSQueueTest.log");
-
     TSQueue<int> q;
+    JsonBox::Value resultString;
 
-    for( int i = 0; i < 100; i++ ) {
+    //Tests enqueue function
+    for (int i = 0; i < 100; i++) {
         int value = i;
-        if(!q.enqueue(value)) {
-            if(print) {
-                qTest << "Failed to enqueue to index "<<i<<std::endl;
-                std::cout<<"TSQueue test error. See TSQueueTest.log" << std::endl;
+        if (!q.enqueue(value)) {
+            if (print) {
+                std::cout << "Failed to enqueue to index " << i << std::endl;
+                std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
             }
-            if(assertFlag) {
+            if (assertFlag) {
                 assert(false);
             }
-            return false;
-        }
+            resultString["Enqueue 1"] = "fail";
+            resultString["pass"] = false;
+            return resultString;
+        };
     }
+    resultString["Enqueue 1"] = "pass";
 
     q.delete_all();
 
+    //Tests size of 0
     unsigned size = q.size();
-    if(size != 0) {
-        if(print) {
-            qTest << "Incorrect size(): " << size << " != 0"<<std::endl;
-            std::cout<<"TSQueue test error. See TSQueueTest.log" << std::endl;
+    if (size != 0) {
+        if (print) {
+            std::cout << "Incorrect size(): " << size << " != 0" << std::endl;
+            std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
         }
-        if(assertFlag) {
+        if (assertFlag) {
             assert(false);
         }
+        resultString["Size 1"] = "fail";
+        resultString["pass"] = false;
+        return resultString;
     };
+    resultString["Size 1"] = "pass";
 
-    for( int i = 0; i < 100; i++ ) {
+    //Tests enqueue function again
+    for (int i = 0; i < 100; i++) {
         int value = i;
-        if(!q.enqueue(value)) {
-            if(print) {
-                qTest << "Failed to enqueue to index "<<i<<std::endl;
-                std::cout<<"TSQueue test error. See TSQueueTest.log" << std::endl;
+        if (!q.enqueue(value)) {
+            if (print) {
+                std::cout << "Failed to enqueue to index " << i << std::endl;
+                std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
             }
             if(assertFlag) {
                 assert(false);
             }
-            return false;
-        }
+            resultString["Enqueue 2"] = "fail";
+            resultString["pass"] = false;
+            return resultString;
+        };
     }
+    resultString["Enqueue 2"] = "pass";
 
+    //Tests size of 100
     size = q.size();
-    if(size != 100) {
+    if (size != 100) {
         if(print) {
-            qTest << "Incorrect size(): " << size << " != 100"<<std::endl;
-            std::cout<<"TSQueue test error. See TSQueueTest.log" << std::endl;
+            std::cout << "Incorrect size(): " << size << " != 100" << std::endl;
+            std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
         }
-        if(assertFlag) {
+        if (assertFlag) {
             assert(false);
         }
-    }
+        resultString["Size 2"] = "fail";
+        resultString["pass"] = false;
+        return resultString;
+    };
+    resultString["Size 2"] = "pass";
 
+    //Tests dequeue function
     int result;
-    for(int i = 0; i < 100; i++ ) {
-        if( !q.dequeue(result)) {
-            if(print) {
-                qTest << "Failed to dqueue at index "<<i<<std::endl;
-                std::cout<<"TSQueue test error. See TSQueueTest.log" << std::endl;
+    for (int i = 0; i < 100; i++) {
+        if (!q.dequeue(result)) {
+            if (print) {
+                std::cout << "Failed to dqueue at index " << i << std::endl;
+                std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
             }
-            if(assertFlag) {
+            if (assertFlag) {
                 assert(false);
             }
-            return false;
-        }
+            resultString["Dequeue1 "] = "fail";
+            resultString["pass"] = false;
+            return resultString;
+        };
 
-        if( result != i ) {
-            if(print) {
-                qTest << "Unexpected result: "<<result<<" != "<<i<<std::endl;
-                std::cout<<"TSQueue test error. See TSQueueTest.log" << std::endl;
+        if (result != i) {
+            if (print) {
+                std::cout << "Unexpected result: "<<result<<" != " << i << std::endl;
+                std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
             }
             if(assertFlag) {
                 assert(false);
             }
-            return false;
-        }
+            resultString["Dequeue 1"] = "fail";
+            resultString["pass"] = false;
+            return resultString;
+        };
     }
+    resultString["Dequeue 1"] = "pass";
 
-    if(q.dequeue(result, 1000)) { //Try to dequeue for a second
-        if(print) {
-            qTest << "Dequeue succeeded with no elements left"<<std::endl;
-            std::cout<<"TSQueue test error. See TSQueueTest.log" << std::endl;
+    if (q.dequeue(result, 1000)) { //Try to dequeue for a second
+        if (print) {
+            std::cout << "Dequeue succeeded with no elements left" << std::endl;
+            std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
         }
-        if(assertFlag) {
+        if (assertFlag) {
             assert(false);
         }
-    }
+        resultString["Dequeue 2"] = "fail";
+        resultString["pass"] = false;
+        return resultString;
+    };
+    resultString["Dequeue 2"] = "pass";
 
     // Test thread safety
     std::thread* t = new std::thread[numThreads];
-    if(print) {
-        qTest << "Default max size: " << q.get_max_size() << std::endl;
+    if (print) {
+        std::cout << "Default max size: " << q.get_max_size() << std::endl;
     }
     q.set_max_size(10);
 
-    if(print) {
-        qTest << "New max size: " << q.get_max_size() << std::endl;
+    if (print) {
+        std::cout << "New max size: " << q.get_max_size() << std::endl;
     }
 
     std::clock_t start;
     double duration = 0;
 
-    if(print) {
-        qTest << "Operations: " << numThreads << std::endl << "Threads: " << numThreads << std::endl;
+    if (print) {
+        std::cout << "Operations: " << numThreads << std::endl << "Threads: " << numThreads << std::endl;
     }
 
     start = std::clock();
 
-    for(unsigned i = 0; i < numThreads; i++) {
-        int num = (uint64_t)(getTime()* 1E6)%6+1;
-        qTest <<"Number:"<<num<<" on count "<<i<<"of "<<numThreads<<std::endl;
-        switch( num ) {
+    for (unsigned i = 0; i < numThreads; i++) {
+        int num = (uint64_t)(getTime()* 1E6) % 6 + 1;
+        std::cout << "Number:" << num << " on count " << i << "of " << numThreads << std::endl;
+        switch (num) {
         case 1:
             t[i] = std::thread(add_to_queue, std::ref(q), i, print);
             break;
@@ -284,35 +307,34 @@ bool testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
         }
     }
 
-    for(unsigned i=0; i < numThreads; i++) {
+    for (unsigned i = 0; i < numThreads; i++) {
         t[i].join();
     }
-    if(print) {
-        qTest << "Joined all"<<std::endl;
+
+    if (print) {
+        std::cout << "Joined all" << std::endl;
     }
 
-    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    duration = (std::clock() - start ) / (double) CLOCKS_PER_SEC;
     if(print) {
-        qTest << "Time: " << duration << std::endl;
+        std::cout << "Time: " << duration << std::endl;
     }
-
 
     delete[] t;
 
-
-    if(print) {
-        std::cout <<"TSQueue Test Complete"<<std::endl;
-    }
-
-    if(print) {
-        std::cout <<"TSQueue Test Complete"<<std::endl;
+    if (print) {
+        std::cout << "TSQueue Test Complete" << std::endl;
     }
 
     result = std::system("rm TSQueueTest.log");
-    if(result != 0){
+    if (result != 0) {
         std::cout << "Failed to remove log" << std::endl;
-        return false;
+        resultString["Remove log"] = "fail";
+        resultString["pass"] = false;
+        return resultString;
     }
-    return true;
+
+    resultString["pass"] = true;
+    return resultString;
 }
 }
