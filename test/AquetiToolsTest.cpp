@@ -1,3 +1,4 @@
+
 #include "AquetiToolsTest.h"
 
 using namespace std;
@@ -9,6 +10,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmo
     JsonBox::Value jsonValue;
     JsonBox::Value subJson1;
     JsonBox::Value subJson2;
+    bool pass = true;
 
     //Get type
     jsonReturn["type"] = "unit_tests";
@@ -48,6 +50,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmo
                 jsonValue = atl::testTimer(true, false);
                 jsonUnits["Timer"] = jsonValue;
                 jsonReturn["units"] = jsonUnits;
+                std::cout << jsonReturn << std::endl;
                 // if(!jsonValue["pass"] ){
                 //     std::cout << "Timer passed successfully!" << std::endl;
                 // }
@@ -110,5 +113,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmo
         }*/
     }
 
+    //get pass
+    jsonReturn["pass"] = pass;
     return jsonReturn;
 }

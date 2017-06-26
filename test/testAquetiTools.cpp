@@ -1,3 +1,4 @@
+
 #include "AquetiToolsTest.h"
 
 using namespace std;
@@ -35,7 +36,6 @@ int main(int argc, char *argv[])
     //run tests
     std::cout << "Testing AquetiTools..." << std::endl;
     JsonBox::Value result = testAquetiTools(testList, testSubmodules, valgrind);
-    std::cout << result << std::endl;
     std::cout << "All tests completed!" << std::endl;
 
 /*
