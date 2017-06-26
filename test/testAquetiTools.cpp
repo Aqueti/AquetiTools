@@ -41,20 +41,20 @@ int main(int argc, char *argv[])
         std::cout << "AquetiTools failed to pass!" << std::endl;
     }
 
-/*
+
     //connect to database and insert JsonValue if "-n" was not used
-    std::cout << "Inserting unit test results in database..."
-    if(insert){
-        mongoapi::MongoInterface mi;
-        bool connected = mi.connect("aqueti");
-        if(connected){
-            mi.insertUnitTests("unit_tests", result);
-        }
-        else{
-            std::cout << "Failed to insert unit test results!" << std::endl;
-            return 0;
-        }
-    }
-*/
+    // std::cout << "Inserting unit test results in database..." << std::endl;
+    // if(insert){
+    //     mongoapi::MongoInterface mi;
+    //     bool connected = mi.connect("aqueti");
+    //     if(connected){
+    //         mi.insertUnitTests("unit_tests", result);
+    //     }
+    //     else{
+    //         std::cout << "Failed to insert unit test results!" << std::endl;
+    //         return 0;
+    //     }
+    // }
+
     return 0;
 }

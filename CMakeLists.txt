@@ -242,9 +242,11 @@ add_library( aquetitools STATIC
 )
 
 target_link_libraries( aquetitools
-   libJsonBox.a
+   JsonBox
    pthread
 )
+
+list(APPEND TARGET_LIST aquetitools )
 
 if(MAKE_TESTS)
    #Make a dedicated test library
@@ -254,7 +256,9 @@ if(MAKE_TESTS)
    target_link_libraries( aquetitools_test
       aquetitools
    )
-   list(APPEND TARGET_LIST aquetitools )
+   list(APPEND TARGET_LIST aquetitools_test )
+
+   list(APPEND ATOOL_HEADERS test/AquetiToolsTest.h )
 
    #Add AquetiTools test as an executavble
    add_executable( testAquetiTools
