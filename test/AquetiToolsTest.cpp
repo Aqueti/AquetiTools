@@ -1,15 +1,11 @@
 
 #include "AquetiToolsTest.h"
 
-using namespace std;
-
-JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmodules, bool valgrind)
+JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmodules, bool valgrind)
 {
     JsonBox::Value jsonReturn;
     JsonBox::Value jsonUnits;
     JsonBox::Value jsonValue;
-    JsonBox::Value subJson1;
-    JsonBox::Value subJson2;
     bool pass = true;
 
     //Get type
@@ -40,10 +36,10 @@ JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmo
     jsonReturn["softwareId"] = softwareId;
 
     //Get results from units
-    for(std::vector<std::string>::iterator it = testList.begin(); it != testList.end(); ++it ) {
+    for(std::vector<std::string>::iterator it = unitList.begin(); it != unitList.end(); ++it ) {
         if( !it->compare("Timer")) {
               if(valgrind) {
-                cout << "Timer will not be tested." << endl;
+                std::cout << "Timer will not be tested." << std::endl;
             } 
             else {
                 std::cout << "Testing Timer..." <<std::endl;
@@ -116,6 +112,5 @@ JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmo
 
     //get pass
     jsonReturn["pass"] = pass;
-    std::cout << jsonReturn << std::endl;
     return jsonReturn;
 }

@@ -2,7 +2,7 @@
 #include "AquetiToolsTest.h"
 
 using namespace std;
-std::vector<std::string> testList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"};
+std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"};
 
 int main(int argc, char *argv[])
 {
@@ -16,16 +16,13 @@ int main(int argc, char *argv[])
     for(i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-v")) {
             valgrind = true;
-        } else if (!strcmp(argv[i], "--version")) {
-            //AquetiTool::printVersion();
-            return 1;
-        } else if(!strcmp(argv[i], "-t")) {
+        } else if(!strcmp(argv[i], "-u")) {
             if (testAll) {
-                testList.clear();
+                unitList.clear();
                 testAll = false;
             }
             i++;
-            testList.push_back( argv[i]);
+            unitList.push_back( argv[i]);
         } else if(strcmp(argv[i], "-n") == 0){
             insert = false;
         } else if(strcmp(argv[i], "-s") == 0){
@@ -35,8 +32,14 @@ int main(int argc, char *argv[])
 
     //run tests
     std::cout << "Testing AquetiTools..." << std::endl;
-    JsonBox::Value result = testAquetiTools(testList, testSubmodules, valgrind);
-    std::cout << "All tests completed!" << std::endl;
+    JsonBox::Value result = testAquetiTools(unitList, testSubmodules, valgrind);
+    std::cout << result << std::endl;
+    if(result["pass"] == true){
+        std::cout << "AquetiTools passed successfully!" << std::endl;
+    }
+    else{
+        std::cout << "AquetiTools failed to pass!" << std::endl;
+    }
 
 /*
     //connect to database and insert JsonValue if "-n" was not used
