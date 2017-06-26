@@ -50,13 +50,14 @@ JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmo
                 jsonValue = atl::testTimer(true, false);
                 jsonUnits["Timer"] = jsonValue;
                 jsonReturn["units"] = jsonUnits;
-                std::cout << jsonReturn << std::endl;
-                // if(!jsonValue["pass"] ){
-                //     std::cout << "Timer passed successfully!" << std::endl;
-                // }
-                // else{
-                //     std::cout << "Timer failed to pass!"
-                // }
+                if(jsonValue["pass"].getBoolean()){
+                    std::cout << "Timer passed successfully!" << std::endl;
+                    pass = pass && true;
+                }
+                else{
+                    std::cout << "Timer failed to pass!" << std::endl;
+                    pass = pass && false;
+                }
             }
         }/*
         else if(!it->compare("Thread")) {
@@ -115,5 +116,6 @@ JsonBox::Value testAquetiTools(std::vector<std::string> testList, bool testSubmo
 
     //get pass
     jsonReturn["pass"] = pass;
+    std::cout << jsonReturn << std::endl;
     return jsonReturn;
 }
