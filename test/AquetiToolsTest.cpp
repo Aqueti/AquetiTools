@@ -42,8 +42,8 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 std::cout << "Timer will not be tested." << std::endl;
             } 
             else {
-                std::cout << "Testing Timer..." <<std::endl;
-                jsonValue = atl::testTimer(true, false);
+                std::cout << "Testing Timer..." << std::endl;
+                jsonValue = atl::testTimer();
                 jsonUnits["Timer"] = jsonValue;
                 jsonReturn["units"] = jsonUnits;
                 if(jsonValue["pass"].getBoolean()){
@@ -55,14 +55,21 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                     pass = pass && false;
                 }
             }
-        }/*
-        else if(!it->compare("Thread")) {
-            std::cout << "Testing Thread" <<std::endl;
-            if( !atl::testThread() ) {
-                cout << "C11Thread test failed!" << endl;
-                return 1;
-            }
         }
+        else if(!it->compare("Thread")) {
+            std::cout << "Testing Thread..." << std::endl;
+            jsonValue = atl::testThread();
+            jsonUnits["Thread"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            if(jsonValue["pass"].getBoolean()) {
+                std::cout << "Thread passed successfully!" << std::endl;
+                    pass = pass && true;
+            }
+            else{
+                    std::cout << "Thread failed to pass!" << std::endl;
+                    pass = pass && false;
+            }        
+        }/*
         else if(!it->compare("MultiThread")) {
             std::cout << "Testing MultiThread" <<std::endl;
             if( !atl::testMultiThread() ) {
@@ -112,5 +119,6 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
 
     //get pass
     jsonReturn["pass"] = pass;
+    std::cout << jsonReturn << std::endl;
     return jsonReturn;
 }

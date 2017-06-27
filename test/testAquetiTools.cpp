@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
     //run tests
     std::cout << "Testing AquetiTools..." << std::endl;
     JsonBox::Value result = testAquetiTools(unitList, testSubmodules, valgrind);
-    std::cout << result << std::endl;
     if(result["pass"] == true){
         std::cout << "AquetiTools passed successfully!" << std::endl;
     }
