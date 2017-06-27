@@ -22,6 +22,4 @@ private:
     unsigned                    m_numThreads;   //!< Number of threads to spawn
     std::vector<std::thread>    m_threads;      //!< Running threads
 };
-
-JsonBox::Value testMultiThread(bool printFlag = true);
 }

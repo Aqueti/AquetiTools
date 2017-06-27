@@ -214,7 +214,6 @@ list( APPEND ATOOL_HEADERS
 
 include_directories( DataTypes )
 set( DataTypes_SRC
-   DataTypes/LruCache.cpp
    DataTypes/TSMap.cpp
    DataTypes/TSQueue.cpp
 )
@@ -252,6 +251,11 @@ if(MAKE_TESTS)
    #Make a dedicated test library
    add_library( aquetitools_test STATIC
       test/AquetiToolsTest.cpp
+      test/TimerTest.cpp
+      test/ThreadTest.cpp
+      test/MultiThreadTest.cpp
+      test/ThreadPoolTest.cpp
+      test/LruCacheTest.cpp
    )
    target_link_libraries( aquetitools_test
       aquetitools
@@ -262,7 +266,7 @@ if(MAKE_TESTS)
 
    #Add AquetiTools test as an executavble
    add_executable( testAquetiTools
-      test/testAquetiTools.cpp 
+     test/testAquetiTools.cpp
    )
    TARGET_LINK_LIBRARIES(testAquetiTools
       aquetitools_test

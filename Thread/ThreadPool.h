@@ -37,9 +37,6 @@ namespace atl
         std::atomic<double> m_timeout;                  //!< Timeout value of the thread pool
         virtual void mainLoop();
     };
-
-    bool doThreadPoolThing(int threads);
-    JsonBox::Value testThreadPool();
 }
 
 #endif /* THREADPOOL_H_ */

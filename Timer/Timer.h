@@ -131,12 +131,5 @@ void        sleep(double time);
 // std::string convertUsecsToDate(uint64_t usecs);
 std::string getDateAsString();
 
-//Functional test for the timer
-JsonBox::Value testTimer(bool printFlag = true, bool assertFlag = false);
-
-//Timer test helper functions
-bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
-                double timeVariance, bool printFlag, bool assertFlag, int testno);
-bool objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString);
 }
 

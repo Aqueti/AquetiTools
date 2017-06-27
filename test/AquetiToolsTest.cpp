@@ -1,6 +1,8 @@
 
 #include "AquetiToolsTest.h"
 
+namespace atl{
+
 JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmodules, bool valgrind)
 {
     JsonBox::Value jsonReturn;
@@ -55,7 +57,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                     pass = pass && false;
                 }
             }
-        }
+        } 
         else if(!it->compare("Thread")) {
             std::cout << "Testing Thread..." << std::endl;
             jsonValue = atl::testThread();
@@ -97,15 +99,22 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                     std::cout << "ThreadPool failed to pass!" << std::endl;
                     pass = pass && false;
             } 
-        }/*
+        }
         else if(!it->compare("LruCache")) {
             int threads = 100;
-            cout << "Testing LruCache with " << threads << " threads" << endl;
-            if( !atl::test_LruCache(threads, true, false)) {
-                std::cout <<"LruCache test failed!"<<std::endl;
-                return 1;
+            std::cout << "Testing LruCache with " << threads << " threads..." << std::endl;
+            jsonValue = atl::testLruCache(threads);
+            jsonUnits["LruCache"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            if(jsonValue["pass"].getBoolean()) {
+                std::cout << "LruCache passed successfully!" << std::endl;
+                    pass = pass && true;
             }
-        } 
+            else{
+                    std::cout << "LruCache failed to pass!" << std::endl;
+                    pass = pass && false;
+            } 
+        } /* 
         
         else if(!it->compare("TSMap")) {
             std::cout << "Testing TSMap" <<std::endl;
@@ -135,4 +144,6 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
     jsonReturn["pass"] = pass;
     std::cout << jsonReturn << std::endl;
     return jsonReturn;
+}
+
 }

@@ -2,6 +2,13 @@
 
 #include "TSQueue.tcc"
 #include <map>
+#include <fstream>
+#include <assert.h>
+#include <random>
+#include <Timer.h>
+#include <mutex>
+#include <future>
+#include <ctime>
 
 namespace atl
 {
@@ -38,6 +45,7 @@ public:
     using Q::size;
     using Q::set_max_size;
     using Q::get_max_size;
+    friend JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assertFlag);
 
 protected:
     typedef typename Q::QNode QNode;      //<! Defining QNode
@@ -282,6 +290,3 @@ push_to_back(std::shared_ptr<QNode> node)
     return true;
 }
 }
-
-
-bool test_LruCache(unsigned int numThreads, bool print = false, bool assertFlag = false);

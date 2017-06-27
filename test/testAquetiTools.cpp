@@ -1,7 +1,6 @@
 
 #include "AquetiToolsTest.h"
 
-using namespace std;
 std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"};
 
 int main(int argc, char *argv[])
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
 
     //run tests
     std::cout << "Testing AquetiTools..." << std::endl;
-    JsonBox::Value result = testAquetiTools(unitList, testSubmodules, valgrind);
+    JsonBox::Value result = atl::testAquetiTools(unitList, testSubmodules, valgrind);
     if(result["pass"] == true){
         std::cout << "AquetiTools passed successfully!" << std::endl;
     }

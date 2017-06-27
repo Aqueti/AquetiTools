@@ -46,6 +46,4 @@ public:
     std::mutex    m_threadMutex;         //!< Mutex to signal closure
     std::thread   m_threadObj;           //!< Thread variable
 };
-
-JsonBox::Value testThread(bool printFlag = true);
 }
