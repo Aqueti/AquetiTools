@@ -69,14 +69,21 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                     std::cout << "Thread failed to pass!" << std::endl;
                     pass = pass && false;
             }        
-        }/*
-        else if(!it->compare("MultiThread")) {
-            std::cout << "Testing MultiThread" <<std::endl;
-            if( !atl::testMultiThread() ) {
-                cout << "MultiThread test failed!" << endl;
-                return 1;
-            }
         }
+        else if(!it->compare("MultiThread")) {
+            std::cout << "Testing MultiThread..." <<std::endl;
+            jsonValue = atl::testMultiThread();
+            jsonUnits["MultiThread"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            if(jsonValue["pass"].getBoolean()) {
+                std::cout << "MultiThread passed successfully!" << std::endl;
+                    pass = pass && true;
+            }
+            else{
+                    std::cout << "MultiThread failed to pass!" << std::endl;
+                    pass = pass && false;
+            } 
+        }/*
         else if(!it->compare("ThreadPool")) {
             std::cout << "Testing ThreadPool" <<std::endl;
             if( !atl::testThreadPool() ) {
