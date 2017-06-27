@@ -94,11 +94,9 @@ JsonBox::Value testThreadPool()
 
     if (!ret) {
         std::cout << "Threadpool test failed." << std::endl;
-        resultString["Threadpool"] = "fail";
         resultString["pass"] = false;
         return resultString;
     }
-    resultString["Threadpool"] = "pass";
     resultString["pass"] = true;
     return resultString;
 }
