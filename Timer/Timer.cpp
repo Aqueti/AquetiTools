@@ -437,6 +437,22 @@ timeval TimevalSum(const timeval& tv1, const timeval& tv2)
 }
 
 /*
+ *!\brief compares two time values
+ *\return 1 if tv1 is greater than tv2;  0 otherwise
+ */
+
+bool TimevalGreater(const timeval& tv1, const timeval& tv2)
+{
+    if (tv1.tv_sec > tv2.tv_sec) {
+        return 1;
+    }
+    if ((tv1.tv_sec == tv2.tv_sec) && (tv1.tv_usec > tv2.tv_usec)) {
+        return 1;
+    }
+    return 0;
+}
+
+/*
  *!\brief perform normalization of a timeval
  * XXX this still needs to be checked for errors if the timeval
  * or the rate is negative
@@ -486,21 +502,6 @@ timeval TimevalScale(const timeval& tv, double scale)
         (long)(tv.tv_usec * scale + fmod(tv.tv_sec * scale, 1.0) * 1000000.0);
     timevalNormalizeInPlace(result);
     return result;
-}
-
-
- *!\brief compares two time values
- *\return 1 if tv1 is greater than tv2;  0 otherwise
- 
-bool TimevalGreater(const timeval& tv1, const timeval& tv2)
-{
-    if (tv1.tv_sec > tv2.tv_sec) {
-        return 1;
-    }
-    if ((tv1.tv_sec == tv2.tv_sec) && (tv1.tv_usec > tv2.tv_usec)) {
-        return 1;
-    }
-    return 0;
 }
 
 

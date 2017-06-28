@@ -115,10 +115,10 @@ int64_t     convertTimeValToTimeCode(timeval tv, double fps);
 int64_t     convertDoubleToTimeCode(double dTime, double fps);
 uint64_t    convertDoubleToTimeStamp(double dTime);
 timeval TimevalSum(const timeval& tv1, const timeval& tv2);
+bool TimevalGreater(const timeval& tv1, const timeval& tv2);
 
 /* Not currently used in testing
 timeval TimevalSum(const timeval& tv1, const timeval& tv2);
-bool TimevalGreater(const timeval& tv1, const timeval& tv2);
 bool TimevalEqual(const timeval& tv1, const timeval& tv2);
 timeval TimevalScale(const timeval& tv, double scale);
 timeval TimevalDiff(const timeval& tv1, const timeval& tv2);
