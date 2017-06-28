@@ -382,8 +382,11 @@ uint64_t convertDoubleToTimeStamp(double dTime)
     return (uint64_t)(dTime * 1e8);
 }
 
-/*
 
+
+
+
+/**
  *!\brief calculates the sum of two time values
  &
  * Calcs the sum of tv1 and tv2.  Returns the sum in a timeval struct.
@@ -392,7 +395,9 @@ uint64_t convertDoubleToTimeStamp(double dTime)
  * NOTE: both abs(tv_usec)'s must be < 1000000 (ie, normal timeval format)
  *
  * borrowed copiously from vrpn (thanks Russell )
- *
+ **/
+
+timeval TimevalSum(const timeval& tv1, const timeval& tv2)
 {
     timeval tvSum = tv1;
 
@@ -431,7 +436,7 @@ uint64_t convertDoubleToTimeStamp(double dTime)
     return tvSum;
 }
 
-
+/*
  *!\brief perform normalization of a timeval
  * XXX this still needs to be checked for errors if the timeval
  * or the rate is negative

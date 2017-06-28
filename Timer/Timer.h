@@ -114,6 +114,7 @@ int64_t     convertSMPTEToTimeCode(SMPTETime time);
 int64_t     convertTimeValToTimeCode(timeval tv, double fps);
 int64_t     convertDoubleToTimeCode(double dTime, double fps);
 uint64_t    convertDoubleToTimeStamp(double dTime);
+timeval TimevalSum(const timeval& tv1, const timeval& tv2);
 
 /* Not currently used in testing
 timeval TimevalSum(const timeval& tv1, const timeval& tv2);
