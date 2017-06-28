@@ -10,8 +10,6 @@
 #include <iostream>
 #include <fstream>
 
-std::ofstream multiThreadTest;
-
 namespace atl
 {
 
@@ -25,19 +23,19 @@ namespace atl
  */
 bool MultiThread::Start(bool* runFlag)
 {
-    if(m_running && *m_running) {
+    if (m_running && *m_running) {
         std::cout << "WARNING: Threads already running." << std::endl;
         return false;
     }
 
-    if(!runFlag) {
+    if (!runFlag) {
         m_deletePtr = true;
         m_running = new bool(true);
     } else {
         m_running = runFlag;
     }
 
-    for(unsigned i = 0; i < m_numThreads; i++) {
+    for (unsigned i = 0; i < m_numThreads; i++) {
         m_threads.emplace(m_threads.end(), [this] {Execute();});
     }
     return true;
@@ -52,9 +50,9 @@ bool MultiThread::Join()
 {
 
     bool rc = true;
-    for(auto&& t: m_threads) {
-        if(!t.joinable() || t.get_id() == std::this_thread::get_id()) {
-            std::cerr << "WARNING: Thread id: " << t.get_id() << " not joinable" << std::endl;
+    for (auto&& t: m_threads) {
+        if (!t.joinable() || t.get_id() == std::this_thread::get_id()) {
+            std::cout << "WARNING: Thread id: " << t.get_id() << " not joinable" << std::endl;
             rc = false;
             continue;
         }
@@ -64,7 +62,7 @@ bool MultiThread::Join()
     std::lock_guard<std::mutex> guard (m_threadMutex);
     m_threads.clear();
 
-    if(m_deletePtr && m_running) {
+    if (m_deletePtr && m_running) {
         delete m_running;
         m_running = nullptr;
     }
@@ -86,55 +84,5 @@ bool MultiThread::setNumThreads(unsigned numThreads)
 {
     m_numThreads = numThreads;
     return true;
-}
-
-/**
-* \brief Test function
-**/
-bool testMultiThread(bool printFlag)
-{
-    //create file to redirect output to
-    multiThreadTest.open("MultiThreadTest.log");
-
-    bool rc = true;
-    MultiThread mThread(5);
-
-    if(printFlag) {
-        multiThreadTest << "Test Stop function"<<std::endl;
-    }
-    mThread.Start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    mThread.Stop();
-    mThread.Join();
-
-    if(printFlag) {
-        multiThreadTest << "Test running flag"<<std::endl;
-    }
-    static bool running = true;
-    mThread.Start(&running);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    if(printFlag) {
-        multiThreadTest << "Running being set to false!" << std::endl;
-    }
-    running = false;
-    rc = mThread.Join();
-    if( !rc ) {
-        if(printFlag) {
-            multiThreadTest << "Unable to join thread!"<<std::endl;
-            std::cout << "Thread test error. See ThreadTest.log" << std::endl;
-        }
-    }
-    if(printFlag) {
-        multiThreadTest << "Joined"<<std::endl;
-    }
-
-    //Vector tests (timed)
-    size_t threadCount = 50;
-    running = true;
-    std::vector<Thread> threadVect(threadCount);
-
-    std::system("rm MultiThreadTest.log");
-    return true;
-
 }
 }

@@ -1,0 +1,483 @@
+\hypertarget{Timer_8cpp}{}\section{Timer.\+cpp File Reference}
+\label{Timer_8cpp}\index{Timer.\+cpp@{Timer.\+cpp}}
+
+
+Timer class provides timing functionality for testing program performance.  
+
+
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$thread$>$}\\*
+{\ttfamily \#include $<$chrono$>$}\\*
+{\ttfamily \#include $<$limits$>$}\\*
+{\ttfamily \#include $<$iomanip$>$}\\*
+{\ttfamily \#include $<$assert.\+h$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$sstream$>$}\\*
+{\ttfamily \#include $<$Json\+Box.\+h$>$}\\*
+{\ttfamily \#include $<$winsock2.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}Timer.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$time.\+h$>$}\\*
+Include dependency graph for Timer.\+cpp\+:
+% FIG 0
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{Timer_8cpp_ade2ece9b704882feffbb9a6fc7958b0a}{atl\+::convert\+Time\+Val\+To\+Double} (timeval tv)
+\begin{DoxyCompactList}\small\item\em converts a timeval struct to double \end{DoxyCompactList}\item 
+timeval \hyperlink{Timer_8cpp_a58482b94aff8dbe635dde42c56988aae}{atl\+::convert\+Double\+To\+Time\+Val} (double d\+Time)
+\begin{DoxyCompactList}\small\item\em converts a double to a timeval struct \end{DoxyCompactList}\item 
+S\+M\+P\+T\+E\+Time \hyperlink{Timer_8cpp_a5402f8ec7c1cd4b04c081038f7c040f5}{atl\+::convert\+Double\+To\+S\+M\+P\+TE} (double d\+Time, double fps)
+\begin{DoxyCompactList}\small\item\em converts a double to an S\+M\+P\+TE time. \end{DoxyCompactList}\item 
+int64\+\_\+t \hyperlink{Timer_8cpp_a9e6af453d5f81bf62e245523f18c19f4}{atl\+::convert\+S\+M\+P\+T\+E\+To\+Time\+Code} (S\+M\+P\+T\+E\+Time smpte)
+\begin{DoxyCompactList}\small\item\em converts a S\+M\+P\+TE to Timecode (hhmmssff) \end{DoxyCompactList}\item 
+int64\+\_\+t \hyperlink{Timer_8cpp_a7d03003ea78abe715939646e4a85d506}{atl\+::convert\+Time\+Val\+To\+Time\+Code} (timeval tv, double fps)
+\begin{DoxyCompactList}\small\item\em converts a timeval structure to Timecode (hhmmssff) \end{DoxyCompactList}\item 
+S\+M\+P\+T\+E\+Time \hyperlink{Timer_8cpp_aa9d2a8842a9b1bd08040ac6534dddc83}{atl\+::convert\+Time\+Val\+To\+S\+M\+P\+TE} (timeval tv, double fps)
+\begin{DoxyCompactList}\small\item\em converts a double to an S\+M\+P\+TE time. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{Timer_8cpp_a829b64c4abc61ff3190ad43bbc31a5b3}{atl\+::convert\+Time\+Val\+To\+String} (timeval tv, double fps)
+\begin{DoxyCompactList}\small\item\em Converts the given timeval and int into a a string. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{Timer_8cpp_a551d7b9cbc4b2532f90b87add46fac20}{atl\+::convert\+Double\+To\+String} (double d\+Time, double fps)
+\begin{DoxyCompactList}\small\item\em Converts the given double into a string with fps. \end{DoxyCompactList}\item 
+int64\+\_\+t \hyperlink{Timer_8cpp_af22a77f0685aa1914fef166d4b3ce87a}{atl\+::convert\+Double\+To\+Time\+Code} (double d\+Time, double fps)
+\begin{DoxyCompactList}\small\item\em Converts a double to a Time\+Code. \end{DoxyCompactList}\item 
+double \hyperlink{Timer_8cpp_acff56a2311fd5a42f5c49d058b38fd43}{atl\+::get\+Time} ()
+\begin{DoxyCompactList}\small\item\em Gets the current time as a double. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{Timer_8cpp_ad7c35067689e99858734c463710e9708}{atl\+::get\+Usec\+Time} ()
+\begin{DoxyCompactList}\small\item\em Gets the number of microseconds since the epoch. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{Timer_8cpp_ad3d45f1cf7d5e0874a3875366eb93cc1}{atl\+::get\+Timestamp} ()
+\begin{DoxyCompactList}\small\item\em Returns the current time as utc with 2$^\wedge$16 sub second steps. \end{DoxyCompactList}\item 
+uint64\+\_\+t \hyperlink{Timer_8cpp_a84dea358f576690ebbb2573bad467a07}{atl\+::convert\+Double\+To\+Time\+Stamp} (double d\+Time)
+\begin{DoxyCompactList}\small\item\em Returns the current timestamp. \end{DoxyCompactList}\item 
+void \hyperlink{Timer_8cpp_a52e920e014a41704e36dd09662e927a8}{atl\+::sleep} (double time)
+\begin{DoxyCompactList}\small\item\em calculates the sum of two time values \& Calcs the sum of tv1 and tv2. Returns the sum in a timeval struct. Calcs negative times properly, with the appropriate sign on both tv\+\_\+sec and tv\+\_\+usec (these signs will match unless one of them is 0). N\+O\+TE\+: both abs(tv\+\_\+usec)\textquotesingle{}s must be $<$ 1000000 (ie, normal timeval format) \end{DoxyCompactList}\item 
+std\+::string \hyperlink{Timer_8cpp_af027be722fe10b8d5e51677431960d0b}{atl\+::get\+Date\+As\+String} ()
+\begin{DoxyCompactList}\small\item\em Returns the current date and time as a string. \end{DoxyCompactList}\item 
+Json\+Box\+::\+Value \hyperlink{Timer_8cpp_a9a45cc33296b6faaeeeefd73ccd76aa8}{atl\+::test\+Timer} (bool print\+Flag, bool assert\+Flag)
+\begin{DoxyCompactList}\small\item\em functional test for this class \end{DoxyCompactList}\item 
+void \hyperlink{Timer_8cpp_a5f337b8bd68e696ee0f9ea0e0fa07a08}{atl\+::object\+I\+D\+Size\+Test} (bool print\+Flag, bool assert\+Flag, Json\+Box\+::\+Value \&result\+String)
+\begin{DoxyCompactList}\small\item\em Helper function to check the Object\+ID size. \end{DoxyCompactList}\item 
+void \hyperlink{Timer_8cpp_a2d5c345ed15df5398f6810b484cee6d4}{atl\+::sleep\+Test} (Json\+Box\+::\+Value \&result\+String, double delay\+Time, double sleep\+Elapsed, double time\+Variance, bool print\+Flag, bool assert\+Flag, int testno)
+\begin{DoxyCompactList}\small\item\em Helper function to test sleep. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+ofstream {\bfseries timer\+Test}\hypertarget{Timer_8cpp_a23a43236d0a46ec7e35a04f36f1dbe30}{}\label{Timer_8cpp_a23a43236d0a46ec7e35a04f36f1dbe30}
+
+\item 
+ofstream {\bfseries timer\+Json}\hypertarget{Timer_8cpp_a0b9a2afe6759984231b1dd191f6bd0b9}{}\label{Timer_8cpp_a0b9a2afe6759984231b1dd191f6bd0b9}
+
+\item 
+const double {\bfseries S\+T\+A\+R\+T\+I\+N\+G\+\_\+\+F\+PS} = 30.\+0\hypertarget{Timer_8cpp_ab2dc00ec64d8d14ace070f3829f04413}{}\label{Timer_8cpp_ab2dc00ec64d8d14ace070f3829f04413}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Timer class provides timing functionality for testing program performance. 
+
+\begin{DoxyAuthor}{Author}
+S. D. Feller 2014 
+\end{DoxyAuthor}
+
+
+\subsection{Function Documentation}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+Double\+To\+S\+M\+P\+TE@{convert\+Double\+To\+S\+M\+P\+TE}}
+\index{convert\+Double\+To\+S\+M\+P\+TE@{convert\+Double\+To\+S\+M\+P\+TE}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Double\+To\+S\+M\+P\+T\+E(double d\+Time, double fps)}{convertDoubleToSMPTE(double dTime, double fps)}}]{\setlength{\rightskip}{0pt plus 5cm}S\+M\+P\+T\+E\+Time atl\+::convert\+Double\+To\+S\+M\+P\+TE (
+\begin{DoxyParamCaption}
+\item[{double}]{d\+Time, }
+\item[{double}]{fps}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a5402f8ec7c1cd4b04c081038f7c040f5}{}\label{Timer_8cpp_file_a5402f8ec7c1cd4b04c081038f7c040f5}
+
+
+converts a double to an S\+M\+P\+TE time. 
+
+! 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em d\+Time} & time to convert \\
+\hline
+\mbox{\tt in}  & {\em fps} & number of frames per second (used to convert decimal time to a frame) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{structatl_1_1SMPTETime}{S\+M\+P\+T\+E\+Time} conversion of double 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+Double\+To\+String@{convert\+Double\+To\+String}}
+\index{convert\+Double\+To\+String@{convert\+Double\+To\+String}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Double\+To\+String(double d\+Time, double fps)}{convertDoubleToString(double dTime, double fps)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string atl\+::convert\+Double\+To\+String (
+\begin{DoxyParamCaption}
+\item[{double}]{d\+Time, }
+\item[{double}]{fps}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a551d7b9cbc4b2532f90b87add46fac20}{}\label{Timer_8cpp_file_a551d7b9cbc4b2532f90b87add46fac20}
+
+
+Converts the given double into a string with fps. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em double} & to be converted to string \\
+\hline
+\mbox{\tt in}  & {\em F\+PS} & value needed to convert double to timeval (before conversion to string) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+std\+::string conversion of double 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+Double\+To\+Time\+Code@{convert\+Double\+To\+Time\+Code}}
+\index{convert\+Double\+To\+Time\+Code@{convert\+Double\+To\+Time\+Code}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Double\+To\+Time\+Code(double d\+Time, double fps)}{convertDoubleToTimeCode(double dTime, double fps)}}]{\setlength{\rightskip}{0pt plus 5cm}int64\+\_\+t atl\+::convert\+Double\+To\+Time\+Code (
+\begin{DoxyParamCaption}
+\item[{double}]{d\+Time, }
+\item[{double}]{fps}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_af22a77f0685aa1914fef166d4b3ce87a}{}\label{Timer_8cpp_file_af22a77f0685aa1914fef166d4b3ce87a}
+
+
+Converts a double to a Time\+Code. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em double} & to be converted to time code \\
+\hline
+\mbox{\tt in}  & {\em F\+PS} & value needed to convert double to timeval (before conversion to time code) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+64-\/bit time code 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+Double\+To\+Time\+Stamp@{convert\+Double\+To\+Time\+Stamp}}
+\index{convert\+Double\+To\+Time\+Stamp@{convert\+Double\+To\+Time\+Stamp}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Double\+To\+Time\+Stamp(double d\+Time)}{convertDoubleToTimeStamp(double dTime)}}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t atl\+::convert\+Double\+To\+Time\+Stamp (
+\begin{DoxyParamCaption}
+\item[{double}]{d\+Time}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a84dea358f576690ebbb2573bad467a07}{}\label{Timer_8cpp_file_a84dea358f576690ebbb2573bad467a07}
+
+
+Returns the current timestamp. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em double} & to be converted to timestamp \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+64-\/bit timestamp
+\end{DoxyReturn}
+This is an internal function since it will eventually calculate frame rate and other information \index{Timer.\+cpp@{Timer.\+cpp}!convert\+Double\+To\+Time\+Val@{convert\+Double\+To\+Time\+Val}}
+\index{convert\+Double\+To\+Time\+Val@{convert\+Double\+To\+Time\+Val}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Double\+To\+Time\+Val(double d\+Time)}{convertDoubleToTimeVal(double dTime)}}]{\setlength{\rightskip}{0pt plus 5cm}timeval atl\+::convert\+Double\+To\+Time\+Val (
+\begin{DoxyParamCaption}
+\item[{double}]{d\+Time}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a58482b94aff8dbe635dde42c56988aae}{}\label{Timer_8cpp_file_a58482b94aff8dbe635dde42c56988aae}
+
+
+converts a double to a timeval struct 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em double} & to be converted to timeval \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+timeval conversion of double 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+S\+M\+P\+T\+E\+To\+Time\+Code@{convert\+S\+M\+P\+T\+E\+To\+Time\+Code}}
+\index{convert\+S\+M\+P\+T\+E\+To\+Time\+Code@{convert\+S\+M\+P\+T\+E\+To\+Time\+Code}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+S\+M\+P\+T\+E\+To\+Time\+Code(\+S\+M\+P\+T\+E\+Time smpte)}{convertSMPTEToTimeCode(SMPTETime smpte)}}]{\setlength{\rightskip}{0pt plus 5cm}int64\+\_\+t atl\+::convert\+S\+M\+P\+T\+E\+To\+Time\+Code (
+\begin{DoxyParamCaption}
+\item[{{\bf S\+M\+P\+T\+E\+Time}}]{smpte}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a9e6af453d5f81bf62e245523f18c19f4}{}\label{Timer_8cpp_file_a9e6af453d5f81bf62e245523f18c19f4}
+
+
+converts a S\+M\+P\+TE to Timecode (hhmmssff) 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em \hyperlink{structatl_1_1SMPTETime}{S\+M\+P\+T\+E\+Time}} & value to be converted to time code \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+64-\/bit time code 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+Time\+Val\+To\+Double@{convert\+Time\+Val\+To\+Double}}
+\index{convert\+Time\+Val\+To\+Double@{convert\+Time\+Val\+To\+Double}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Time\+Val\+To\+Double(timeval tv)}{convertTimeValToDouble(timeval tv)}}]{\setlength{\rightskip}{0pt plus 5cm}double atl\+::convert\+Time\+Val\+To\+Double (
+\begin{DoxyParamCaption}
+\item[{timeval}]{tv}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_ade2ece9b704882feffbb9a6fc7958b0a}{}\label{Timer_8cpp_file_ade2ece9b704882feffbb9a6fc7958b0a}
+
+
+converts a timeval struct to double 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em timeval} & to be converted to double \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+double conversion of timeval 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+Time\+Val\+To\+S\+M\+P\+TE@{convert\+Time\+Val\+To\+S\+M\+P\+TE}}
+\index{convert\+Time\+Val\+To\+S\+M\+P\+TE@{convert\+Time\+Val\+To\+S\+M\+P\+TE}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Time\+Val\+To\+S\+M\+P\+T\+E(timeval tv, double fps)}{convertTimeValToSMPTE(timeval tv, double fps)}}]{\setlength{\rightskip}{0pt plus 5cm}S\+M\+P\+T\+E\+Time atl\+::convert\+Time\+Val\+To\+S\+M\+P\+TE (
+\begin{DoxyParamCaption}
+\item[{timeval}]{tv, }
+\item[{double}]{fps}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_aa9d2a8842a9b1bd08040ac6534dddc83}{}\label{Timer_8cpp_file_aa9d2a8842a9b1bd08040ac6534dddc83}
+
+
+converts a double to an S\+M\+P\+TE time. 
+
+! 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em tv} & time to convert \\
+\hline
+\mbox{\tt in}  & {\em fps} & number of frames per second (used to convert decimal time to a frame) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{structatl_1_1SMPTETime}{S\+M\+P\+T\+E\+Time} conversion of timeval 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+Time\+Val\+To\+String@{convert\+Time\+Val\+To\+String}}
+\index{convert\+Time\+Val\+To\+String@{convert\+Time\+Val\+To\+String}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Time\+Val\+To\+String(timeval tv, double fps)}{convertTimeValToString(timeval tv, double fps)}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string atl\+::convert\+Time\+Val\+To\+String (
+\begin{DoxyParamCaption}
+\item[{timeval}]{tv, }
+\item[{double}]{fps}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a829b64c4abc61ff3190ad43bbc31a5b3}{}\label{Timer_8cpp_file_a829b64c4abc61ff3190ad43bbc31a5b3}
+
+
+Converts the given timeval and int into a a string. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em timeval} & to be converted to string \\
+\hline
+\mbox{\tt in}  & {\em F\+PS} & value needed to convert timeval to S\+M\+P\+TE (before conversion to string) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+std\+::string conversion of timeval 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!convert\+Time\+Val\+To\+Time\+Code@{convert\+Time\+Val\+To\+Time\+Code}}
+\index{convert\+Time\+Val\+To\+Time\+Code@{convert\+Time\+Val\+To\+Time\+Code}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{convert\+Time\+Val\+To\+Time\+Code(timeval tv, double fps)}{convertTimeValToTimeCode(timeval tv, double fps)}}]{\setlength{\rightskip}{0pt plus 5cm}int64\+\_\+t atl\+::convert\+Time\+Val\+To\+Time\+Code (
+\begin{DoxyParamCaption}
+\item[{timeval}]{tv, }
+\item[{double}]{fps}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a7d03003ea78abe715939646e4a85d506}{}\label{Timer_8cpp_file_a7d03003ea78abe715939646e4a85d506}
+
+
+converts a timeval structure to Timecode (hhmmssff) 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em timeval} & to be converted to time code \\
+\hline
+\mbox{\tt in}  & {\em F\+PS} & value needed to convert timeval to S\+M\+P\+TE (before conversion to time code) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+64-\/bit time code 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!get\+Date\+As\+String@{get\+Date\+As\+String}}
+\index{get\+Date\+As\+String@{get\+Date\+As\+String}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{get\+Date\+As\+String()}{getDateAsString()}}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string atl\+::get\+Date\+As\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_af027be722fe10b8d5e51677431960d0b}{}\label{Timer_8cpp_file_af027be722fe10b8d5e51677431960d0b}
+
+
+Returns the current date and time as a string. 
+
+\begin{DoxyReturn}{Returns}
+std\+::string conversion of date 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!get\+Time@{get\+Time}}
+\index{get\+Time@{get\+Time}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{get\+Time()}{getTime()}}]{\setlength{\rightskip}{0pt plus 5cm}double atl\+::get\+Time (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_acff56a2311fd5a42f5c49d058b38fd43}{}\label{Timer_8cpp_file_acff56a2311fd5a42f5c49d058b38fd43}
+
+
+Gets the current time as a double. 
+
+\begin{DoxyReturn}{Returns}
+double time 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!get\+Timestamp@{get\+Timestamp}}
+\index{get\+Timestamp@{get\+Timestamp}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{get\+Timestamp()}{getTimestamp()}}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t atl\+::get\+Timestamp (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_ad3d45f1cf7d5e0874a3875366eb93cc1}{}\label{Timer_8cpp_file_ad3d45f1cf7d5e0874a3875366eb93cc1}
+
+
+Returns the current time as utc with 2$^\wedge$16 sub second steps. 
+
+\begin{DoxyReturn}{Returns}
+64-\/bit timestamp 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!get\+Usec\+Time@{get\+Usec\+Time}}
+\index{get\+Usec\+Time@{get\+Usec\+Time}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{get\+Usec\+Time()}{getUsecTime()}}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t atl\+::get\+Usec\+Time (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_ad7c35067689e99858734c463710e9708}{}\label{Timer_8cpp_file_ad7c35067689e99858734c463710e9708}
+
+
+Gets the number of microseconds since the epoch. 
+
+\begin{DoxyReturn}{Returns}
+64-\/bit microsecond time 
+\end{DoxyReturn}
+\index{Timer.\+cpp@{Timer.\+cpp}!object\+I\+D\+Size\+Test@{object\+I\+D\+Size\+Test}}
+\index{object\+I\+D\+Size\+Test@{object\+I\+D\+Size\+Test}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{object\+I\+D\+Size\+Test(bool print\+Flag, bool assert\+Flag, Json\+Box\+::\+Value \&result\+String)}{objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value &resultString)}}]{\setlength{\rightskip}{0pt plus 5cm}void atl\+::object\+I\+D\+Size\+Test (
+\begin{DoxyParamCaption}
+\item[{bool}]{print\+Flag, }
+\item[{bool}]{assert\+Flag, }
+\item[{Json\+Box\+::\+Value \&}]{result\+String}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a5f337b8bd68e696ee0f9ea0e0fa07a08}{}\label{Timer_8cpp_file_a5f337b8bd68e696ee0f9ea0e0fa07a08}
+
+
+Helper function to check the Object\+ID size. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em print\+Flag} & boolean (true prints info to console) \\
+\hline
+\mbox{\tt in}  & {\em assert\+Flag} & boolean (true stops the program) \\
+\hline
+\mbox{\tt in}  & {\em Json\+Box\+::\+Value} & passed by reference, updated only if this test fails \\
+\hline
+\end{DoxyParams}
+\index{Timer.\+cpp@{Timer.\+cpp}!sleep@{sleep}}
+\index{sleep@{sleep}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{sleep(double time)}{sleep(double time)}}]{\setlength{\rightskip}{0pt plus 5cm}void atl\+::sleep (
+\begin{DoxyParamCaption}
+\item[{double}]{time}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a52e920e014a41704e36dd09662e927a8}{}\label{Timer_8cpp_file_a52e920e014a41704e36dd09662e927a8}
+
+
+calculates the sum of two time values \& Calcs the sum of tv1 and tv2. Returns the sum in a timeval struct. Calcs negative times properly, with the appropriate sign on both tv\+\_\+sec and tv\+\_\+usec (these signs will match unless one of them is 0). N\+O\+TE\+: both abs(tv\+\_\+usec)\textquotesingle{}s must be $<$ 1000000 (ie, normal timeval format) 
+
+! borrowed copiously from vrpn (thanks Russell ) !perform normalization of a timeval X\+XX this still needs to be checked for errors if the timeval or the rate is negative !perform normalization of a timeval !\+Calcs the diff between tv1 and tv2.
+
+\begin{DoxyReturn}{Returns}
+the diff in a timeval struct. Calcs negative times properly, with the appropriate sign on both tv\+\_\+sec and tv\+\_\+usec (these signs will match unless one of them is 0) !multiplies the timevale by the given structure !compares two time values 
+
+1 if tv1 is greater than tv2; 0 otherwise !checks if two timevals are equal
+
+1 if tv1 is equal to tv2; 0 otherwise converts the Object\+Id time into a double. the m\+\_\+id field is lost converts a double time to an Object\+Id time. The m\+\_\+id field is set to 0 
+\end{DoxyReturn}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em value} & time value to set to the object \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Object\+Id with the m\+\_\+utc and m\+\_\+step set appropriately.
+\end{DoxyReturn}
+{\bfseries N\+O\+TE} -\/ There is a potential for a rounding error to have the step off by 1 This function will convert millisecond time to our standard frame\+Time timestep
+
+
+\begin{DoxyParams}{Parameters}
+{\em usecs} & Microseconds since the epoch \\
+\hline
+{\em fps} & The current fps of the camera\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+This function will convert usecs time to standard date time
+\end{DoxyReturn}
+
+\begin{DoxyParams}{Parameters}
+{\em usecs} & Microseconds since the epoch\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Sleeps for the given amount of time
+\end{DoxyReturn}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em double} & time to sleep in seconds (supports millisecond resolution) \\
+\hline
+\end{DoxyParams}
+\index{Timer.\+cpp@{Timer.\+cpp}!sleep\+Test@{sleep\+Test}}
+\index{sleep\+Test@{sleep\+Test}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{sleep\+Test(\+Json\+Box\+::\+Value \&result\+String, double delay\+Time, double sleep\+Elapsed, double time\+Variance, bool print\+Flag, bool assert\+Flag, int testno)}{sleepTest(JsonBox::Value &resultString, double delayTime, double sleepElapsed, double timeVariance, bool printFlag, bool assertFlag, int testno)}}]{\setlength{\rightskip}{0pt plus 5cm}void atl\+::sleep\+Test (
+\begin{DoxyParamCaption}
+\item[{Json\+Box\+::\+Value \&}]{result\+String, }
+\item[{double}]{delay\+Time, }
+\item[{double}]{sleep\+Elapsed, }
+\item[{double}]{time\+Variance, }
+\item[{bool}]{print\+Flag, }
+\item[{bool}]{assert\+Flag, }
+\item[{int}]{testno}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a2d5c345ed15df5398f6810b484cee6d4}{}\label{Timer_8cpp_file_a2d5c345ed15df5398f6810b484cee6d4}
+
+
+Helper function to test sleep. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em Json\+Box\+::\+Value} & passed by reference, updated with results of this test \\
+\hline
+\mbox{\tt in}  & {\em expected} & delay time of sleep function \\
+\hline
+\mbox{\tt in}  & {\em actual} & elapsed time of sleep function \\
+\hline
+\mbox{\tt in}  & {\em acceptable} & time variance \\
+\hline
+\mbox{\tt in}  & {\em print\+Flag} & boolean (true prints info to console) \\
+\hline
+\mbox{\tt in}  & {\em assert\+Flag} & boolean (true stops the program) \\
+\hline
+\mbox{\tt in}  & {\em the} & number of the test currently running (either 1 or 2)\\
+\hline
+\end{DoxyParams}
+Calculates the variance between the delay time passed in and the actual sleep time elapsed, and checks this against an allowed time variance. Notifies user that the test has been passed if actual variance is less than the time variance. \index{Timer.\+cpp@{Timer.\+cpp}!test\+Timer@{test\+Timer}}
+\index{test\+Timer@{test\+Timer}!Timer.\+cpp@{Timer.\+cpp}}
+\subsubsection[{\texorpdfstring{test\+Timer(bool print\+Flag, bool assert\+Flag)}{testTimer(bool printFlag, bool assertFlag)}}]{\setlength{\rightskip}{0pt plus 5cm}Json\+Box\+::\+Value atl\+::test\+Timer (
+\begin{DoxyParamCaption}
+\item[{bool}]{print\+Flag, }
+\item[{bool}]{assert\+Flag}
+\end{DoxyParamCaption}
+)}\hypertarget{Timer_8cpp_file_a9a45cc33296b6faaeeeefd73ccd76aa8}{}\label{Timer_8cpp_file_a9a45cc33296b6faaeeeefd73ccd76aa8}
+
+
+functional test for this class 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em print\+Flag} & boolean (true prints info to console) \\
+\hline
+\mbox{\tt in}  & {\em assert\+Flag} & boolean (true stops the program) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Json\+Box\+::\+Value containing test results 
+\end{DoxyReturn}

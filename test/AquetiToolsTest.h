@@ -1,13 +1,12 @@
 
 #pragma once
 
-// includes
 #include "JsonBox.h"
 #include <Timer.h>
 #include <Thread.h>
 #include <MultiThread.h>
 #include <ThreadPool.h>
-//#include <LruCache.cpp>
+#include <LruCache.tcc>
 //#include <TSMap.cpp>
 #include <TSMap.tcc>
 #include <aquetitools/revision.h>
@@ -16,94 +15,39 @@
 #include <string.h>
 //#include <TSQueue.cpp>
 #include <TSQueue.tcc>
-
-
 #include "ThreadPool.h"
 #include <CRC.hpp>
+#include <assert.h>
 
-
+namespace atl{
 
 /**
  * Perform unit tests for the aquetitools repository
  *
+ * @param unitList The list of units to run tests on.
  * @param testSubmodules The boolean, if true run unit tests on submodules as well.
- * @param i The integer that denotes which units to run tests on.
+ * @param valgrind The boolean, if true run with valgrind settings.
  * @return JsonBox value with results
  */
-JsonBox::Value testAquetiTools(bool testSubmodules, int i);
+JsonBox::Value testAquetiTools(std::vector<std::string> unitList = {"Timer", "CRC", 
+	"Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"}, 
+	bool testSubmodules = true, bool printFlag = true, bool assertFlag = false, bool valgrind = false);
 
+//Functional tests
+JsonBox::Value testTimer(bool printFlag = true, bool assertFlag = false);
+JsonBox::Value testThread(bool printFlag = true);
+JsonBox::Value testMultiThread(bool printFlag = true);
+JsonBox::Value testThreadPool();
+JsonBox::Value testLruCache(unsigned int numThreads = 100, bool printFlag = true, bool assertFlag = false);
+JsonBox::Value testTSQueue(unsigned int numThreads = 20, bool printFlag = true, bool assertFlag = false);
+JsonBox::Value testCRC();
+JsonBox::Value testTSMap(bool printFlag = false, bool assertFlag = false, bool valgrind = false);
 
+//Timer test helper functions
+bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
+                double timeVariance, bool printFlag, bool assertFlag, int testno);
+bool objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString);
 
-
-
-
-
-
-
-
-
-
-
-/*
-#include <BaseContainerMetadata.h>
-#include <BaseContainerArrayMetadata.h>
-#include <BaseContainerArray.h>
-#include <BaseContainer.h>
-#include <HContainerMetadata.h>
-#include <HContainer.h>
-#include <MapContainerMetadata.h>
-#include <MapContainer.tcc>
-#include <ImageMetadata.h>
-#include <ImageContainer.h>
-#include <CamImage.h>
-#include <ViewMetadata.h>
-#include <BaseBuffer.h>
-#include <ExtendedBuffer.tcc>
-#include <BaseSocket.h>
-#include <SocketServer.h>
-#include <TSArray.tcc>
-#include <TSQueue.tcc>
-#include <LruCache.tcc>
-#include <ContainerSocket.h>
-#include <ContainerServer.h>
-#include <MultiCommandClient.h>
-#include <CommandServer.h>
-#include <IntKey.h>
-#include <IntPairKey.h>
-#include <StringKey.h>
-#include "Interrupt.tcc"
-#include "Property.tcc"
-#include "PropertyManager.h"
-#include "PropertyTypes.h"
-#include "Messages.h"
-#include "testFactory.h"
-#include <JsonValidator.h>
-#include <TSMap.tcc>
-#include "BaseModule.h"
-#include "RingBufferAllocator.tcc"
-#include "TaskManager.tcc"
-*/
-// Defines test functions
-/*
-bool test_PropertyManager(int numThreads);
-bool testBaseContainerThreadSafety( bool printFlag=false, bool valgrind=false );
-bool testImageContainerThreadSafety( bool printFlag=false, bool valgrind=false );
-bool testCamImageThreadSafety( bool printFlag=false, bool valgrind=false );
-bool testHContainerThreadSafety( bool printFlag=false, bool valgrind=false );
-bool testStreamManager( bool printFlag=false, bool valgrind=false );
-bool testContainerSocket( bool printFlag=false, bool valgrnd=false );
-bool testThreadPool();
-bool testMessages();
-bool testModule();
-bool testTaskManager(int threads);
-
-
-class TestModule: public atl::BaseModule
-{
-public:
-    TestModule(atl::PropertyManager& pm, atl::PropertyManager& logger);
-
-    void testWarning();
-};
-*/
-
+//ThreadPool test helper functions
+bool doThreadPoolThing(int threads);
+}

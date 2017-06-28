@@ -6,6 +6,14 @@
 #include <chrono>
 #include <condition_variable>
 #include <memory>
+#include "JsonBox.h"
+#include <cstdio>
+#include <ctime>
+#include <random>
+#include <thread>
+#include <assert.h>
+#include <Timer.h>
+#include <fstream>
 
 #pragma once
 
@@ -36,25 +44,24 @@ protected:
 
     virtual void enqueue(std::shared_ptr<QNode> node);   //<! Adds a QNode to the tail of the queue
 
+
 public:
-    TSQueue();                                          //<! Constructor
-    virtual ~TSQueue();                                 //<! Destructor.  Deletes all data in queue
-    virtual bool enqueue(const T&, bool force=false);   //<! Add data to the tail of the queue
-    virtual bool dequeue(T& data, uint16_t timeout=0);  //<! Remove and return data from the head of the queue
-    virtual bool push(T, bool force=false);             //<! Add data to the head of the queue (as a stack)
-    virtual bool pop(T& data, uint16_t timeout=0);      //<! Pop data off the head of the queue (as a stack)
-    virtual bool peek(T& value, uint16_t timeout=0);    //<! Peek at the head of the queue
-    virtual size_t size();                              //<! Return the size of the queue
-    virtual void delete_all();                          //<! Deletes all nodes in the queue
-    virtual void set_max_size(size_t);                  //<! Sets max size
-    virtual size_t get_max_size();                      //<! Returns max size
-    virtual bool wait_until_empty(uint16_t timeout=0);  //<! Waits until queue is empty
+    TSQueue();                                            //<! Constructor
+    virtual ~TSQueue();                                   //<! Destructor.  Deletes all data in queue
+    virtual bool enqueue(const T&, bool force = false);   //<! Add data to the tail of the queue
+    virtual bool dequeue(T& data, uint16_t timeout = 0);  //<! Remove and return data from the head of the queue
+    virtual bool push(T, bool force = false);             //<! Add data to the head of the queue (as a stack)
+    virtual bool pop(T& data, uint16_t timeout = 0);      //<! Pop data off the head of the queue (as a stack)
+    virtual bool peek(T& value, uint16_t timeout = 0);    //<! Peek at the head of the queue
+    virtual size_t size();                                //<! Return the size of the queue
+    virtual void delete_all();                            //<! Deletes all nodes in the queue
+    virtual void set_max_size(size_t);                    //<! Sets max size
+    virtual size_t get_max_size();                        //<! Returns max size
+    virtual bool wait_until_empty(uint16_t timeout = 0);  //<! Waits until queue is empty
 };
 
 //template<class K, class V> struct CacheNode;
 //template class TSQueue<CacheNode<int,int>>;
-
-bool testTSQueue(unsigned int numThreads=20, bool print=false, bool assertFlag = false);
 
 /**
 * @brief Node struct for linked list
@@ -63,6 +70,7 @@ template<typename T> struct TSQueue<T>::QNode {
     QNode(const T& new_data) {
         data = new_data;
     }
+
     T data;
     std::weak_ptr<QNode> next;   // Node closer to head
     std::shared_ptr<QNode> prev; // Node closer to tail
@@ -100,14 +108,15 @@ template<typename T> void TSQueue<T>::delete_all()
 template<typename T> void TSQueue<T>::enqueue(std::shared_ptr<QNode> node)
 {
     std::lock_guard<std::recursive_mutex> lock(m);
-    if(auto tailPtr = tail.lock()) {
+
+    if (auto tailPtr = tail.lock()) {
         tailPtr->prev = node;
         node->next = tailPtr;
     } else {
         head = node;
     }
-    tail = node;
 
+    tail = node;
     length++;
 }
 
@@ -120,7 +129,8 @@ template<typename T> void TSQueue<T>::enqueue(std::shared_ptr<QNode> node)
 template<typename T> bool TSQueue<T>::enqueue(const T& data, bool force)
 {
     std::lock_guard<std::recursive_mutex> lock(m);
-    if(!force && length >= max_size) {
+
+    if (!force && length >= max_size) {
         return false;
     }
 
@@ -139,13 +149,16 @@ template<typename T> bool TSQueue<T>::enqueue(const T& data, bool force)
 template<typename T> bool TSQueue<T>::dequeue(T& data, uint16_t timeout)
 {
     std::unique_lock<std::recursive_mutex> lock(m);
-    if(!enqueue_cv.wait_for(lock, std::chrono::milliseconds(timeout), [this] {return length > 0;})) {
+
+    if (!enqueue_cv.wait_for(lock, std::chrono::milliseconds(timeout), [this] {return length > 0;})) {
         return false;
     }
+
     data = head->data;
     head = head->prev;
     length--;
-    if(!length) {
+
+    if (!length) {
         dequeue_cv.notify_all();
     }
     return true;
@@ -165,12 +178,12 @@ template<typename T> bool TSQueue<T>::wait_until_empty(uint16_t timeout)
 {
     std::unique_lock<std::recursive_mutex> lock(m);
 
-    if(!timeout) {
+    if (!timeout) {
         dequeue_cv.wait(lock, [this] {return length == 0;});
         return true;
     }
 
-    if(!dequeue_cv.wait_for(lock, std::chrono::milliseconds(timeout),
+    if (!dequeue_cv.wait_for(lock, std::chrono::milliseconds(timeout),
                 [this] {return length == 0;})) {
         return false;
     }
@@ -186,19 +199,21 @@ template<typename T> bool TSQueue<T>::wait_until_empty(uint16_t timeout)
 template<typename T> bool TSQueue<T>::push(T data, bool force)
 {
     std::unique_lock<std::recursive_mutex> lock(m);
-    if(!force && length >= max_size) {
+
+    if (!force && length >= max_size) {
         return false;
     }
 
     std::shared_ptr<QNode> temp = std::shared_ptr<QNode>(new QNode(data));
-    if(head) {
+
+    if (head) {
         head->next = temp;
         temp->prev = head;
     } else {
         tail = temp;
     }
-    head = temp;
 
+    head = temp;
     length++;
     enqueue_cv.notify_one();
     return true;
@@ -212,7 +227,7 @@ template<typename T> bool TSQueue<T>::push(T data, bool force)
 */
 template<typename T> bool TSQueue<T>::pop( T& data, uint16_t timeout)
 {
-    return dequeue( data, timeout);
+    return dequeue(data, timeout);
 }
 
 /**
@@ -224,7 +239,8 @@ template<typename T> bool TSQueue<T>::pop( T& data, uint16_t timeout)
 template<typename T> bool TSQueue<T>::peek(T& value, uint16_t timeout)
 {
     std::unique_lock<std::recursive_mutex> lock(m);
-    if(!enqueue_cv.wait_for(lock, std::chrono::milliseconds(timeout), [this] {return length > 0;})) {
+
+    if (!enqueue_cv.wait_for(lock, std::chrono::milliseconds(timeout), [this] {return length > 0;})) {
         return false;
     }
 
