@@ -137,7 +137,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 std::cout << "TSQueue failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        } /*
+        } 
         else if( !it->compare("CRC")) {
             std::cout << "Testing CRC..." <<std::endl;
             jsonValue = atl::testCRC();
@@ -151,7 +151,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 std::cout << "CRC failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        }*/
+        }
     }
 
     //get pass
