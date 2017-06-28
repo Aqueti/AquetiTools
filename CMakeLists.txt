@@ -256,6 +256,7 @@ if(MAKE_TESTS)
       test/ThreadPoolTest.cpp
       test/LruCacheTest.cpp
       test/TSQueueTest.cpp
+      test/CRCTest.cpp
    )
    target_link_libraries( aquetitools_test
       aquetitools

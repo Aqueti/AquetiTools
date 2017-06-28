@@ -5,6 +5,7 @@
 #define  CRC_HPP
 
 #include <map>
+#include "JsonBox.h"
 
 namespace atl
 {
@@ -13,8 +14,8 @@ namespace atl
     **/
    union CRCMap
    {
-      uint16_t crc;
-      uint8_t bytes[2];
+      uint16_t crc;                       //!< Unsigned 16-bit CRC           
+      uint8_t bytes[2];                   //!< Bytes that make up crc
    };
 
 
@@ -24,17 +25,15 @@ namespace atl
    class CRC16
    {
       public:
-         CRC16( uint16_t intial = 0x0000, uint16_t poly = 0x1021 );
-         uint16_t calculate( uint8_t * array, size_t length );
+         CRC16(uint16_t initial = 0x0000, uint16_t poly = 0x1021);
+         uint16_t calculate(uint8_t * array, size_t length);
       
       private:
-         uint16_t m_crcTable[256];
+         uint16_t m_crcTable[256];          //!< Calculation table of CRC codes
          uint16_t m_initialValue = 0x0000;  //!< Starting value for the CRC
-         uint16_t m_polynomial = 0x1021;   //!< Polynomial used to caclculate the CRC
+         uint16_t m_polynomial = 0x1021;   //!< Polynomial used to calculate the CRC
 
          bool     generateTable();
    };
-
-   bool testCRC();
 }
 #endif
