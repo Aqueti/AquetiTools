@@ -1,20 +1,4 @@
-/******************************************************************************
- *
- * \file TSMap.cpp
- *
- *****************************************************************************/
-
-#include "TSMap.tcc"
-
-#include <atomic>
-#include <chrono>
-#include <future>
-#include <iostream>
-#include <limits>
-#include <random>
-#include <thread>
-#include <string>
-#include "assert.h"
+#include "AquetiToolsTest.h"
 
 using namespace atl;
 
@@ -107,6 +91,8 @@ bool add_to_map(TSMap<std::string, int>& map,
     }
     return true;
 }
+
+namespace atl {
 
 JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
 {
@@ -1047,4 +1033,5 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
     std::cout << "TSMap Unit Test passed!\n" << std::endl;
     resultString["pass"] = true;
     return resultString;
+}
 }

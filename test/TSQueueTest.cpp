@@ -310,13 +310,13 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
         std::cout << "TSQueue Test Complete" << std::endl;
     }
 
-    result = std::system("rm TSQueueTest.log");
-    if (result != 0) {
-        std::cout << "Failed to remove log" << std::endl;
-        resultString["Remove log"] = "fail";
-        resultString["pass"] = false;
-        return resultString;
-    }
+    // result = std::system("rm TSQueueTest.log");
+    // if (result != 0) {
+    //     std::cout << "Failed to remove log" << std::endl;
+    //     resultString["Remove log"] = "fail";
+    //     resultString["pass"] = false;
+    //     return resultString;
+    // }
 
     resultString["pass"] = true;
     return resultString;

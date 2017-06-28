@@ -14,6 +14,15 @@
 #include "JsonBox.h"
 
 #include "shared_mutex.h"
+#include <atomic>
+#include <chrono>
+#include <future>
+#include <iostream>
+#include <limits>
+#include <random>
+#include <thread>
+#include <string>
+#include "assert.h"
 
 namespace atl
 {
@@ -403,5 +412,3 @@ namespace atl
     }
     
 }
-
-JsonBox::Value testTSMap(bool printFlag = false, bool assertFlag = false, bool valgrind = false);

@@ -15,8 +15,6 @@
 #include <string.h>
 //#include <TSQueue.cpp>
 #include <TSQueue.tcc>
-
-
 #include "ThreadPool.h"
 #include <CRC.hpp>
 #include <assert.h>
@@ -33,7 +31,7 @@ namespace atl{
  */
 JsonBox::Value testAquetiTools(std::vector<std::string> unitList = {"Timer", "CRC", 
 	"Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"}, 
-	bool testSubmodules = true, bool valgrind = false);
+	bool testSubmodules = true, bool printFlag = true, bool assertFlag = false, bool valgrind = false);
 
 //Functional tests
 JsonBox::Value testTimer(bool printFlag = true, bool assertFlag = false);
@@ -43,6 +41,7 @@ JsonBox::Value testThreadPool();
 JsonBox::Value testLruCache(unsigned int numThreads = 100, bool printFlag = true, bool assertFlag = false);
 JsonBox::Value testTSQueue(unsigned int numThreads = 20, bool printFlag = true, bool assertFlag = false);
 JsonBox::Value testCRC();
+JsonBox::Value testTSMap(bool printFlag = false, bool assertFlag = false, bool valgrind = false);
 
 //Timer test helper functions
 bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,

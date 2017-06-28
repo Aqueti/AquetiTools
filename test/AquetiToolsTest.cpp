@@ -3,7 +3,7 @@
 
 namespace atl{
 
-JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmodules, bool valgrind)
+JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmodules, bool printFlag, bool assertFlag, bool valgrind)
 {
     JsonBox::Value jsonReturn;
     JsonBox::Value jsonUnits;
@@ -45,7 +45,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
             } 
             else {
                 std::cout << "Testing Timer..." << std::endl;
-                jsonValue = atl::testTimer();
+                jsonValue = atl::testTimer(printFlag, assertFlag);
                 jsonUnits["Timer"] = jsonValue;
                 jsonReturn["units"] = jsonUnits;
                 if(jsonValue["pass"].getBoolean()){
@@ -60,7 +60,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
         } 
         else if(!it->compare("Thread")) {
             std::cout << "Testing Thread..." << std::endl;
-            jsonValue = atl::testThread();
+            jsonValue = atl::testThread(printFlag);
             jsonUnits["Thread"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
             if(jsonValue["pass"].getBoolean()) {
@@ -74,7 +74,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
         }
         else if(!it->compare("MultiThread")) {
             std::cout << "Testing MultiThread..." <<std::endl;
-            jsonValue = atl::testMultiThread();
+            jsonValue = atl::testMultiThread(printFlag);
             jsonUnits["MultiThread"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
             if(jsonValue["pass"].getBoolean()) {
@@ -103,7 +103,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
         else if(!it->compare("LruCache")) {
             int threads = 100;
             std::cout << "Testing LruCache with " << threads << " threads..." << std::endl;
-            jsonValue = atl::testLruCache(threads);
+            jsonValue = atl::testLruCache(threads, printFlag, assertFlag);
             jsonUnits["LruCache"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
             if(jsonValue["pass"].getBoolean()) {
@@ -114,19 +114,24 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 std::cout << "LruCache failed to pass!" << std::endl;
                 pass = pass && false;
             } 
-        } /* 
-        
+        } /*
         else if(!it->compare("TSMap")) {
             std::cout << "Testing TSMap" <<std::endl;
-            if( !testTSMap( true, valgrind )) {
-                cout << "TSMap test failed!" << endl;
-                return 1;
+            jsonValue = atl::testTSMap(printFlag, assertFlag, valgrind);
+            jsonUnits["TSMap"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            if(jsonValue["pass"].getBoolean()) {
+                std::cout << "TSMap passed successfully!" << std::endl;
+                pass = pass && true;
             }
-        }
-        */ 
+            else{
+                std::cout << "TSMap failed to pass!" << std::endl;
+                pass = pass && false;
+            }
+        } */
         else if(!it->compare("TSQueue")) {
             std::cout << "Testing TSQueue..." <<std::endl;
-            jsonValue = atl::testTSQueue();
+            jsonValue = atl::testTSQueue(20, printFlag, assertFlag);
             jsonUnits["TSQueue"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
             if(jsonValue["pass"].getBoolean()) {
