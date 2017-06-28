@@ -1,19 +1,4 @@
-//   Copyright Aqueti 2016.
-
-// Distributed under the Boost Software License, Version 1.0.
-
-//    (See accompanying file LICENSE_1_0.txt or copy at
-
-//   http://www.boost.org/LICENSE_1_0.txt)
-
-#include "TSQueue.tcc"
-#include <cstdio>
-#include <ctime>
-#include <random>
-#include <thread>
-#include <assert.h>
-#include <Timer.h>
-#include <fstream>
+#include "AquetiToolsTest.h"
 
 using namespace atl;
 
@@ -129,8 +114,7 @@ bool pop_from_queue(TSQueue<int>& q, bool print)
     return true;
 }
 
-namespace atl
-{
+namespace atl {
 
 /**
 * @brief Tests the thread-safe queue with multiple threads

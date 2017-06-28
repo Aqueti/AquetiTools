@@ -40,7 +40,8 @@ JsonBox::Value testTimer(bool printFlag = true, bool assertFlag = false);
 JsonBox::Value testThread(bool printFlag = true);
 JsonBox::Value testMultiThread(bool printFlag = true);
 JsonBox::Value testThreadPool();
-JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag = true, bool assertFlag = false);
+JsonBox::Value testLruCache(unsigned int numThreads = 100, bool printFlag = true, bool assertFlag = false);
+JsonBox::Value testTSQueue(unsigned int numThreads = 20, bool printFlag = true, bool assertFlag = false);
 
 //Timer test helper functions
 bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,

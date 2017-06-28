@@ -215,7 +215,6 @@ list( APPEND ATOOL_HEADERS
 include_directories( DataTypes )
 set( DataTypes_SRC
    DataTypes/TSMap.cpp
-   DataTypes/TSQueue.cpp
 )
 list( APPEND ATOOL_HEADERS
    DataTypes/LruCache.tcc
@@ -256,6 +255,7 @@ if(MAKE_TESTS)
       test/MultiThreadTest.cpp
       test/ThreadPoolTest.cpp
       test/LruCacheTest.cpp
+      test/TSQueueTest.cpp
    )
    target_link_libraries( aquetitools_test
       aquetitools

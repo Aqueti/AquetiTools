@@ -65,11 +65,11 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
             jsonReturn["units"] = jsonUnits;
             if(jsonValue["pass"].getBoolean()) {
                 std::cout << "Thread passed successfully!" << std::endl;
-                    pass = pass && true;
+                pass = pass && true;
             }
             else{
-                    std::cout << "Thread failed to pass!" << std::endl;
-                    pass = pass && false;
+                std::cout << "Thread failed to pass!" << std::endl;
+                pass = pass && false;
             }        
         }
         else if(!it->compare("MultiThread")) {
@@ -79,11 +79,11 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
             jsonReturn["units"] = jsonUnits;
             if(jsonValue["pass"].getBoolean()) {
                 std::cout << "MultiThread passed successfully!" << std::endl;
-                    pass = pass && true;
+                pass = pass && true;
             }
             else{
-                    std::cout << "MultiThread failed to pass!" << std::endl;
-                    pass = pass && false;
+                std::cout << "MultiThread failed to pass!" << std::endl;
+                pass = pass && false;
             } 
         }
         else if(!it->compare("ThreadPool")) {
@@ -93,11 +93,11 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
             jsonReturn["units"] = jsonUnits;
             if(jsonValue["pass"].getBoolean()) {
                 std::cout << "ThreadPool passed successfully!" << std::endl;
-                    pass = pass && true;
+                pass = pass && true;
             }
             else{
-                    std::cout << "ThreadPool failed to pass!" << std::endl;
-                    pass = pass && false;
+                std::cout << "ThreadPool failed to pass!" << std::endl;
+                pass = pass && false;
             } 
         }
         else if(!it->compare("LruCache")) {
@@ -108,11 +108,11 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
             jsonReturn["units"] = jsonUnits;
             if(jsonValue["pass"].getBoolean()) {
                 std::cout << "LruCache passed successfully!" << std::endl;
-                    pass = pass && true;
+                pass = pass && true;
             }
             else{
-                    std::cout << "LruCache failed to pass!" << std::endl;
-                    pass = pass && false;
+                std::cout << "LruCache failed to pass!" << std::endl;
+                pass = pass && false;
             } 
         } /* 
         
@@ -123,19 +123,33 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 return 1;
             }
         }
-        */ /*
+        */ 
         else if(!it->compare("TSQueue")) {
-            std::cout << "Testing TSQueue" <<std::endl;
-            if( !atl::testTSQueue(20, true, false)) {
-                std::cout <<"TSQueue test failed!"<<std::endl;
-                return 1;
+            std::cout << "Testing TSQueue..." <<std::endl;
+            jsonValue = atl::testTSQueue();
+            jsonUnits["TSQueue"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            if(jsonValue["pass"].getBoolean()) {
+                std::cout << "TSQueue passed successfully!" << std::endl;
+                pass = pass && true;
             }
-        }
+            else{
+                std::cout << "TSQueue failed to pass!" << std::endl;
+                pass = pass && false;
+            }
+        } /*
         else if( !it->compare("CRC")) {
-            std::cout << "Testing CRC" <<std::endl;
-            if( !atl::testCRC() ) {
-                cout << "CRC test failed!" << endl;
-                return 0;
+            std::cout << "Testing CRC..." <<std::endl;
+            jsonValue = atl::testCRC();
+            jsonUnits["CRC"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            if(jsonValue["pass"].getBoolean()) {
+                std::cout << "CRC passed successfully!" << std::endl;
+                pass = pass && true;
+            }
+            else{
+                std::cout << "CRC failed to pass!" << std::endl;
+                pass = pass && false;
             }
         }*/
     }

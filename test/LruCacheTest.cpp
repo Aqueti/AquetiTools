@@ -2,7 +2,7 @@
 
 std::mutex printMutex;
 
-namespace atl {
+using namespace atl;
 
 /**
 * @brief Test: prints the size of the cache for debugging
@@ -101,6 +101,8 @@ bool handler(int, std::string)
 {
     return rand() % 2;
 }
+
+namespace atl {
 
 /**
  * @brief Tests the cache functions with and without threads
