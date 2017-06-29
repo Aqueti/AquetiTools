@@ -128,7 +128,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
         } */
         else if (!it->compare("TSQueue")) {
             std::cout << "Testing TSQueue..." <<std::endl;
-            jsonValue = atl::testTSQueue(20, printFlag, assertFlag);
+            jsonValue = atl::testTSQueue();
             jsonUnits["TSQueue"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
             
@@ -154,7 +154,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
             }
         } else if (!it->compare("TaskManager")) {
             std::cout << "Testing TaskManager..." <<std::endl;
-            jsonValue = atl::testTaskManager(threads, valgrind, printFlag, assertFlag);
+            jsonValue = atl::testTaskManager();
             jsonUnits["TaskManager"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
             

@@ -2,7 +2,7 @@
 
 namespace atl {
 
-JsonBox::Value testTaskManager(int threads, bool valgrind, bool printFlag, bool assertFlag)
+JsonBox::Value testTaskManager(int threads, bool printFlag, bool assertFlag, bool valgrind)
 {
 	JsonBox::Value resultString;
 
