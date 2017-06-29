@@ -23,9 +23,11 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
     std::string guid;
     std::ifstream nameFileout;
     nameFileout.open("/etc/guid");
+    
     if (nameFileout.good()) {
         getline(nameFileout, guid);
     }
+    
     nameFileout.close();
     jsonReturn["hardwareId"] = guid;
 
@@ -38,79 +40,74 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
     jsonReturn["softwareId"] = softwareId;
 
     //Get results from units
-    for(std::vector<std::string>::iterator it = unitList.begin(); it != unitList.end(); ++it ) {
-        if( !it->compare("Timer")) {
-              if(valgrind) {
+    for (std::vector<std::string>::iterator it = unitList.begin(); it != unitList.end(); ++it) {
+        if (!it->compare("Timer")) {
+            if (valgrind) {
                 std::cout << "Timer will not be tested." << std::endl;
-            } 
-            else {
+            } else {
                 std::cout << "Testing Timer..." << std::endl;
                 jsonValue = atl::testTimer(printFlag, assertFlag);
                 jsonUnits["Timer"] = jsonValue;
                 jsonReturn["units"] = jsonUnits;
-                if(jsonValue["pass"].getBoolean()){
+
+                if (jsonValue["pass"].getBoolean()) {
                     std::cout << "Timer passed successfully!" << std::endl;
                     pass = pass && true;
-                }
-                else{
+                } else {
                     std::cout << "Timer failed to pass!" << std::endl;
                     pass = pass && false;
                 }
             }
-        } 
-        else if(!it->compare("Thread")) {
+        } else if (!it->compare("Thread")) {
             std::cout << "Testing Thread..." << std::endl;
             jsonValue = atl::testThread(printFlag);
             jsonUnits["Thread"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
-            if(jsonValue["pass"].getBoolean()) {
+
+            if (jsonValue["pass"].getBoolean()) {
                 std::cout << "Thread passed successfully!" << std::endl;
                 pass = pass && true;
-            }
-            else{
+            } else {
                 std::cout << "Thread failed to pass!" << std::endl;
                 pass = pass && false;
             }        
-        }
-        else if(!it->compare("MultiThread")) {
+        } else if (!it->compare("MultiThread")) {
             std::cout << "Testing MultiThread..." <<std::endl;
             jsonValue = atl::testMultiThread(printFlag);
             jsonUnits["MultiThread"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
-            if(jsonValue["pass"].getBoolean()) {
+
+            if (jsonValue["pass"].getBoolean()) {
                 std::cout << "MultiThread passed successfully!" << std::endl;
                 pass = pass && true;
-            }
-            else{
+            } else {
                 std::cout << "MultiThread failed to pass!" << std::endl;
                 pass = pass && false;
             } 
-        }
-        else if(!it->compare("ThreadPool")) {
+        } else if (!it->compare("ThreadPool")) {
             std::cout << "Testing ThreadPool..." <<std::endl;
             jsonValue = atl::testThreadPool();
             jsonUnits["ThreadPool"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
-            if(jsonValue["pass"].getBoolean()) {
+
+            if (jsonValue["pass"].getBoolean()) {
                 std::cout << "ThreadPool passed successfully!" << std::endl;
                 pass = pass && true;
-            }
-            else{
+            } else {
                 std::cout << "ThreadPool failed to pass!" << std::endl;
                 pass = pass && false;
             } 
-        }
-        else if(!it->compare("LruCache")) {
+        } else if (!it->compare("LruCache")) {
             int threads = 100;
             std::cout << "Testing LruCache with " << threads << " threads..." << std::endl;
             jsonValue = atl::testLruCache(threads, printFlag, assertFlag);
             jsonUnits["LruCache"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
-            if(jsonValue["pass"].getBoolean()) {
+
+            if (jsonValue["pass"].getBoolean()) {
                 std::cout << "LruCache passed successfully!" << std::endl;
                 pass = pass && true;
-            }
-            else{
+            } else {
                 std::cout << "LruCache failed to pass!" << std::endl;
                 pass = pass && false;
             } 
@@ -129,44 +126,42 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 pass = pass && false;
             }
         } */
-        else if(!it->compare("TSQueue")) {
+        else if (!it->compare("TSQueue")) {
             std::cout << "Testing TSQueue..." <<std::endl;
             jsonValue = atl::testTSQueue(20, printFlag, assertFlag);
             jsonUnits["TSQueue"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
-            if(jsonValue["pass"].getBoolean()) {
+            
+            if (jsonValue["pass"].getBoolean()) {
                 std::cout << "TSQueue passed successfully!" << std::endl;
                 pass = pass && true;
-            }
-            else{
+            } else {
                 std::cout << "TSQueue failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        } 
-        else if( !it->compare("CRC")) {
+        } else if (!it->compare("CRC")) {
             std::cout << "Testing CRC..." <<std::endl;
             jsonValue = atl::testCRC();
             jsonUnits["CRC"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
+            
             if(jsonValue["pass"].getBoolean()) {
                 std::cout << "CRC passed successfully!" << std::endl;
                 pass = pass && true;
-            }
-            else{
+            } else {
                 std::cout << "CRC failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        }
-        else if( !it->compare("TaskManager")) {
+        } else if (!it->compare("TaskManager")) {
             std::cout << "Testing TaskManager..." <<std::endl;
-            jsonValue = atl::testTaskManager();
+            jsonValue = atl::testTaskManager(threads, valgrind, printFlag, assertFlag);
             jsonUnits["TaskManager"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
-            if(jsonValue["pass"].getBoolean()) {
+            
+            if (jsonValue["pass"].getBoolean()) {
                 std::cout << "TaskManager passed successfully!" << std::endl;
                 pass = pass && true;
-            }
-            else{
+            } else {
                 std::cout << "TaskManager failed to pass!" << std::endl;
                 pass = pass && false;
             }

@@ -1,12 +1,15 @@
 #include "AquetiToolsTest.h"
 
-namespace atl{
+namespace atl {
 
-JsonBox::Value testTaskManager(int threads, bool valgrind)
+JsonBox::Value testTaskManager(int threads, bool valgrind, bool printFlag, bool assertFlag)
 {
 	JsonBox::Value resultString;
-    std::cout << "Testing TaskManager" << std::endl;
-    std::cout << threads << " threads: ";
+
+    if (printFlag) {
+        std::cout << "Testing TaskManager" << std::endl;
+        std::cout << threads << " threads: ";
+    }
 
     atl::ThreadPool tp(threads, threads);
     atl::TaskManager<int, int> man;
@@ -19,7 +22,7 @@ JsonBox::Value testTaskManager(int threads, bool valgrind)
 
     int j;
 
-    for(j = 0; j < 1000; j++) {
+    for (j = 0; j < 1000; j++) {
         tp.push_job([&]() {
             man.performJob(j%5, fun);
         });
@@ -36,12 +39,21 @@ JsonBox::Value testTaskManager(int threads, bool valgrind)
     std::cout << "elapsed time: " << time << std::endl;
 
     bool ret = (i < 10 && time < 0.15) || valgrind;
-    if(ret) {
-        std::cout << "TaskManager Unit Test Passed!" << std::endl;
-        resultString["pass"] = true;
+    if (!ret) {
+        if (printFlag) {
+            std::cout << "Test failed!" << std::endl;
+        }
+        if (assertFlag) {
+            assert(false);
+        }
+        resultString["pass"] = false;
         return resultString;
     }
-    resultString["pass"] = false;
+
+    if (printFlag) {
+        std::cout << "TaskManager test passed!" << std::endl;
+    }
+    resultString["pass"] = true;
     return resultString;
 }
 }
