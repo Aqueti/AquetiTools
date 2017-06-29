@@ -157,6 +157,20 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 pass = pass && false;
             }
         }
+        else if( !it->compare("TaskManager")) {
+            std::cout << "Testing TaskManager..." <<std::endl;
+            jsonValue = atl::testTaskManager();
+            jsonUnits["TaskManager"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            if(jsonValue["pass"].getBoolean()) {
+                std::cout << "TaskManager passed successfully!" << std::endl;
+                pass = pass && true;
+            }
+            else{
+                std::cout << "TaskManager failed to pass!" << std::endl;
+                pass = pass && false;
+            }
+        }
     }
 
     //get pass
