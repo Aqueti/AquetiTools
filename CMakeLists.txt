@@ -1,50 +1,16 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-
 cmake_policy(SET CMP0048 NEW)
 
 project(AquetiTools VERSION "0.0.0.1" )
 ############################################################
 # Configuration Step
 ############################################################
-#set default build location if a project has not been defined. After the
-#project below, the PROJECT_SOURCE_DIR should be defined
-#set(CMAKE_INSTALL_PREFIX "$PROJECT_DEST" CACHE PATH "Install Directory" FORCE )
-
-#if(NOT DEFINED PROJECT_SOURCE_DIR )
-#endif()
-
-#set( CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory")
-#set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/INSTALL" CACHE PATH "Install Directory" FORCE )
 
 #General build options
 option( MAKE_STATIC_LIB "Compile the library statically (off for dynamic)" ON )
 option( MAKE_TESTS "Build test executables" ON )
-option( USE_CLANG "Use clang for compiler instead of gcc" ON )
 option( USE_SUPERBUILD "Build all dependencies in SUPERBUILD mode" ON)
-
-#Determine if we have the cpack program for building packages
-#Specify compiler options
-if( USE_CLANG)
-   if(NOT WIN32)
-      #Make these cache variable so they persist if we are not using Superbuild
-      set(CMAKE_C_COMPILER "/usr/bin/clang" CACHE STRING "Compiler to use" )
-      set(CMAKE_CXX_COMPILER "/usr/bin/clang++" CACHE STRING "CXX Compiler to use")
-
-      #See if the AddressSanitizer(ASAN) is installed. If so, make it an option
-      find_program(ASAN asan_symbolize DOC "ASAN executable")
-      string( COMPARE EQUAL ${ASAN} "ASAN-NOTFOUND" ASAN_NOTFOUND )
-      if(NOT ASAN_NOTFOUND )
-         option(USE_ASAN "Enable Address sanitizer" OFF)
-         if(USE_ASAN)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fno-optimize-sibling-calls -DVOGL_USE_STB_MALLOC=0")
-            set(CMAKE_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS_LIST}  -fno-omit-frame-pointer -fsanitize=address -fno-optimize-sibling-calls -DVOGL_USE_STB_MALLOC=0")
-            set(CMAKE_EXE_LINK_FLAGS_LIST "${CMAKE_EXE_LINK_FLAGS_LIST} -fsanitize=address -fno-omit-frame-pointer")
-            set(CMAKE_SHARED_LINK_FLAGS_LIST "${CMAKE_SHARED_LINK_FLAGS_LIST} -fsanitize=address -fno-omit-frame-pointer")
-         endif(USE_ASAN)
-      endif(NOT ASAN_NOTFOUND)
-   endif(NOT WIN32)
-endif(USE_CLANG)
 
 ##############################################
 ## Build dependencies
@@ -53,7 +19,6 @@ endif(USE_CLANG)
 ##be executed in this pass. The superbuild file will recursively call this CMakeLists.txt
 ##with USE_SUPERBUILD set to off to skip the SUPERBUILD part
 if(USE_SUPERBUILD )
-   set(GIT_HTTPS ON CACHE BOOL "Clone git repositories with HTTPS")
    include(ExternalProject)
    include(Superbuild.cmake)
    return()
@@ -65,15 +30,6 @@ endif(USE_SUPERBUILD)
 # information.
 #############################################
 
-message("------------------------------INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-link_directories(${CMAKE_INSTALL_PREFIX}/lib)
-include_directories(
-   ${CMAKE_INSTALL_PREFIX}/include 
-   ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-
-#include( ${CMAKE_INSTALL_PREFIX}/include)
 #If Doxygen is installed, make it an option. Default to OFF so it's not built
 #as a SubProject of a superbuild
 find_package( Doxygen)
@@ -123,7 +79,6 @@ execute_process(
    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-
 #set the version tag
 if( "${GIT_BRANCH}" MATCHES "master" )
    set(VERSION_TAG "dev")
@@ -136,20 +91,23 @@ configure_file(
    "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
 )
 
-include_directories( ${CMAKE_CURRENT_BINARY_DIR})
-
-#If we use clang, set up parameters
 #############################################
 #Specify local compiler options
 #############################################
 #Determine Compiler options
 if (NOT WIN32)
-   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-parameter -std=c++14 -fPIC -O0") #Compile faster on debug, with warnings
-   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++14 -fPIC") #Optimize compilation, no warnings
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14 -fPIC -O2") #Else slightly optimize, with warnings
-
+   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-parameter -std=c++11 -fPIC -O0") #Compile faster on debug, with warnings
+   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++11 -fPIC") #Optimize compilation, no warnings
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -fPIC -O2") #Else slightly optimize, with warnings
    add_definitions(-DUNIX)
 endif(NOT WIN32)
+
+list(APPEND CMAKE_PREFIX_PATH
+    ${CMAKE_INSTALL_PREFIX}/lib/cmake
+    usr/lib/cmake
+)
+
+find_package(JsonBox CONFIG REQUIRED)
 
 list( APPEND ATOOL_HEADERS 
    Timer/Timer.h
@@ -205,7 +163,7 @@ add_library( aquetitools STATIC
 )
 
 target_link_libraries( aquetitools
-   libJsonBox.a
+    JsonBox
 )
 
 LIST( APPEND LIB_LIST aquetitools )
@@ -216,7 +174,7 @@ if(MAKE_TESTS)
    )
 
    target_link_libraries( AquetiToolTest ${LIB_LIST})
-   LIST( APPEND TARGET_LIST AquetiToolTest )
+   list( APPEND TARGET_LIST AquetiToolTest )
 endif()
 
 list(APPEND TARGET_LIST ${LIB_LIST})
@@ -226,16 +184,24 @@ list(APPEND TARGET_LIST ${LIB_LIST})
 # This sections initiates the build of the  components in th TARGET_LIST. 
 # Each component
 #############################################
-message("installing: ${TARGET_LIST}")
-install( TARGETS 
-   ${TARGET_LIST}
-#   ${LIB_LIST}
-   RUNTIME DESTINATION bin
-   LIBRARY DESTINATION lib${LIB_SUFFIX}
-   ARCHIVE DESTINATION lib${LIB_SUFFIX}
-   INCLUDES DESTINATION include/aqueti
-   PUBLIC_HEADER DESTINATION include/aqueti
+configure_file(${CMAKE_SOURCE_DIR}/AquetiToolsConfig.cmake.in
+               ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+               @ONLY)
+
+export(TARGETS ${TARGET_LIST} FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake)
+
+install(TARGETS ${TARGET_LIST} EXPORT ${PROJECT_NAME}
+   RUNTIME DESTINATION bin COMPONENT lib
+   LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT lib
+   ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT lib
+   INCLUDES DESTINATION include/aquetitools
+   PUBLIC_HEADER DESTINATION include/aquetitools
 )
 
 install( FILES ${ATOOL_HEADERS} DESTINATION include/aquetitools)
 
+install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        DESTINATION lib${LIB_SUFFIX}/cmake)
+install(EXPORT ${PROJECT_NAME}
+        DESTINATION lib${LIB_SUFFIX}/cmake
+        FILE ${PROJECT_NAME}Targets.cmake)
