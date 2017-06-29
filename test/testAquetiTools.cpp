@@ -2,7 +2,7 @@
 
 #include "AquetiToolsTest.h"
 
-std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue"};
+std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager"};
 
 int main(int argc, char *argv[])
 {

@@ -257,6 +257,7 @@ if(MAKE_TESTS)
       test/TSQueueTest.cpp
       test/CRCTest.cpp
       test/TSMapTest.cpp
+      test/TaskManagerTest.cpp
    )
    target_link_libraries( aquetitools_test
       aquetitools
