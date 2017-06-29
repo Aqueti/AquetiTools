@@ -1,18 +1,7 @@
-//   Copyright Aqueti 2016.
+/**
+ * \file Timer.cpp
+ **/
 
-// Distributed under the Boost Software License, Version 1.0.
-
-//    (See accompanying file LICENSE_1_0.txt or copy at
-
-//   http://www.boost.org/LICENSE_1_0.txt)
-
-//***********************************************************
-/*!\file Timer.cpp
- * \brief Timer class provides timing functionality for testing
- * program performance
- *
- * \author S. D. Feller 2014
- *************************************************************/
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,25 +17,22 @@
 #include <string>
 #include <sstream>
 #include <JsonBox.h>
+#include "Timer.h"
+#include <time.h>
 
 #ifdef UNIX
 #else
 #include <winsock2.h>
 #endif
-//#include <curl/curl.h>
-//#include <JsonBox.h>
-#include "Timer.h"
-#include <time.h>
 
 using namespace std;
 
 namespace atl
 
 {
-//************************************************************
-/*!\brief Timer constructor
+/**
+ * Constructor
  */
-//************************************************************
 Timer::Timer()
 {
 
@@ -55,45 +41,38 @@ Timer::Timer()
     start();
 }
 
-//***********************************************************
-/*!\brief Timer destructor
+/**
+ * Destructor
  */
-//************************************************************/
 Timer::~Timer()
 {
 }
 
-//***********************************************************
-/*!\brief Sets the number of fps in timer
+/**
+ * Function to set the FPS of the timer
  *
- * \param [in] rate to set as FPS
+ * @param rate The double that represents the rate
  */
-//************************************************************
 void Timer::setFPS(double rate)
 {
     m_fps = rate;
 }
 
-//***********************************************************
-/*!\brief returns the number of fps in timer
+/**
+ * Function to get the FPS of the timer
+ *
+ * @return The FPS of timer
  */
-//************************************************************
 double Timer::getFPS()
 {
     return m_fps;
 }
 
-
-//***********************************************************
 /**
- *!\brief returns the current timecode
+ * Function to return the current timecode
  *
- * \return SMPTETime conversion of time code
- *
- * This is an internal function since it will eventually calculate
- * frame rate and other information
- **/
-//************************************************************
+ * @return The SMPTETime conversion of time code
+ */
 SMPTETime Timer::getTimeCode()
 {
     double now = getTime() + m_timeCodeOffset;
@@ -123,64 +102,54 @@ SMPTETime Timer::getTimeCode()
     return;
 }*/
 
-
-//***********************************************************
-/*!\brief returns the timeCode offset to match system time with global time
+/**
+ * Function to return the timeCode offset to match system time with global time
  *
- * \return 64-bit time code offset
+ * @return The 64-bit time code offset
  */
-//************************************************************
 int64_t Timer::getTimeCodeOffset()
 {
     return m_timeCodeOffset;
 }
 
-
-//***********************************************************
-/*!\brief starts timer
+/**
+ * Function to start the timer and become the new point of reference
  *
- * Resets the start time and becomes the new point of reference
  */
-//************************************************************/
 void Timer::start()
 {
     m_startTime = getTime();
     return;
 }
 
-//***********************************************************
-/*!\brief starts timer
+/**
+ * Function to determine the time elapsed since the timer was started
  *
- * \return double elapsed time
- *
- * Resets the start time and becomes the new point of reference
+ * @return The stop time minus the start time
  */
-//************************************************************/
 double Timer::elapsed()
 {
     double m_stopTime = getTime();
     return  m_stopTime - m_startTime;
 }
 
-//***********************************************************
-/*!\brief converts a timeval struct to double
+/**
+ * Function to convert a timeval struct to double
  *
- * \param [in] tv timeval to be converted to double
- * \return double conversion of timeval
+ * @param tv The tv timeval to be converted to double
+ * @return The double conversion of timeval
  */
-//************************************************************/
 double convertTimeValToDouble(timeval tv)
 {
     return (double)tv.tv_sec + (double)((int)tv.tv_usec) / double(TIMER_STEP);
 }
 
-//***********************************************************
-/*!\brief converts a double to a timeval struct
+/**
+ * Function to convert a double to a timeval struct
  *
- * \param [in] dTime double to be converted to timeval
- * \return timeval conversion of double
+ * @param dTime The double to be converted to timeval
+ * @return The timeval conversion of double
  */
-//************************************************************/
 timeval convertDoubleToTimeVal(double dTime)
 {
     timeval tv;
@@ -190,15 +159,13 @@ timeval convertDoubleToTimeVal(double dTime)
     return tv;
 }
 
-//***********************************************************
 /**
- *!\brief converts a double to an SMPTE time.
+ * Function to convert a double to SMPTE time
  *
- * \param [in] dTime double to convert
- * \param [in] fps number of frames per second (used to convert decimal time to a frame)
- * \return SMPTETime conversion of double
- **/
-//***********************************************************
+ * @param dTime The double to convert
+ * @param fps The number of frames per second (used to convert decimal time to a frame)
+ * @return The SMPTETime conversion of double
+ */
 SMPTETime convertDoubleToSMPTE(double dTime, double fps)
 {
     timeval tv = convertDoubleToTimeVal(dTime);
@@ -207,26 +174,24 @@ SMPTETime convertDoubleToSMPTE(double dTime, double fps)
     return smpte;
 }
 
-//***********************************************************
-/*!\brief converts a SMPTE to Timecode (hhmmssff)
+/**
+ * Function to convert a SMPTE to Timecode (hhmmssff)
  *
- * \param [in] smpte value to be converted to time code
- * \return 64-bit time code
+ * @param smpte The SMPTE time to convert to time code
+ * @return The 64-bit time code
  */
-//************************************************************/
 int64_t convertSMPTEToTimeCode(SMPTETime smpte)
 {
     return smpte.hour*1e6 + smpte.minute*1e4+smpte.second*1e2+smpte.frame;
 }
 
-//***********************************************************
-/*!\brief converts a timeval structure to Timecode (hhmmssff)
+/**
+ * Function to convert a timeval to time code
  *
- * \param [in] tv timeval to be converted to time code
- * \param [in] fps number of frames per second (used to convert time val to SMPTE)
- * \return 64-bit time code
- **/
-//************************************************************/
+ * @param tv The timevale
+ * @param fps The FPS data coming in
+ * @return The time code converted
+ */
 int64_t convertTimeValToTimeCode(timeval tv, double fps)
 {
     SMPTETime smpte = convertTimeValToSMPTE(tv, fps);
@@ -234,15 +199,13 @@ int64_t convertTimeValToTimeCode(timeval tv, double fps)
     return convertSMPTEToTimeCode(smpte);
 }
 
-//***********************************************************
 /**
- *!\brief converts a double to an SMPTE time.
+ * Function to convert a double to an SMPTE time
  *
- * \param [in] tv time  to convert
- * \param [in] fps number of frames per second (used to convert decimal time to a frame)
- * \return SMPTETime conversion of timeval
- **/
-//***********************************************************
+ * @param tv The time to convert
+ * @param fps The number of frames per second (used to convert decimal time to a frame)
+ * @return The SMPTETime conversion of timeval
+ */
 SMPTETime convertTimeValToSMPTE(timeval tv, double fps)
 {
     SMPTETime smpte;
@@ -260,15 +223,13 @@ SMPTETime convertTimeValToSMPTE(timeval tv, double fps)
     return smpte;
 }
 
-//***********************************************************
 /**
- * \brief Converts the given timeval and int into a a string
+ * Converts the given timeval and int into a a string
  *
- * \param [in] tv timeval to be converted to string
- * \param [in] fps number of frames per second (used to convert time val to SMPTE)
- * \return std::string conversion of timeval
- **/
-//***********************************************************
+ * @param tv The time to convert
+ * @param fps The number of frames per second (used to convert time val to SMPTE)
+ * @return The string conversion of timeval
+ */
 std::string convertTimeValToString(timeval tv, double fps)
 {
     char buffer[256];
@@ -288,53 +249,46 @@ std::string convertTimeValToString(timeval tv, double fps)
     return result;
 }
 
-//***********************************************************
 /**
- * \brief Converts the given double into a string with fps
+ * Converts the given double into a string with fps
  *
- * \param [in] dTime double to be converted to string
- * \param [in] fps number of frames per second (used to convert time val to string)
- * \return std::string conversion of double
- **/
-//***********************************************************
+ * @param dTime The double to be converted to string
+ * @param fps The number of frames per second (used to convert time val to string)
+ * @return The std::string conversion of double
+ */
 std::string convertDoubleToString(double dTime, double fps)
 {
     timeval tv = convertDoubleToTimeVal(dTime);
     return convertTimeValToString(tv, fps);
 }
 
-
-//***********************************************************
 /**
- * \brief Converts a double to a TimeCode
- * 
- * \param [in] dTime double to be converted to time code
- * \param [in] fps number of frams per second (used to convert time val to time code)
- * \return 64-bit time code
- **/
-//***********************************************************
+ * Converts a double to a TimeCode
+ *
+ * @param dTime The double to be converted to time code
+ * @param fps The number of frams per second (used to convert time val to time code)
+ * @return The 64-bit time code
+ */
 int64_t convertDoubleToTimeCode(double dTime, double fps)
 {
 	timeval tv = convertDoubleToTimeVal(dTime);
     return convertTimeValToTimeCode(tv, fps);
 }
 
-//***********************************************************
 /**
- * \brief Gets the current time as a double
+ * Gets the current time as a double
  *
- * \return double time
- **/
-//***********************************************************
+ * @return The double time
+ */
 double getTime()
 {
     return (double)getUsecTime() / (double)1e6;
 }
 
 /**
- * @brief Gets the number of microseconds since the epoch
+ * Gets the number of microseconds since the epoch
  *
- * \return 64-bit microsecond time
+ * @return 64-bit microsecond time
  */
 uint64_t getUsecTime()
 {
@@ -347,9 +301,9 @@ uint64_t getUsecTime()
 }
 
 /**
- * \brief Returns the current time as utc with 2^16 sub second steps
+ * Returns the current time as utc with 2^16 sub second steps
  *
- * \return 64-bit timestamp
+ * @return 64-bit timestamp
  **/
 uint64_t getTimestamp()
 {
@@ -367,36 +321,24 @@ uint64_t getTimestamp()
     return id.m_value;
 }
 
-//***********************************************************
-/*!\brief Returns the current timestamp
+/**
+ * Returns the current timestamp
  *
- * \param [in] dTime double to be converted to timestamp
- * \return 64-bit timestamp
- *
- * This is an internal function since it will eventually calculate
- * frame rate and other information
+ * @param dTime The double to be converted to timestamp
+ * @return The 64-bit timestamp
  */
-//************************************************************/
 uint64_t convertDoubleToTimeStamp(double dTime)
 {
     return (uint64_t)(dTime * 1e8);
 }
 
-
-
-
-
 /**
- *!\brief calculates the sum of two time values
- &
- * Calcs the sum of tv1 and tv2.  Returns the sum in a timeval struct.
- * Calcs negative times properly, with the appropriate sign on both tv_sec
- * and tv_usec (these signs will match unless one of them is 0).
- * NOTE: both abs(tv_usec)'s must be < 1000000 (ie, normal timeval format)
+ * calculates the sum of two time values
  *
- * borrowed copiously from vrpn (thanks Russell )
- **/
-
+ * @param tv1 The first timeval
+ * @param tv2 The second timeval
+ * @return The sum of the two timevals
+ */
 timeval TimevalSum(const timeval& tv1, const timeval& tv2)
 {
     timeval tvSum = tv1;
@@ -436,11 +378,13 @@ timeval TimevalSum(const timeval& tv1, const timeval& tv2)
     return tvSum;
 }
 
-/*
- *!\brief compares two time values
- *\return 1 if tv1 is greater than tv2;  0 otherwise
+/**
+ * Compares two time values
+ *
+ * @param tv1 The first timeval
+ * @param tv2 The second timeval
+ * @return 1 if tv1 is greater than tv2 and 0 otherwise
  */
-
 bool TimevalGreater(const timeval& tv1, const timeval& tv2)
 {
     if (tv1.tv_sec > tv2.tv_sec) {
@@ -591,10 +535,10 @@ std::string convertUsecsToDate(uint64_t usecs)
 }*/
 
 /**
- * \brief Sleeps for the given amount of time
+ * Sleeps for the given amount of time
  *
- * \param [in] time double to sleep in seconds (supports millisecond resolution)
- **/
+ * @param time The double to sleep in seconds (supports millisecond resolution)
+ */
 void sleep(double time)
 {
     if(time <= 0) {
@@ -606,10 +550,10 @@ void sleep(double time)
 }
 
 /**
- * \brief Returns the current date and time as a string
+ * Returns the current date and time as a string
  *
- * \return std::string conversion of date
- **/
+ * @return The std::string conversion of date
+ */
 std::string getDateAsString() {
   auto now = std::chrono::system_clock::now();
   auto as_time_t = std::chrono::system_clock::to_time_t(now);

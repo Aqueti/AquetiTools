@@ -1,3 +1,7 @@
+/**
+ * \file MultiThreadTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 namespace atl {
@@ -9,8 +13,8 @@ namespace atl {
 **/
 JsonBox::Value testMultiThread(bool printFlag)
 {
-    JsonBox::Value resultString;
-
+    JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
+ 
     bool rc = true;
     MultiThread mThread(5);
 

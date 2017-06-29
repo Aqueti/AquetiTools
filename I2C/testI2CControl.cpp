@@ -1,3 +1,6 @@
+/**
+ * \file testI2CControl.cpp
+ **/
 
 #include <iostream>
 #include "I2CControl.hpp"

@@ -1,3 +1,7 @@
+/**
+ * \file TSQueue.tcc
+ **/
+
 #include <iostream>
 #include <vector>
 #include <atomic>

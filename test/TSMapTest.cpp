@@ -1,3 +1,7 @@
+/**
+ * \file TSMapTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 using namespace atl;
@@ -96,7 +100,7 @@ namespace atl {
 
 JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
 {
-    JsonBox::Value resultString;
+    JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
     std::cout << "Testing TSMap" << std::endl;
 
     //***********************************************

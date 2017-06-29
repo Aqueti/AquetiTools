@@ -1,4 +1,9 @@
+/**
+ * \file I2CControl.hpp
+ **/
+
 #pragma once
+
 #include <linux/i2c-dev.h>
 #include <string>
 #include <vector>

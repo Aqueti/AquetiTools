@@ -1,3 +1,7 @@
+/**
+ * \file ThreadPoolTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 namespace atl {
@@ -40,7 +44,7 @@ bool doThreadPoolThing(int threads)
 **/
 JsonBox::Value testThreadPool()
 {
-    JsonBox::Value resultString;
+    JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
 
     bool ret = doThreadPoolThing(5);
     ret = doThreadPoolThing(1) && ret;

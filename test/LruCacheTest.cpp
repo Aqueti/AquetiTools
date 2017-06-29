@@ -1,3 +1,7 @@
+/**
+ * \file LruCacheTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 std::mutex printMutex;
@@ -111,7 +115,7 @@ namespace atl {
  */
 JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assertFlag)
 {
-    JsonBox::Value resultString;
+    JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
     LruCache <int, std::string> cache;
     cache.set_max_size(50);
 

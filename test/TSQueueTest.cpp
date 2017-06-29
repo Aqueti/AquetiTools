@@ -1,3 +1,7 @@
+/**
+ * \file TSQueueTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 using namespace atl;
@@ -127,7 +131,7 @@ namespace atl {
 JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
 {
     TSQueue<int> q;
-    JsonBox::Value resultString;
+    JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
 
     //Tests enqueue function
     for (int i = 0; i < 100; i++) {

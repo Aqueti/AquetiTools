@@ -1,7 +1,7 @@
 /**
  * \file CRC.cpp
- * 
  **/
+
 #include <iostream>
 #include "CRC.hpp"
 

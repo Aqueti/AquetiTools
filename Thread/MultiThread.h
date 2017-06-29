@@ -1,3 +1,7 @@
+/**
+ * \file MultiThread.h
+ **/
+
 #pragma once
 
 #include "Thread.h"

@@ -1,3 +1,6 @@
+/**
+ * \file AquetiToolsTest.cpp
+ **/
 
 #include "AquetiToolsTest.h"
 
@@ -5,9 +8,9 @@ namespace atl{
 
 JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmodules, bool printFlag, bool assertFlag, bool valgrind)
 {
-    JsonBox::Value jsonReturn;
-    JsonBox::Value jsonUnits;
-    JsonBox::Value jsonValue;
+    JsonBox::Value jsonReturn; //!< Brief JsonBox value with AquetiTools results
+    JsonBox::Value jsonUnits; //!< Brief JsonBox value with unit test results
+    JsonBox::Value jsonValue; //!< Brief JsonBox value that holds the unit test results (all of them)
     bool pass = true;
 
     //Get type

@@ -1,16 +1,7 @@
-/*!\file Timer.h
- * \brief AWARE Camera Interface Wrapper
- *
- * \author S. D. Feller 2013
- *
- * Timer data formats
- *
- * SMPTETime - structure with hour, minute, second and frame fields
- * double    - represents time as UTCSeconds.utc microseconds
- * timeval   - structure with 32bit tv_sec and 32 bit tv_usec
- * int64_t   -
- *
-*/
+/**
+ * \file Timer.h
+ **/
+
 #pragma once
 
 #ifdef __linux__
@@ -18,6 +9,7 @@
 #else
 #include <Winsock2.h>
 #endif
+
 #include <chrono>
 #include <time.h>
 #include <stdint.h>

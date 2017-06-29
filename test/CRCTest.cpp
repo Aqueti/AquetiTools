@@ -1,3 +1,7 @@
+/**
+ * \file CRCTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 namespace atl {
@@ -8,7 +12,7 @@ namespace atl {
 **/
 JsonBox::Value testCRC()
 {
-    JsonBox::Value resultString;
+    JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
 
     uint8_t buffer[256];
     uint16_t expected = 0x03d2;

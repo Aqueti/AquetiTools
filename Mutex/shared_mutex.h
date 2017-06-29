@@ -1,8 +1,6 @@
-/******************************************************************************
- *
+/**
  * \file shared_mutex.h
- *
- *****************************************************************************/
+ **/
 
 #pragma once
 
@@ -12,18 +10,23 @@
 
 namespace atl
 {
+    /**
+     * @class shared_mutex
+     *
+     * @brief A class that allows threaded applications to lock threads and prevent deadlocks and race conditions
+     */
     class shared_mutex
     {
         private:
-            std::mutex m_read;
-            std::mutex m_mutex;
-            std::atomic_int readers;
+            std::mutex m_read; //!< Brief readers
+            std::mutex m_mutex;  //!< Brief member fields for mutext
+            std::atomic_int readers; //!< Brief the number of readers
 
         public:
             shared_mutex();
             shared_mutex( const shared_mutex& other ) = delete;
             shared_mutex& operator=( const shared_mutex& ) = delete;
-            void lock();
+            void lock(); 
             bool try_lock();
             void unlock();
             void lock_shared();
@@ -32,11 +35,16 @@ namespace atl
 
     };
 
+    /**
+     * @class shared_lock
+     *
+     * @brief A class that allows shared locking of threads
+     */
     class shared_lock
     {
         private:
-            shared_mutex* m_mutex;
-            std::atomic_bool owns;
+            shared_mutex* m_mutex; //!< Brief pointer to readers
+            std::atomic_bool owns; //!< Brief boolean for whether the lock is owned
 
         public:
             shared_lock( shared_mutex& m );

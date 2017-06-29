@@ -1,3 +1,7 @@
+/**
+ * \file TaskManager.tcc
+ **/
+
 #include <map>
 #include <thread>
 #include <future>

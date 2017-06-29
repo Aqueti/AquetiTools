@@ -1,3 +1,7 @@
+/**
+ * \file I2CControl.cpp
+ **/
+
 #include <iostream>
 #include <string>
 #include <vector>

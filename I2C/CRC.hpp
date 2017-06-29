@@ -1,6 +1,7 @@
 /**
  * \file CRC.hpp
  **/
+
 #ifndef CRC_HPP
 #define  CRC_HPP
 

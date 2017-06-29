@@ -1,10 +1,14 @@
+/**
+ * \file TaskManagerTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 namespace atl {
 
 JsonBox::Value testTaskManager(int threads, bool printFlag, bool assertFlag, bool valgrind)
 {
-	JsonBox::Value resultString;
+	JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
 
     if (printFlag) {
         std::cout << "Testing TaskManager" << std::endl;

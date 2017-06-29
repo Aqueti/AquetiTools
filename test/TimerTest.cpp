@@ -1,3 +1,7 @@
+/**
+ * \file TimerTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 namespace atl{
@@ -11,7 +15,7 @@ namespace atl{
 //***********************************************************
 JsonBox::Value testTimer(bool printFlag, bool assertFlag)
 {
-    JsonBox::Value resultString;
+    JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
     Timer timer;
 
     double timeVariance = (double) 2.0 / 1e3;

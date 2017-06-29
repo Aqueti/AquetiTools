@@ -1,3 +1,7 @@
+/**
+ * \file ThreadTest.cpp
+ **/
+
 #include "AquetiToolsTest.h"
 
 namespace atl {
@@ -6,7 +10,7 @@ namespace atl {
  **/
 JsonBox::Value testThread(bool printFlag)
 {
-    JsonBox::Value resultString;
+    JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
 
     bool rc = true;
     Thread cThread;

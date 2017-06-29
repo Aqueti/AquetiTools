@@ -1,3 +1,7 @@
+/**
+ * \file ThreadPool.h
+ **/
+
 #ifndef THREADPOOL_H_
 #define THREADPOOL_H_
 
