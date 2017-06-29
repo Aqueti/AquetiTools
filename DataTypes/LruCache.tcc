@@ -2,8 +2,15 @@
 
 #include "TSQueue.tcc"
 #include <map>
+#include <fstream>
+#include <assert.h>
+#include <random>
+#include "Timer.h"
+#include <mutex>
+#include <future>
+#include <ctime>
 
-namespace aqt
+namespace atl
 {
 
 /**
@@ -34,19 +41,18 @@ public:
     virtual bool get_value(K, V&);
     virtual bool get_lower_bound(K, V&);
     virtual void empty_cache();
-    virtual void setCleanupHandler(std::function<bool(K,V)> handler=nullptr);
+    virtual void setCleanupHandler(std::function<bool(K, V)> handler=nullptr);
     using Q::size;
     using Q::set_max_size;
     using Q::get_max_size;
+    friend JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assertFlag);
 
 protected:
     typedef typename Q::QNode QNode;      //<! Defining QNode
     virtual bool push_to_back(std::shared_ptr<QNode>);
     std::map<K, std::weak_ptr<QNode>> keyMap;         // map of Key to weak pointer to QNodes
-    std::function<bool(K,V)> m_cleanupHandler;
+    std::function<bool(K, V)> m_cleanupHandler;
 };
-
-bool test_LruCache(unsigned int numThreads, bool print, bool assertFlag);
 
 /*
  * @brief Destructor.  Calls empty_cache()
@@ -93,21 +99,25 @@ template<class K, class V> bool LruCache<K,V>::
 get_value(K key, V& val)
 {
     std::lock_guard<std::recursive_mutex> lock(Q::m);
-    if(!keyMap.count(key)) {
+
+    if (!keyMap.count(key)) {
         return false;
     } else if (keyMap[key].expired()) {
         std::cerr << "WE SHOULDN'T SEE THIS OR WE HAVE A PROBLEM" << std::endl;
         std::cerr << "map size: " << keyMap.size() << " length: " << Q::length;
         auto node = Q::head;
-        int i=0;
-        while(node) {
+        int i = 0;
+
+        while (node) {
             i++;
             node = node->prev;
         }
+
         keyMap.erase(key);
         //std::cout << " real len: " << i << std::endl;
         return false;
     }
+
     auto node = keyMap[key].lock();
     val = node->data.value;
     push_to_back(node);
@@ -126,21 +136,25 @@ template<class K, class V> bool LruCache<K,V>::
 get_lower_bound(K key, V& val)
 {
     std::lock_guard<std::recursive_mutex> lock(Q::m);
-    if( keyMap.lower_bound(key) == keyMap.end() ) {
+
+    if (keyMap.lower_bound(key) == keyMap.end()) {
         return false;
     } else if (keyMap.lower_bound(key)->second.expired()) {
         std::cerr << "WE SHOULDN'T SEE THIS OR WE HAVE A PROBLEM" << std::endl;
         std::cerr << "map size: " << keyMap.size() << " length: " << Q::length;
         auto node = Q::head;
-        int i=0;
-        while(node) {
+        int i = 0;
+
+        while (node) {
             i++;
             node = node->prev;
         }
+
         keyMap.erase(key);
         //std::cout << " real len: " << i << std::endl;
         return false;
     }
+
     auto node = keyMap.lower_bound(key)->second.lock();
     val = node->data.value;
     push_to_back(node);
@@ -164,42 +178,51 @@ add_to_cache(K key, V value)
 
     //Check to see if something needs booted
     int count = 0;
-    while(Q::length >= Q::max_size && count < 5) {  //Try to boot 5 times.  If still too big, give up.
-        if(!Q::head) {
+    while (Q::length >= Q::max_size && count < 5) {  //Try to boot 5 times.  If still too big, give up.
+        if (!Q::head) {
             std::cerr << "LruCache::add_to_cache ERROR: Head is null but length is non-zero." << std::endl;
             break;
         }
+
         std::shared_ptr<QNode> temp = Q::head;
         Q::head = Q::head->prev;
         temp->prev = nullptr;
-        if(Q::head) {
+
+        if (Q::head) {
             Q::head->next.reset();
         }
+
         Q::length--;
-        if(keyMap.erase(temp->data.key) == 0) {
-            std::cerr << "LruCache::add_to_cache ERROR: keyMap could not find key" << std::endl;
+        if (keyMap.erase(temp->data.key) == 0) {
+            std::cerr << "LruCache::add_to_cache ERROR: keyMap could not find key" 
+                      << std::endl;
             //std::cout << "length: " << Q::length << std::endl;
             //std::cout << "size: " << keyMap.size() << std::endl;
             auto it = Q::head;
             int i = 0;
+
             while(it != nullptr) {
                 it = it->prev;
                 i++;
             }
+
             //std::cout << "actual length: " << i << std::endl;
         }
 
-        if(m_cleanupHandler) {
+        if (m_cleanupHandler) {
             lock.unlock();
             bool boot = m_cleanupHandler(temp->data.key, temp->data.value);
             lock.lock();
-            if(!boot) {
+
+            if (!boot) {
                 auto it = keyMap.emplace(temp->data.key, temp);
-                if(it.second) {
+
+                if (it.second) {
                     Q::enqueue(temp);
                 } else {
                     std::cerr << "LruCache::add_to_cache ERROR: couldn't resubmit after failed boot" << std::endl;
                 }
+
                 count++;
                 continue;
             }
@@ -216,8 +239,10 @@ add_to_cache(K key, V value)
 
     // Put the key in the keySet
     auto it = keyMap.emplace(key, temp);
-    if(!it.second) {
-        std::cerr << "LruCache::add_to_cache ERROR: Failed to add element to map." << std::endl;
+
+    if (!it.second) {
+        std::cerr << "LruCache::add_to_cache ERROR: Failed to add element to map." 
+                  << std::endl;
         return false;
     }
 
@@ -239,12 +264,12 @@ add_to_cache(K key, V value)
 template<class K, class V> bool LruCache<K,V>::
 push_to_back(std::shared_ptr<QNode> node)
 {
-    if(node->prev == nullptr) {
+    if (node->prev == nullptr) {
         return false;    //Already at the back of the queue
     }
     // So we KNOW node->prev exists
 
-    if(auto next = node->next.lock()) { // If there exists a next node, snatch it
+    if (auto next = node->next.lock()) { // If there exists a next node, snatch it
         next->prev = node->prev;        // and point it's prev pointer to node->prev
     } else {
         Q::head = node->prev;              // If not, this must be head. Set it to node->prev
@@ -253,7 +278,7 @@ push_to_back(std::shared_ptr<QNode> node)
     node->prev->next = node->next;      //already checked for prev.  set it's next to node->next
 
     node->next = Q::tail;                  // Point node to previous tail
-    if(auto t = Q::tail.lock()) {
+    if (auto t = Q::tail.lock()) {
         t->prev = node;                 // Point previous tail to node
     } else {
         std::cerr << "ERROR: Tail pointer could not be found" << std::endl;

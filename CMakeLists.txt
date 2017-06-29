@@ -40,6 +40,11 @@ if( DOXYGEN_FOUND )
    endif( USE_DOXYGEN)
 endif( DOXYGEN_FOUND )
 
+include_directories(
+   ${CMAKE_INSTALL_PREFIX}/include 
+   ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
 #############################################################
 # From here on is the build component (SUPERBUILD is disabled)
 ############################################################
@@ -99,6 +104,7 @@ if (NOT WIN32)
    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-parameter -std=c++11 -fPIC -O0") #Compile faster on debug, with warnings
    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++11 -fPIC") #Optimize compilation, no warnings
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -fPIC -O2") #Else slightly optimize, with warnings
+
    add_definitions(-DUNIX)
 endif(NOT WIN32)
 
@@ -108,6 +114,7 @@ list(APPEND CMAKE_PREFIX_PATH
 )
 
 find_package(JsonBox CONFIG REQUIRED)
+find_package(Threads REQUIRED)
 
 list( APPEND ATOOL_HEADERS 
    Timer/Timer.h
@@ -116,6 +123,17 @@ list( APPEND ATOOL_HEADERS
 include_directories( Timer )
 set(Timer_SRC
    Timer/Timer.cpp
+)
+
+list( APPEND ATOOL_HEADERS 
+   I2C/CRC.hpp
+   I2C/I2CControl.hpp
+)
+include_directories( I2C ) 
+
+set( I2C_SRC
+   I2C/CRC.cpp
+   I2C/I2CControl.cpp
 )
 
 include_directories( Thread )
@@ -137,9 +155,6 @@ list( APPEND ATOOL_HEADERS
 
 include_directories( DataTypes )
 set( DataTypes_SRC
-   DataTypes/LruCache.cpp
-   DataTypes/TSMap.cpp
-   DataTypes/TSQueue.cpp
 )
 list( APPEND ATOOL_HEADERS
    DataTypes/LruCache.tcc
@@ -158,26 +173,63 @@ list(APPEND ATOOL_HEADERS
 
 add_library( aquetitools STATIC  
    ${Timer_SRC}
+   ${I2C_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
+   ${DataTypes_SRC}
 )
 
 target_link_libraries( aquetitools
     JsonBox
+    Threads::Threads
 )
 
-LIST( APPEND LIB_LIST aquetitools )
+list(APPEND TARGET_LIST aquetitools )
 
 if(MAKE_TESTS)
-   add_executable( AquetiToolTest 
-      test/AquetiToolTest.cpp
+   #Make a dedicated test library
+   add_library( aquetitools_test STATIC
+      test/AquetiToolsTest.cpp
+      test/TimerTest.cpp
+      test/ThreadTest.cpp
+      test/MultiThreadTest.cpp
+      test/ThreadPoolTest.cpp
+      test/LruCacheTest.cpp
+      test/TSQueueTest.cpp
+      test/CRCTest.cpp
+      test/TSMapTest.cpp
+      test/TaskManagerTest.cpp
    )
+   target_link_libraries( aquetitools_test
+      aquetitools
+   )
+   list(APPEND TARGET_LIST aquetitools_test )
+
+   list(APPEND ATOOL_HEADERS test/AquetiToolsTest.h )
+
+   #Add AquetiTools test as an executavble
+   add_executable( testAquetiTools
+     test/testAquetiTools.cpp
+   )
+   TARGET_LINK_LIBRARIES(testAquetiTools
+      aquetitools_test
+   )
+   list(APPEND TARGET_LIST testAquetiTools )
+
+   #i2C Test application
+   add_executable( i2CControl
+     test/testI2CControl.cpp
+   )
+   target_link_libraries( i2CControl 
+      aquetitools
+   )
+   LIST( APPEND TARGET_LIST i2CControl)
 
    target_link_libraries( AquetiToolTest ${LIB_LIST})
    list( APPEND TARGET_LIST AquetiToolTest )
 endif()
 
-list(APPEND TARGET_LIST ${LIB_LIST})
+
 
 #############################################
 #install library files

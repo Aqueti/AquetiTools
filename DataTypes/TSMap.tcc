@@ -11,10 +11,20 @@
 #include <map>
 #include <mutex>
 #include <vector>
+#include "JsonBox.h"
 
 #include "shared_mutex.h"
+#include <atomic>
+#include <chrono>
+#include <future>
+#include <iostream>
+#include <limits>
+#include <random>
+#include <thread>
+#include <string>
+#include "assert.h"
 
-namespace aqt
+namespace atl
 {
 
     /*
@@ -28,29 +38,29 @@ namespace aqt
     
         public:
             // read functions
-            std::pair<Value, bool>  find( Key k ) const;
-            std::pair<Value, bool>  lower_bound( Key k ) const;
-            std::pair<std::pair<Key,Value>, bool> lower_bound_key( Key k ) const;
+            std::pair<Value, bool>  find(Key k) const;
+            std::pair<Value, bool>  lower_bound(Key k) const;
+            std::pair<std::pair<Key,Value>, bool> lower_bound_key(Key k) const;
             size_t                  size() const;
             bool                    empty() const;
             std::vector<Key>        getKeyList() const;
     
             // write functions
-            bool                    emplace( Key k, Value v, bool force = false );
+            bool                    emplace(Key k, Value v, bool force = false);
             template<typename... Args>
-            bool                    createInPlace( Key k, Args... );
-            std::pair<Value,bool>   replace( Key k, Value v, bool force = true );
-            bool                    erase( Key k, std::function<bool(Key,Value&)> f = nullptr);
-            std::pair<Value, bool>  remove( Key k );
+            bool                    createInPlace(Key k, Args... args);
+            std::pair<Value,bool>   replace(Key k, Value v, bool force = true);
+            bool                    erase(Key k, std::function<bool(Key,Value&)> f = nullptr);
+            std::pair<Value, bool>  remove(Key k);
 
-            bool                    perform( Key k, std::function<bool(Key,Value&)> f = nullptr);
-            bool                    perform_ro( Key k, std::function<bool(Key,const Value&)> f = nullptr) const;
+            bool                    perform(Key k, std::function<bool(Key,Value&)> f = nullptr);
+            bool                    perform_ro(Key k, std::function<bool(Key,const Value&)> f = nullptr) const;
             void                    clear();
 
             // function iterators
-            size_t for_each_ro( std::function<bool(Key k, const Value& v)> f ) const;
-            size_t for_each( std::function<bool(Key k, Value& v)> f );
-            size_t delete_if( std::function<bool(Key k, Value& v)> f );
+            size_t for_each_ro(std::function<bool(Key k, const Value& v)> f) const;
+            size_t for_each(std::function<bool(Key k, Value& v)> f);
+            size_t delete_if(std::function<bool(Key k, Value& v)> f);
     };
 
 
@@ -65,17 +75,18 @@ namespace aqt
      * \return The value correspoding to Key k
      */
     template<typename Key, typename Value> std::pair<Value, bool> TSMap<Key, Value>::
-            find( Key k ) const
+            find(Key k) const
     {
         bool rc = false;
         Value v{};
-        aqt::shared_lock lock( m_mutex );
-        auto it = m_map.find( k );
-        if( it != m_map.end() ){
+        atl::shared_lock lock(m_mutex);
+        auto it = m_map.find(k);
+        
+        if (it != m_map.end()){
             rc = true;
             v = it->second;
         }
-        return std::make_pair( v, rc );
+        return std::make_pair(v, rc);
     }
     
     /*
@@ -86,17 +97,18 @@ namespace aqt
      * correspoding to Key k
      */
     template<typename Key, typename Value> std::pair<Value, bool> TSMap<Key, Value>::
-            lower_bound( Key k ) const
+            lower_bound(Key k) const
     {
         bool rc = false;
         Value v{};
-        aqt::shared_lock lock( m_mutex );
-        auto it = m_map.lower_bound( k );
-        if( it != m_map.end() ){
+        atl::shared_lock lock(m_mutex);
+        auto it = m_map.lower_bound(k);
+
+        if (it != m_map.end()){
             rc = true;
             v = it->second;
         }
-        return std::make_pair( v, rc );
+        return std::make_pair(v, rc);
     }
     
     /*
@@ -108,19 +120,20 @@ namespace aqt
      */
     template<typename Key, typename Value> 
             std::pair<std::pair<Key, Value>, bool> TSMap<Key, Value>::
-            lower_bound_key( Key k ) const
+            lower_bound_key(Key k) const
     {
         bool rc = false;
         Key returnKey{};
         Value v{};
-        aqt::shared_lock lock( m_mutex );
-        auto it = m_map.lower_bound( k );
-        if( it != m_map.end() ){
+        atl::shared_lock lock(m_mutex);
+        auto it = m_map.lower_bound(k);
+
+        if (it != m_map.end()){
             rc = true;
             returnKey = it->first;
             v = it->second;
         }
-        return std::make_pair( std::make_pair(returnKey, v), rc );
+        return std::make_pair(std::make_pair(returnKey, v), rc);
     }
     
     /*
@@ -129,7 +142,7 @@ namespace aqt
     template<typename Key, typename Value> size_t TSMap<Key, Value>::
             size() const
     {
-        aqt::shared_lock lock( m_mutex );
+        atl::shared_lock lock(m_mutex);
         size_t s = m_map.size();
         return s;
     }
@@ -140,7 +153,7 @@ namespace aqt
     template<typename Key, typename Value> bool TSMap<Key, Value>::
             empty() const
     {
-        aqt::shared_lock lock( m_mutex );
+        atl::shared_lock lock(m_mutex);
         bool rc = m_map.empty();
         return rc;
     }
@@ -149,9 +162,10 @@ namespace aqt
             getKeyList() const
     {
         std::vector<Key> keyList;
-        aqt::shared_lock lock( m_mutex );
-        for( auto it = m_map.cbegin(); it != m_map.cend(); it++ ){
-            keyList.push_back( it->first );
+        atl::shared_lock lock(m_mutex);
+
+        for (auto it = m_map.cbegin(); it != m_map.cend(); it++) {
+            keyList.push_back(it->first);
         }
         return keyList;
     }
@@ -169,16 +183,16 @@ namespace aqt
      * return true if no element previously existed, false if one did
      */
     template<typename Key, typename Value> bool TSMap<Key, Value>::
-            emplace( Key k, Value v, bool force )
+            emplace(Key k, Value v, bool force)
     {
-        std::unique_lock<aqt::shared_mutex> lock( m_mutex );
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
 
-        if(!force && m_map.find(k) != m_map.end()) {
+        if (!force && m_map.find(k) != m_map.end()) {
             return false;
         }
         m_map.erase(k);
 
-        return m_map.emplace( k, v).second;
+        return m_map.emplace(k, v).second;
     }
 
     /*
@@ -190,9 +204,9 @@ namespace aqt
      */
     template<typename Key, typename Value>
     template<typename... Args> bool TSMap<Key,Value>::
-        createInPlace( Key k, Args... args )
+        createInPlace(Key k, Args... args)
     {
-        std::unique_lock<aqt::shared_mutex> lock(m_mutex);
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
         auto ret = m_map.emplace(std::piecewise_construct,
                                   std::forward_as_tuple(k),
                                   std::forward_as_tuple(args...));
@@ -212,15 +226,15 @@ namespace aqt
      * be the value that was passed in. 
      */
     template<typename Key, typename Value> std::pair<Value,bool> TSMap<Key, Value>::
-            replace( Key k, Value v, bool force )
+            replace(Key k, Value v, bool force)
     {
-        std::unique_lock<aqt::shared_mutex> lock( m_mutex );
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
         Value newVal = v;
+        auto it = m_map.emplace(k, v);
 
-        auto it = m_map.emplace( k, v );
-        if(!it.second) {
+        if (!it.second) {
             newVal = it.first->second;
-            if(force) {
+            if (force) {
                 m_map[k] = v;
             }
         }
@@ -236,16 +250,17 @@ namespace aqt
      * \return true if the element was erased, false otherwise
      */
     template<typename Key, typename Value> bool TSMap<Key, Value>::
-            erase( Key k, std::function<bool(Key,Value&)> f )
+            erase(Key k, std::function<bool(Key,Value&)> f)
     {
-        std::unique_lock<aqt::shared_mutex> lock( m_mutex );
-        auto it = m_map.find( k );
-        if( it == m_map.end() ){
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        auto it = m_map.find(k);
+
+        if (it == m_map.end()){
             return false;
         }
 
-        if(!f || f(k, it->second)) {
-            size_t rc = m_map.erase( k );
+        if (!f || f(k, it->second)) {
+            size_t rc = m_map.erase(k);
             return rc == 1;
         } else {
             return false;
@@ -259,18 +274,19 @@ namespace aqt
  * \return A pair of the value and a bool to indicate success
  **/
     template<typename Key, typename Value> std::pair<Value, bool> TSMap<Key, Value>::
-            remove( Key k )
+            remove(Key k)
     {
-        std::unique_lock<aqt::shared_mutex> lock( m_mutex );
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
         bool rc = false;
         Value v{};
         auto it = m_map.find(k);
-        if( it != m_map.end() ){
+
+        if (it != m_map.end()) {
             rc = true;
             v = it->second;
             m_map.erase(k);
         }
-        return std::make_pair( v, rc );
+        return std::make_pair(v, rc);
     }
     
     /*
@@ -281,11 +297,12 @@ namespace aqt
      * \return The value returned by the fucntion
      */
     template<typename Key, typename Value> bool TSMap<Key, Value>::
-    perform( Key k, std::function<bool(Key,Value&)> f)
+    perform(Key k, std::function<bool(Key,Value&)> f)
     {
-        std::unique_lock<aqt::shared_mutex> lock( m_mutex );
-        auto it = m_map.find( k );
-        if( it == m_map.end() || !f ){
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        auto it = m_map.find(k);
+
+        if (it == m_map.end() || !f) {
             return false;
         }
 
@@ -300,11 +317,12 @@ namespace aqt
      * \return The value returned by the fucntion
      */
     template<typename Key, typename Value> bool TSMap<Key, Value>::
-    perform_ro( Key k, std::function<bool(Key,const Value&)> f) const
+    perform_ro(Key k, std::function<bool(Key,const Value&)> f) const
     {
-        aqt::shared_lock lock( m_mutex );
+        atl::shared_lock lock(m_mutex);
         auto it = m_map.find( k );
-        if( it == m_map.end() || !f ){
+
+        if (it == m_map.end() || !f) {
             return false;
         }
 
@@ -317,7 +335,7 @@ namespace aqt
     template<typename Key, typename Value> void TSMap<Key, Value>::
             clear()
     {
-        std::unique_lock<aqt::shared_mutex> lock( m_mutex );
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
         m_map.clear();
     }
 
@@ -334,12 +352,13 @@ namespace aqt
      * \return number of successful returns from f
      */
     template<typename Key, typename Value> size_t TSMap<Key, Value>::
-            for_each_ro( std::function<bool(Key k, const Value& v)> f ) const
+            for_each_ro(std::function<bool(Key k, const Value& v)> f) const
     {
         size_t numSuccess = 0;
-        aqt::shared_lock lock( m_mutex );
-        for( auto it = m_map.cbegin(); it != m_map.cend(); it++ ){
-            if( f( it->first, it->second ) ){
+        atl::shared_lock lock(m_mutex);
+
+        for (auto it = m_map.cbegin(); it != m_map.cend(); it++) {
+            if (f(it->first, it->second)){
                 numSuccess++;
             }
         }
@@ -354,12 +373,13 @@ namespace aqt
      * \return number of successful returns from f
      */
     template<typename Key, typename Value> size_t TSMap<Key, Value>::
-            for_each( std::function<bool(Key k, Value& v)> f )
+            for_each(std::function<bool(Key k, Value& v)> f)
     {
         size_t numSuccess = 0;
-        std::unique_lock<aqt::shared_mutex> lock( m_mutex );
-        for( auto it = m_map.begin(); it != m_map.end(); it++ ){
-            if( f( it->first, it->second ) ){
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+
+        for (auto it = m_map.begin(); it != m_map.end(); it++) {
+            if (f(it->first, it->second)){
                 numSuccess++;
             }
         }
@@ -375,15 +395,16 @@ namespace aqt
      * \return the number of entries deleted
      */
     template<typename Key, typename Value> size_t TSMap<Key, Value>::
-            delete_if( std::function<bool(Key k, Value& v)> f )
+            delete_if(std::function<bool(Key k, Value& v)> f)
     {
         size_t numErased = 0;
-        std::unique_lock<aqt::shared_mutex> lock( m_mutex );
-        for( auto it = m_map.begin(); it != m_map.end(); ){
-            if( f( it->first, it->second ) ){
-                it = m_map.erase( it );
+        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+
+        for (auto it = m_map.begin(); it != m_map.end(); it++) {
+            if (f(it->first, it->second)) {
+                it = m_map.erase(it);
                 numErased++;
-            } else{
+            } else {
                 it++;
             }
         }
@@ -391,5 +412,3 @@ namespace aqt
     }
     
 }
-
-bool testTSMap( bool printFlag=false, bool valgrind = false );
