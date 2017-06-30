@@ -224,9 +224,6 @@ if(MAKE_TESTS)
       aquetitools
    )
    LIST( APPEND TARGET_LIST i2CControl)
-
-   target_link_libraries( AquetiToolTest ${LIB_LIST})
-   list( APPEND TARGET_LIST AquetiToolTest )
 endif()
 
 
