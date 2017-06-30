@@ -4,7 +4,7 @@
 
 #include "AquetiToolsTest.h"
 
-std::mutex printMutex;
+std::mutex printMutex; //!< std::mutex used throughout the testing for thread management 
 
 using namespace atl;
 
@@ -13,6 +13,7 @@ using namespace atl;
 *
 * @param cache The cache
 * @param print False suppresses output
+* @param start A shared future
 */
 void print_size(LruCache<int,std::string>& cache, bool print, std::shared_future<void> start)
 {
@@ -33,6 +34,7 @@ void print_size(LruCache<int,std::string>& cache, bool print, std::shared_future
 * @param num the number
 * @param val the value
 * @param print False suppresses output
+* @param start A shared future
 */
 void add_to_cache(LruCache<int,std::string>& cache, int num, std::string val, bool print, std::shared_future<void> start)
 {
@@ -49,7 +51,11 @@ void add_to_cache(LruCache<int,std::string>& cache, int num, std::string val, bo
 * @brief Retrieves and prints the value associated with the specified key
 *
 * @param cache The cache
+* @param key the key used in the function
 * @param print False suppresses output
+* @param start A shared future
+*
+* @return True if tests run correctly
 */
 bool retrieve_from_cache(LruCache<int,std::string>& cache, int key, bool print, std::shared_future<void> start)
 {
@@ -78,6 +84,9 @@ bool retrieve_from_cache(LruCache<int,std::string>& cache, int key, bool print, 
 *
 * @param cache The cache
 * @param print False suppresses output
+* @param start A shared future
+*
+* @return True if tests run correctly
 */
 bool clear_cache(LruCache<int,std::string>& cache, bool print, std::shared_future<void> start)
 {
@@ -111,7 +120,7 @@ namespace atl {
 /**
  * @brief Tests the cache functions with and without threads
  *
- * @return true on success
+ * @return the Jsonbox with the results of the test
  */
 JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assertFlag)
 {

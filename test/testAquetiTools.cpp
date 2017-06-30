@@ -4,8 +4,11 @@
 
 #include "AquetiToolsTest.h"
 
-std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager"};
+std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager"}; //!< List of units that tests must be run on 
 
+/**
+ * \brief main function
+ **/
 int main(int argc, char *argv[])
 {
     bool testSubmodules = true;

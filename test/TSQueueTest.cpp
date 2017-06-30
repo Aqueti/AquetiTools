@@ -41,6 +41,8 @@ void add_to_queue(TSQueue<int>& q, int num, bool print)
 *
 * @param q The queue
 * @param print False suppresses output
+*
+* @return True when done testing, false if remove from queue fails
 */
 bool remove_from_queue(TSQueue<int>& q, bool print)
 {
@@ -64,6 +66,8 @@ bool remove_from_queue(TSQueue<int>& q, bool print)
 *
 * @param q The queue
 * @param print False suppresses output
+*
+* @return True if peek succeeds 
 */
 bool peek_at_queue(TSQueue<int>& q, bool print)
 {
@@ -85,7 +89,10 @@ bool peek_at_queue(TSQueue<int>& q, bool print)
 * @brief Pushes an element to the head of the queue
 *
 * @param q The queue
+* @param num The number added to the queue
 * @param print False suppresses output
+*
+* @return True when done testing
 */
 bool push_to_queue(TSQueue<int>& q, int num, bool print)
 {
@@ -101,6 +108,8 @@ bool push_to_queue(TSQueue<int>& q, int num, bool print)
 *
 * @param q The queue
 * @param print False suppresses output
+*
+* @return True when done testing, false if pop fails
 */
 bool pop_from_queue(TSQueue<int>& q, bool print)
 {
@@ -124,11 +133,11 @@ namespace atl {
 * @brief Tests the thread-safe queue with multiple threads
 *
 * @param numThreads The number of threads to spawn
-* @param print False supresses output
+* @param printFlag False supresses output
 *
 * @return true on success
 */
-JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
+JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertFlag)
 {
     TSQueue<int> q;
     JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
@@ -137,7 +146,7 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
     for (int i = 0; i < 100; i++) {
         int value = i;
         if (!q.enqueue(value)) {
-            if (print) {
+            if (printFlag) {
                 std::cout << "Failed to enqueue to index " << i << std::endl;
                 std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
             }
@@ -156,7 +165,7 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
     //Tests size of 0
     unsigned size = q.size();
     if (size != 0) {
-        if (print) {
+        if (printFlag) {
             std::cout << "Incorrect size(): " << size << " != 0" << std::endl;
             std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
         }
@@ -173,7 +182,7 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
     for (int i = 0; i < 100; i++) {
         int value = i;
         if (!q.enqueue(value)) {
-            if (print) {
+            if (printFlag) {
                 std::cout << "Failed to enqueue to index " << i << std::endl;
                 std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
             }
@@ -190,7 +199,7 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
     //Tests size of 100
     size = q.size();
     if (size != 100) {
-        if(print) {
+        if(printFlag) {
             std::cout << "Incorrect size(): " << size << " != 100" << std::endl;
             std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
         }
@@ -207,7 +216,7 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
     int result;
     for (int i = 0; i < 100; i++) {
         if (!q.dequeue(result)) {
-            if (print) {
+            if (printFlag) {
                 std::cout << "Failed to dqueue at index " << i << std::endl;
                 std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
             }
@@ -220,7 +229,7 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
         };
 
         if (result != i) {
-            if (print) {
+            if (printFlag) {
                 std::cout << "Unexpected result: "<<result<<" != " << i << std::endl;
                 std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
             }
@@ -235,7 +244,7 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
     resultString["Dequeue 1"] = "pass";
 
     if (q.dequeue(result, 1000)) { //Try to dequeue for a second
-        if (print) {
+        if (printFlag) {
             std::cout << "Dequeue succeeded with no elements left" << std::endl;
             std::cout << "TSQueue test error. See TSQueueTest.log" << std::endl;
         }
@@ -250,19 +259,19 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
 
     // Test thread safety
     std::thread* t = new std::thread[numThreads];
-    if (print) {
+    if (printFlag) {
         std::cout << "Default max size: " << q.get_max_size() << std::endl;
     }
     q.set_max_size(10);
 
-    if (print) {
+    if (printFlag) {
         std::cout << "New max size: " << q.get_max_size() << std::endl;
     }
 
     std::clock_t start;
     double duration = 0;
 
-    if (print) {
+    if (printFlag) {
         std::cout << "Operations: " << numThreads << std::endl << "Threads: " << numThreads << std::endl;
     }
 
@@ -273,22 +282,22 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
         std::cout << "Number:" << num << " on count " << i << "of " << numThreads << std::endl;
         switch (num) {
         case 1:
-            t[i] = std::thread(add_to_queue, std::ref(q), i, print);
+            t[i] = std::thread(add_to_queue, std::ref(q), i, printFlag);
             break;
         case 2:
-            t[i] = std::thread(remove_from_queue, std::ref(q), print);
+            t[i] = std::thread(remove_from_queue, std::ref(q), printFlag);
             break;
         case 3:
-            t[i] = std::thread(peek_at_queue, std::ref(q), print);
+            t[i] = std::thread(peek_at_queue, std::ref(q), printFlag);
             break;
         case 4:
-            t[i] = std::thread(push_to_queue, std::ref(q), i, print);
+            t[i] = std::thread(push_to_queue, std::ref(q), i, printFlag);
             break;
         case 5:
-            t[i] = std::thread(pop_from_queue, std::ref(q), print);
+            t[i] = std::thread(pop_from_queue, std::ref(q), printFlag);
             break;
         case 6:
-            t[i] = std::thread(print_queue_size, std::ref(q), print);
+            t[i] = std::thread(print_queue_size, std::ref(q), printFlag);
             break;
         default:
             break;
@@ -299,18 +308,18 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool print, bool assertFlag)
         t[i].join();
     }
 
-    if (print) {
+    if (printFlag) {
         std::cout << "Joined all" << std::endl;
     }
 
     duration = (std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    if(print) {
+    if(printFlag) {
         std::cout << "Time: " << duration << std::endl;
     }
 
     delete[] t;
 
-    if (print) {
+    if (printFlag) {
         std::cout << "TSQueue Test Complete" << std::endl;
     }
 

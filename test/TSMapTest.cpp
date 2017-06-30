@@ -6,7 +6,15 @@
 
 using namespace atl;
 
-// Test threads
+/**
+* Finds a random value from a map structure
+*
+* @param map The TSMap of string keys to int values
+* @param iter The int iterator value
+* @param max The maximum value the random value can be
+* @param print The boolean to determine if a message is printed out
+* @return True if the function performed correctly, false otherwise
+*/
 bool find_random_from_map(TSMap<std::string, int>& map, int iter, int max, bool print)
 {
     for (int i = 0; i < iter; i++) {
@@ -22,6 +30,14 @@ bool find_random_from_map(TSMap<std::string, int>& map, int iter, int max, bool 
     return true;
 }
 
+/**
+* Looks for a nonexistant entry in the map
+*
+* @param map The TSMap of string keys to int values
+* @param iter The int iterator value
+* @param print The boolean to determine if a message is printed out
+* @return True if the function performed correctly, false if nonexistant entry is found
+*/
 bool find_nonexistent(TSMap<std::string, int>& map, int iter, bool print)
 {
     for (int i = 0; i < iter; i++) {
@@ -37,6 +53,14 @@ bool find_nonexistent(TSMap<std::string, int>& map, int iter, bool print)
     return true;
 }
 
+/**
+* Checks the size of the map stays constant
+*
+* @param map The TSMap of string keys to int values
+* @param iter The int iterator value
+* @param print The boolean to determine if a message is printed out
+* @return True if the function performed correctly, false if the map size changed
+*/
 bool check_size_constant(TSMap<std::string, int>& map, int iter, bool print)
 {
     size_t size = map.size();
@@ -55,6 +79,15 @@ bool check_size_constant(TSMap<std::string, int>& map, int iter, bool print)
     return true;
 }
 
+/**
+* Checks the size of the map increases
+*
+* @param map The TSMap of string keys to int values
+* @param iter The int iterator value
+* @param max The maximum value the random value can be
+* @param print The boolean to determine if a message is printed out
+* @return True if the function performed correctly, false if the map size didnt increase
+*/
 bool check_size_increasing(TSMap<std::string, int>& map, int iter, int max, bool print)
 {
     size_t size = map.size();
@@ -77,6 +110,14 @@ bool check_size_increasing(TSMap<std::string, int>& map, int iter, int max, bool
     return true;
 }
 
+/**
+* Checks the size of the map increases
+*
+* @param map The TSMap of string keys to int values
+* @param stuff A vector used for looping through the map
+* @param print The boolean to determine if a message is printed out
+* @return True if the function performed correctly, false if the map size didnt increase
+*/
 bool add_to_map(TSMap<std::string, int>& map, 
                  std::vector<std::pair<std::string, int>> stuff, 
                  bool print)
