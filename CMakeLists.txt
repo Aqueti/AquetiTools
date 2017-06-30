@@ -62,7 +62,6 @@ endif( DOXYGEN_FOUND )
 ##be executed in this pass. The superbuild file will recursively call this CMakeLists.txt
 ##with USE_SUPERBUILD set to off to skip the SUPERBUILD part
 if(USE_SUPERBUILD )
-   set(GIT_HTTPS ON CACHE BOOL "Clone git repositories with HTTPS")
    include(ExternalProject)
    include(Superbuild.cmake)
    return()
