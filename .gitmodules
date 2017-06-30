@@ -1,6 +1,6 @@
 [submodule "JsonBox"]
 	path = JsonBox
-	url = https://github.com/anhero/JsonBox.git
+	url = https://github.com/anhero/JsonBox
     fetchRecurseSubmodules = false
     ignore = dirty
     update = none
