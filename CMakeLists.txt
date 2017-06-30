@@ -12,6 +12,20 @@ option( MAKE_STATIC_LIB "Compile the library statically (off for dynamic)" ON )
 option( MAKE_TESTS "Build test executables" ON )
 option( USE_SUPERBUILD "Build all dependencies in SUPERBUILD mode" ON)
 
+# Doxygen support
+# add a target to generate API documentation with Doxygen
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+    set(DOXYGEN_DIR "${CMAKE_BINARY_DIR}/Doxygen" CACHE STRING "Where to build Doxygen")
+    file(MAKE_DIRECTORY ${DOXYGEN_DIR})
+    configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${DOXYGEN_DIR}/Doxyfile @ONLY)
+    add_custom_target(doc
+        ${DOXYGEN_EXECUTABLE} ${DOXYGEN_DIR}/Doxyfile
+        WORKING_DIRECTORY ${DOXYGEN_DIR}
+        COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
+endif(DOXYGEN_FOUND)
+
 ##############################################
 ## Build dependencies
 ##############################################
@@ -29,16 +43,6 @@ endif(USE_SUPERBUILD)
 # Generate the revision.h file to integrate version
 # information.
 #############################################
-
-#If Doxygen is installed, make it an option. Default to OFF so it's not built
-#as a SubProject of a superbuild
-find_package( Doxygen)
-if( DOXYGEN_FOUND )
-   option( USE_DOXYGEN "Build Documentation" OFF )
-   if( USE_DOXYGEN)
-       set( DOXYGEN_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/Documentation" CACHE PATH "Directory to install documentation")
-   endif( USE_DOXYGEN)
-endif( DOXYGEN_FOUND )
 
 include_directories(
    ${CMAKE_INSTALL_PREFIX}/include 
@@ -226,8 +230,6 @@ if(MAKE_TESTS)
    LIST( APPEND TARGET_LIST i2CControl)
 endif()
 
-
-
 #############################################
 #install library files
 # This sections initiates the build of the  components in th TARGET_LIST. 
@@ -254,3 +256,4 @@ install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
 install(EXPORT ${PROJECT_NAME}
         DESTINATION lib${LIB_SUFFIX}/cmake
         FILE ${PROJECT_NAME}Targets.cmake)
+
