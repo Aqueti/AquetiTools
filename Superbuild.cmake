@@ -35,7 +35,7 @@ macro(add_external_project MYNAME LOCATION MASTER DEPENDS ARGS)
     )
 endmacro(add_external_project)
 
-add_external_project(JsonBox JsonBox OFF "" "")
+add_external_project(JsonBox dependencies/JsonBox OFF "" "")
 
 #ATL
 ExternalProject_Add(AquetiTools
