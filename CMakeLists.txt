@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-
 cmake_policy(SET CMP0048 NEW)
 
 project(AquetiTools VERSION "0.0.0.1" )
