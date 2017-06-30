@@ -172,7 +172,7 @@ list(APPEND ATOOL_HEADERS
    Mutex/shared_mutex.h
 )
 
-add_library( aquetitools STATIC  
+add_library( AquetiTools STATIC  
    ${Timer_SRC}
    ${I2C_SRC}
    ${Thread_SRC}
@@ -180,12 +180,12 @@ add_library( aquetitools STATIC
    ${DataTypes_SRC}
 )
 
-target_link_libraries( aquetitools
+target_link_libraries( AquetiTools
     JsonBox
     Threads::Threads
 )
 
-list(APPEND TARGET_LIST aquetitools )
+list(APPEND TARGET_LIST AquetiTools )
 
 if(MAKE_TESTS)
    #Make a dedicated test library
@@ -202,7 +202,7 @@ if(MAKE_TESTS)
       test/TaskManagerTest.cpp
    )
    target_link_libraries( aquetitools_test
-      aquetitools
+      AquetiTools
    )
    list(APPEND TARGET_LIST aquetitools_test )
 
@@ -222,7 +222,7 @@ if(MAKE_TESTS)
      test/testI2CControl.cpp
    )
    target_link_libraries( i2CControl 
-      aquetitools
+      AquetiTools
    )
    LIST( APPEND TARGET_LIST i2CControl)
 endif()
