@@ -1,0 +1,7 @@
+[submodule "Jsonbox"]
+	path = Jsonbox
+	url = https://github.com/anhero/Jsonbox.git
+    fetchRecurseSubmodules = false
+    ignore = dirty
+    update = none
+    branch = none
