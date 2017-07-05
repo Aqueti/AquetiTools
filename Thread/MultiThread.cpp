@@ -14,6 +14,17 @@ namespace atl
 {
 
 /**
+ * \brief  Destructor
+ *
+ * This destructor detaches all threads
+ **/
+MultiThread::~MultiThread()
+{
+    Stop();
+    Join();
+}
+
+/**
  * @brief Starts as many threads as were set in the constructor
  * or most recent setNumThreads call.
  *
@@ -69,6 +80,40 @@ bool MultiThread::Join()
     m_deletePtr = false;
 
     return rc;
+}
+
+/**
+ * @brief Waits for all threads to complete before returning
+ *
+ * @return true if all threads were able to join
+ */
+bool MultiThread::Detach()
+{
+    bool rc = true;
+    for(auto&& t: m_threads) {
+        if(!t.joinable() || t.get_id() == std::this_thread::get_id()) {
+            rc = false;
+            continue;
+        }
+        t.detach();
+    }
+
+    return rc;
+}
+
+/**
+ * @brief Returns a thread ID for this thread.  Will be an int between 0 and n-1,
+ * where n is the number of threads
+ *
+ * @return -1 on failure, or an int between 0 and n-1
+ */
+int MultiThread::getMyId()
+{
+    if(!m_idMap.count(std::this_thread::get_id())) {
+        std::cerr << "ERROR: called getMyId from thread outside of MultiThread" << std::endl;
+        return -1;
+    }
+    return m_idMap[std::this_thread::get_id()];
 }
 
 /**
