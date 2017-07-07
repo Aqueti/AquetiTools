@@ -121,7 +121,6 @@ execute_process(
    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-
 #set the version tag
 if( "${GIT_BRANCH}" MATCHES "master" )
    set(VERSION_TAG "dev")
