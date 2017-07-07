@@ -17,13 +17,18 @@ namespace atl
 class MultiThread : public Thread
 {
 public:
-    MultiThread(int numThreads = 2): m_numThreads(numThreads) {}	//!< Number of threads
-    virtual bool setNumThreads(unsigned numThreads);
+    MultiThread(int numThreads=2): m_numThreads(numThreads) {}
+    virtual ~MultiThread();
+    virtual bool setNumThreads(unsigned);
     virtual bool Start(bool* runFlag = nullptr);
     virtual bool Join();
+    virtual bool Detach();
 
-private:
-    unsigned                    m_numThreads;   //!< Number of threads to spawn
-    std::vector<std::thread>    m_threads;      //!< Running threads
+protected:
+    virtual int getMyId();
+
+    unsigned                    m_numThreads;   //<! Number of threads to spawn
+    std::vector<std::thread>    m_threads;      //<! Running threads
+    std::map<std::thread::id,int>  m_idMap;      //<! map of Ids
 };
 }
