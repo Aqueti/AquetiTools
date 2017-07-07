@@ -1,6 +1,7 @@
 /**
- * \fiel MultiThread.cpp
- */
+ * \file MultiThread.cpp
+ **/
+
 #include "MultiThread.h"
 #include <iostream>
 #include <fstream>
@@ -112,12 +113,11 @@ bool MultiThread::Detach()
 {
     bool rc = true;
     for(auto&& t: m_threads) {
-        try {
-            t.detach();
-        } catch (const std::system_error& e) {
-            std::cerr << "Warning: Detach could not detach: " << e.what() << std::endl;
+        if(!t.joinable() || t.get_id() == std::this_thread::get_id()) {
             rc = false;
+            continue;
         }
+        t.detach();
     }
 
     return rc;
@@ -152,4 +152,5 @@ int MultiThread::getMyId()
     }
     return m_idMap[std::this_thread::get_id()];
 }
+
 }
