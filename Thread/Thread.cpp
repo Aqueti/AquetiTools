@@ -13,6 +13,8 @@
 
 #include "Thread.h"
 
+std::ofstream threadTest;
+
 namespace atl
 {
 
@@ -25,7 +27,7 @@ namespace atl
 Thread::~Thread()
 {
     Stop();
-    Join();
+    Thread::Join();
 }
 
 /**
@@ -34,14 +36,14 @@ Thread::~Thread()
  * \param [in] runFlag boolean pointer to terminate thread execution
  * \return std::thread object for this threads
  **/
-bool Thread::Start(bool* runFlag)
+bool Thread::Start( bool* runFlag )
 {
-    if ((m_running && *m_running) || m_threadObj.joinable()) {
-        std::cout << "WARNING: Thread threadObject already running" << std::endl;
+    if( (m_running && *m_running) || m_threadObj.joinable() ) {
+        std::cerr << "WARNING: Thread threadObject already running" << std::endl;
         return false;
     }
 
-    if (!runFlag) {
+    if(!runFlag) {
         m_deletePtr = true;
         m_running = new bool(true);
     } else {
@@ -60,7 +62,7 @@ bool Thread::Start(bool* runFlag)
  **/
 void Thread::Execute()
 {
-    while (isRunning()) {
+    while(isRunning()) {
         mainLoop();
     }
 }
@@ -73,7 +75,7 @@ void Thread::Execute()
  **/
 void Thread::mainLoop(void)
 {
-    std::cout << m_threadObj.get_id() <<": Thread mainLoop"<<std::endl;
+    threadTest << m_threadObj.get_id() <<": Thread mainLoop"<<std::endl;
     std::cerr << "WARNING: thread mainLoop method not overridden" << std::endl;
     sleep(1);
 }
@@ -83,16 +85,30 @@ void Thread::mainLoop(void)
  *
  * This call is implements the std::thread::join for the class
  **/
-bool Thread::Join()
+bool Thread::Detach()
 {
-    if (!m_threadObj.joinable() || m_threadObj.get_id() == std::this_thread::get_id()) { //Don't join yourself!
+    if( !m_threadObj.joinable() || m_threadObj.get_id() == std::this_thread::get_id()) { //Don't join yourself!
         return false;
     }
 
-    m_threadObj.join();
+    m_threadObj.detach();
+
+    return true;
+}
+
+/**
+ * \brief Waits for the thread to complete before returning
+ *
+ * This call is implements the std::thread::join for the class
+ **/
+bool Thread::Join()
+{
+    if( m_threadObj.joinable() && m_threadObj.get_id() != std::this_thread::get_id()) { //Don't join yourself!
+        m_threadObj.join();
+    }
 
     std::unique_lock<std::mutex> guard (m_threadMutex);
-    if (m_deletePtr && m_running) {
+    if(m_deletePtr && m_running) {
         delete m_running;
         m_running = nullptr;
     }
@@ -118,7 +134,7 @@ void Thread::Stop()
 bool Thread::isRunning()
 {
     std::lock_guard<std::mutex> guard (m_threadMutex);
-    if (m_running) {
+    if(m_running) {
         return *m_running;
     } else {
         return false;

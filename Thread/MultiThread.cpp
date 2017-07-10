@@ -113,11 +113,12 @@ bool MultiThread::Detach()
 {
     bool rc = true;
     for(auto&& t: m_threads) {
-        if(!t.joinable() || t.get_id() == std::this_thread::get_id()) {
+        try {
+            t.detach();
+        } catch (const std::system_error& e) {
+            std::cerr << "Warning: Detach could not detach: " << e.what() << std::endl;
             rc = false;
-            continue;
         }
-        t.detach();
     }
 
     return rc;
@@ -152,5 +153,4 @@ int MultiThread::getMyId()
     }
     return m_idMap[std::this_thread::get_id()];
 }
-
 }
