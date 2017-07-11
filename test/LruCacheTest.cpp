@@ -142,10 +142,12 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
             }
             resultString["Add"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Add"] = "pass";
+
+    if(resultString["Add"] != "fail"){
+        resultString["Add"] = "pass";
+    }
 
     //Test size
     unsigned size = cache.size();
@@ -160,9 +162,9 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
         }
         resultString["Size"] = "fail";
         resultString["pass"] = false;
-        return resultString;
-    };
-    resultString["Size"] = "pass";
+    } else {
+        resultString["Size"] = "pass";
+    }
 
     //Test retrieve function
     std::string result;
@@ -186,7 +188,6 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
                 }
                 resultString["Retrieve"] = "fail";
                 resultString["pass"] = false;
-                return resultString;
             }
         }
 
@@ -201,10 +202,12 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
             }
             resultString["Retrieve"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Retrieve"] = "pass";
+
+    if(resultString["Retrieve"] != "fail"){
+        resultString["Retrieve"] = "pass";
+    }
 
     //Test max size add function
     cache.set_max_size(40);
@@ -219,9 +222,9 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
         }
         resultString["Max size add"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Max size add"] = "pass";
     }
-    resultString["Max size add"] = "pass";
 
     //Test retrieve with changed max size
     for (int i = 99; i >= 50; i--) {
@@ -244,7 +247,6 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
                 }
                 resultString["Retrieve 2"] = "fail";
                 resultString["pass"] = false;
-                return resultString;
             }
         }
 
@@ -259,10 +261,12 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
             }
             resultString["Retrieve 2"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Retrieve 2"] = "pass";
+
+    if(resultString["Retrieve 2"] != "fail"){
+        resultString["Retrieve 2"] = "pass";
+    }
 
     //Test empty cache size
     cache.empty_cache();
@@ -279,9 +283,9 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
         }
         resultString["Empty cache size"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Empty cache size"] = "pass";
     }
-    resultString["Empty cache size"] = "pass";
 
     // Test thread safety
     std::thread* t = new std::thread[numThreads];
@@ -367,6 +371,9 @@ JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assert
         std::cout << "LruCache Test Complete" << std::endl;
     }
 
+    if (resultString["pass"] == false) {
+        return resultString;
+    }
     resultString["pass"] = true;
     return resultString;
 }

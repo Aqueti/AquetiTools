@@ -41,10 +41,13 @@ JsonBox::Value testCRC()
                   << expected <<std::endl;
       resultString["CRC Check"] = "fail";
       resultString["pass"] = false;
-      return resultString;
+    } else {
+      resultString["CRC Check"] = "pass";
     }
 
-    resultString["CRC Check"] = "pass";
+    if (resultString["pass"] == false) {
+        return resultString;
+    }
     resultString["pass"] = true;
     return resultString;
 }
