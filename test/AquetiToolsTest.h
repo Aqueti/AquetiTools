@@ -117,36 +117,4 @@ JsonBox::Value testTSMap(bool printFlag = false, bool assertFlag = false, bool v
  */
 JsonBox::Value testTaskManager(int threads = 1000, bool printFlag = true, bool assertFlag = false, bool valgrind = false);
 
-/**
- * Helper function for testing the Timer
- *
- * @param resultString The JsonBox value that holds the results of the unit testing
- * @param delayTime A double that gives the delay time for sleeping
- * @param sleepElapsed A double that shows the amount of time elapsed since the last sleep
- * @param timeVariance A double acceptable variance between delayTime and sleepElapsed
- * @param printFlag A boolean, if true tests print out messages to the console
- * @param assertFlag A boolean, if true program halts on error
- * @param testno An int that keeps track of current test number (either 1 or 2)
- * @return True if the sleeptest runs correctly
- */
-bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
-                double timeVariance, bool printFlag, bool assertFlag, int testno);
-
-/**
- * Helper function for testing the Timer
- *
- * @param printFlag A boolean, if true tests print out messages to the console
- * @param assertFlag A boolean, if true program halts on error
- * @param resultString JsonBox value passed by reference, updated only if this test fails
- * @return True if the sleep tests runs properly
- */
-bool objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString);
-
-/**
- * Helper function for ThreadPool testing
- *
- * @param threads An int of the number of threads the test is run with
- * @return True if thread pool things runs correctly
- */
-bool doThreadPoolThing(int threads);
 }

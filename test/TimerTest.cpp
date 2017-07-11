@@ -4,6 +4,83 @@
 
 #include "AquetiToolsTest.h"
 
+/**
+ * \brief Helper function to check the ObjectID size
+ *
+ * \param [in] printFlag boolean (true prints info to console)
+ * \param [in] assertFlag boolean (true stops the program)
+ * \param [in] resultString JsonBox value passed by reference, updated only if this test fails
+ **/
+bool objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString) 
+{
+    if (sizeof(uint64_t) != sizeof(atl::ObjectId)) {
+        if (printFlag) {
+            std::cout << "size uint64_t: " << sizeof(uint64_t) << "!= ObjectId: " << sizeof(atl::ObjectId) << "!\n"
+                      << "Check variable alignment in ObjectId structure." << std::endl;
+
+            std::cout << "Timer test failed. See TimerTest.log" << std::endl;
+        }
+
+        if (assertFlag) {
+            assert(false);
+        };
+
+        resultString["pass"] = false;
+        return false;
+    }
+    return true;
+}
+
+/**
+ * \brief Helper function to test sleep
+ *
+ * \param [in] resultString JsonBox value passed by reference, updated with results of this test
+ * \param [in] delayTime double delay expected of sleep function
+ * \param [in] sleepElapsed double actual elapsed time of sleep function
+ * \param [in] timeVariance double acceptable variance between delayTime and sleepElapsed
+ * \param [in] printFlag boolean (true prints info to console)
+ * \param [in] assertFlag boolean (true stops the program)
+ * \param [in] testno int that keeps track of current test number (either 1 or 2)
+ *
+ *  Calculates the variance between the delay time passed in and the actual sleep time
+ *  elapsed, and checks this against an allowed time variance. Notifies user that the
+ *  test has been passed if actual variance is less than the time variance.
+ **/
+bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
+                double timeVariance, bool printFlag, bool assertFlag, int testno) 
+{
+    std::string currTest = "sleep time " + std::to_string(testno);
+
+    resultString[currTest] = sleepElapsed;
+    double variance = delayTime - sleepElapsed;
+
+    if (variance < 0) {
+        variance = -variance;
+    }
+
+    resultString[currTest]["variance"].setDouble(variance);
+    resultString[currTest]["delay time"].setDouble(delayTime);
+    resultString[currTest]["elapsed time"].setDouble(sleepElapsed);
+
+    if (variance > timeVariance) {
+        if (printFlag) {
+            std::cout << currTest << ": " << std::fixed << delayTime << "failed: " 
+                        << sleepElapsed << ">" << delayTime + timeVariance << std::endl;
+            std::cout << "Timer test failed. See TimerTest.log" << std::endl;
+        }
+
+        if (assertFlag) {
+            assert(false);
+        };
+
+        resultString[currTest]["status"] = "fail";
+        resultString["pass"] = false;
+        return false;
+    }
+
+    return true;
+}
+
 namespace atl{
 //***********************************************************
 /*!\brief functional test for this class
@@ -188,84 +265,11 @@ JsonBox::Value testTimer(bool printFlag, bool assertFlag)
 
     //std::system("rm TimerTest.log"); */
 
+    if (resultString["pass"] == false) {
+        return resultString;
+    }
     resultString["pass"] = true;
     return resultString;
 }
-
-/**
- * \brief Helper function to check the ObjectID size
- *
- * \param [in] printFlag boolean (true prints info to console)
- * \param [in] assertFlag boolean (true stops the program)
- * \param [in] resultString JsonBox value passed by reference, updated only if this test fails
- **/
-bool objectIDSizeTest(bool printFlag, bool assertFlag, JsonBox::Value& resultString) 
-{
-    if (sizeof(uint64_t) != sizeof(ObjectId)) {
-        if (printFlag) {
-            std::cout << "size uint64_t: " << sizeof(uint64_t) << "!= ObjectId: " << sizeof(ObjectId) << "!\n"
-                      << "Check variable alignment in ObjectId structure." << std::endl;
-
-            std::cout << "Timer test failed. See TimerTest.log" << std::endl;
-        }
-
-        if (assertFlag) {
-            assert(false);
-        };
-
-        resultString["pass"] = false;
-        return false;
-    }
-    return true;
 }
 
-/**
- * \brief Helper function to test sleep
- *
- * \param [in] resultString JsonBox value passed by reference, updated with results of this test
- * \param [in] delayTime double delay expected of sleep function
- * \param [in] sleepElapsed double actual elapsed time of sleep function
- * \param [in] timeVariance double acceptable variance between delayTime and sleepElapsed
- * \param [in] printFlag boolean (true prints info to console)
- * \param [in] assertFlag boolean (true stops the program)
- * \param [in] testno int that keeps track of current test number (either 1 or 2)
- *
- *  Calculates the variance between the delay time passed in and the actual sleep time
- *  elapsed, and checks this against an allowed time variance. Notifies user that the
- *  test has been passed if actual variance is less than the time variance.
- **/
-bool sleepTest(JsonBox::Value& resultString, double delayTime, double sleepElapsed,
-				double timeVariance, bool printFlag, bool assertFlag, int testno) 
-{
-	std::string currTest = "sleep time " + std::to_string(testno);
-
-	resultString[currTest] = sleepElapsed;
-    double variance = delayTime - sleepElapsed;
-
-    if (variance < 0) {
-    	variance = -variance;
-    }
-
-    resultString[currTest]["variance"].setDouble(variance);
-    resultString[currTest]["delay time"].setDouble(delayTime);
-    resultString[currTest]["elapsed time"].setDouble(sleepElapsed);
-
-    if (variance > timeVariance) {
-    	if (printFlag) {
-    		std::cout << currTest << ": " << std::fixed << delayTime << "failed: " 
-    					<< sleepElapsed << ">" << delayTime + timeVariance << std::endl;
-    		std::cout << "Timer test failed. See TimerTest.log" << std::endl;
-    	}
-
-    	if (assertFlag) {
-    		assert(false);
-    	};
-
-    	resultString[currTest]["status"] = "fail";
-    	resultString["pass"] = false;
-    	return false;
-    }
-
-    return true;
-}
-}
