@@ -162,9 +162,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Empty map return"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Empty map"] = "pass";
     }
-    resultString["Empty map"] = "pass";
 
     //check the size of an empty array
     size_t size = testMap.size();
@@ -177,9 +177,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Empty map size return"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Empty map size return"] = "pass";
     }
-    resultString["Empty map size return"] = "pass";
 
     //insert a few values
     for (int i = 0; i < 100; i++) {
@@ -195,10 +195,12 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             }
             resultString["Insert"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Insert"] = "pass";
+
+    if(resultString["Insert"] != "fail"){
+        resultString["Insert"] = "pass";
+    }
 
     //check map size and test retrieving values
     size = testMap.size();
@@ -213,9 +215,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Size"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Size"] = "pass";
     }
-    resultString["Size"] = "pass";
 
     for (int i = 0; i < 100; i++) {
         std::string s = "test" + std::to_string(i);
@@ -230,10 +232,12 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             }
             resultString["Value return"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Value return"] = "pass";
+
+    if(resultString["Value return"] != "fail"){
+        resultString["Value return"] = "pass";
+    }
 
     //test deleting entries
     for (int i = 0; i < 50; i++) {
@@ -247,10 +251,12 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             }
             resultString["Delete"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Delete"] = "pass";
+
+    if(resultString["Delete"] != "fail"){
+        resultString["Delete"] = "pass";
+    }
 
     if (testMap.size() != 50) {
         if (printFlag) {
@@ -263,9 +269,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Delete size return"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Delete size return"] = "pass";
     }
-    resultString["Delete size return"] = "pass";
 
     testMap.clear();
     if (!testMap.empty()) {
@@ -277,9 +283,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Clear map"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Clear map"] = "pass";
     }
-    resultString["Clear map"] = "pass";
 
     if (printFlag) {
         std::cout << "Basic correctness testing (single thread) passed!" << std::endl;
@@ -350,10 +356,12 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             }
             resultString["Write thread"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Write thread"] = "pass";
+
+    if(resultString["Write thread"] != "fail"){
+        resultString["Write thread"] = "pass";
+    }
 
     if (printFlag) {
         std::cout << "Checking that all " << numTests*numWrites
@@ -374,9 +382,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Write size"] = "fail";      
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Write size"] = "pass";
     }
-    resultString["Write size"] = "pass";
 
     //If multithreaded writes pass...
     if (printFlag){
@@ -456,10 +464,12 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             }
             resultString["Read thread"] = "fail";           
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Read thread"] = "pass";
+
+    if(resultString["Read thread"] != "fail"){
+        resultString["Read thread"] = "pass";
+    }
 
     if (printFlag) {
         std::cout << "...test passed!" << std::endl;
@@ -561,9 +571,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Write entries to map"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Write entries to map"] = "pass";
     }
-    resultString["Write entries to map"] = "pass";
 
     for (int i = 0; i < writes+reads+counts; i++) {
         sThreads[i].join();
@@ -573,17 +583,18 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
                 if (i < writes+reads) {
                     resultString["Thread join"] = "fail";
                     resultString["pass"] = false;
-                    return resultString;
                 }
             }
             if (assertFlag) {
                 assert(false);
             }
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Thread join"] = "pass";
+
+    if(resultString["Thread join"] != "fail"){
+        resultString["Thread join"] = "pass";
+    }
 
     if (printFlag) {
         std::cout << "Simultaneous read-write testing passed!" << std::endl;
@@ -655,9 +666,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             }
             resultString["Mult. thread read"] = "fail";
             resultString["pass"] = false;
-            return resultString;
+        } else {
+            resultString["Mult. thread read"] = "pass";
         }
-        resultString["Mult. thread read"] = "pass";
 
         if (printFlag) {
             std::cout << "Mutual exclusivity read test passed!" << std::endl;
@@ -700,9 +711,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Entry add"] = "fail";  
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Entry add"] = "pass";
     }
-    resultString["Entry add"] = "pass";
 
     if (printFlag) {
         std::cout << "...entries generated." << std::endl;
@@ -738,9 +749,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Conditional delete"] = "fail";         
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Conditional delete"] = "pass";
     }
-    resultString["Conditional delete"] = "pass";
 
     if (printFlag) {
         std::cout << "Successfully deleted " << numDeleted << " elements"
@@ -816,8 +827,7 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
                 assert(false);
             }
             resultString["Thread act"] = "fail";  
-            resultString["pass"] = false;
-            return resultString;       
+            resultString["pass"] = false;   
         }
 
         if (counters[i] != (int)ceil((float)numFEntries/(i+1))) {
@@ -832,11 +842,16 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             }
             resultString["Thread count"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         }
     }
-    resultString["Thread act"] = "pass";
-    resultString["Thread count"] = "pass";
+
+    if(resultString["Thread act"] != "fail"){
+        resultString["Thread act"] = "pass"; 
+    }
+
+    if(resultString["Thread count"] != "fail"){
+        resultString["Thread count"] = "pass";
+    }
 
     if (printFlag) {
         std::cout << "For-each read-only testing passed!" << std::endl;
@@ -866,9 +881,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Function act"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Function act"] = "pass";
     }
-    resultString["Function act"] = "pass";
 
     size_t numZeros = testMap3.for_each_ro( 
             [](int k, int v)->bool{
@@ -896,9 +911,9 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         }
         resultString["Function change"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Function change"] = "pass";
     }
-    resultString["Function change"] = "pass";
 
     if (printFlag) {
         std::cout << "For-each function testing passed!" << std::endl;
@@ -1069,13 +1084,18 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             }
             resultString["getKeyList()"] = "fail";
             resultString["pass"] = false;
-            return resultString;
-        } else {
-            resultString["getKeyList()"] = "pass";
         }
     }
 
+    if(resultString["getKeyList()"] != "fail"){
+        resultString["getKeyList()"] = "pass";
+    }
+
     std::cout << "TSMap Unit Test passed!\n" << std::endl;
+
+    if (resultString["pass"] == false) {
+        return resultString;
+    }
     resultString["pass"] = true;
     return resultString;
 }

@@ -155,10 +155,12 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertF
             }
             resultString["Enqueue 1"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         };
     }
-    resultString["Enqueue 1"] = "pass";
+
+    if(resultString["Enqueue 1"] != "fail"){
+        resultString["Enqueue 1"] = "pass";
+    }
 
     q.delete_all();
 
@@ -174,9 +176,9 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertF
         }
         resultString["Size 1"] = "fail";
         resultString["pass"] = false;
-        return resultString;
-    };
-    resultString["Size 1"] = "pass";
+    } else {
+        resultString["Size 1"] = "pass";
+    }
 
     //Tests enqueue function again
     for (int i = 0; i < 100; i++) {
@@ -191,10 +193,12 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertF
             }
             resultString["Enqueue 2"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         };
     }
-    resultString["Enqueue 2"] = "pass";
+
+    if(resultString["Enqueue 2"] != "fail"){
+        resultString["Enqueue 2"] = "pass";
+    }
 
     //Tests size of 100
     size = q.size();
@@ -209,8 +213,9 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertF
         resultString["Size 2"] = "fail";
         resultString["pass"] = false;
         return resultString;
-    };
-    resultString["Size 2"] = "pass";
+    } else {
+        resultString["Size 2"] = "pass";
+    }
 
     //Tests dequeue function
     int result;
@@ -225,7 +230,6 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertF
             }
             resultString["Dequeue1 "] = "fail";
             resultString["pass"] = false;
-            return resultString;
         };
 
         if (result != i) {
@@ -238,10 +242,12 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertF
             }
             resultString["Dequeue 1"] = "fail";
             resultString["pass"] = false;
-            return resultString;
         };
     }
-    resultString["Dequeue 1"] = "pass";
+
+    if(resultString["Dequeue 1"] != "fail"){
+        resultString["Dequeue 1"] = "pass";
+    }
 
     if (q.dequeue(result, 1000)) { //Try to dequeue for a second
         if (printFlag) {
@@ -253,9 +259,9 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertF
         }
         resultString["Dequeue 2"] = "fail";
         resultString["pass"] = false;
-        return resultString;
-    };
-    resultString["Dequeue 2"] = "pass";
+    } else {
+        resultString["Dequeue 2"] = "pass";
+    }
 
     // Test thread safety
     std::thread* t = new std::thread[numThreads];
@@ -331,6 +337,9 @@ JsonBox::Value testTSQueue(unsigned int numThreads, bool printFlag, bool assertF
     //     return resultString;
     // }
 
+    if (resultString["pass"] == false) {
+        return resultString;
+    }
     resultString["pass"] = true;
     return resultString;
 }

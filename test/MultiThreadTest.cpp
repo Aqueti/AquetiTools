@@ -49,9 +49,9 @@ JsonBox::Value testMultiThread(bool printFlag)
         }
         resultString["Join"] = "fail";
         resultString["pass"] = false;
-        return resultString;
+    } else {
+        resultString["Join"] = "pass";
     }
-    resultString["Join"] = "pass";
 
     if (printFlag) {
         std::cout << "Joined" << std::endl;
@@ -62,6 +62,9 @@ JsonBox::Value testMultiThread(bool printFlag)
     running = true;
     std::vector<Thread> threadVect(threadCount);
 
+    if (resultString["pass"] == false) {
+        return resultString;
+    }
     resultString["pass"] = true;
     return resultString;
 }
