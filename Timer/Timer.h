@@ -84,7 +84,7 @@ public:
     Timer();
     ~Timer();
     SMPTETime   getTimeCode();
-    //void        updateTimeCodeOffset(int64_t refTimeCode);
+    void        updateTimeCodeOffset(int64_t refTimeCode);
     int64_t     getTimeCodeOffset();
     void        setFPS(double rate);
     double      getFPS(void);
@@ -109,18 +109,17 @@ uint64_t    convertDoubleToTimeStamp(double dTime);
 timeval TimevalSum(const timeval& tv1, const timeval& tv2);
 bool TimevalGreater(const timeval& tv1, const timeval& tv2);
 
-/* Not currently used in testing
 timeval TimevalSum(const timeval& tv1, const timeval& tv2);
 bool TimevalEqual(const timeval& tv1, const timeval& tv2);
 timeval TimevalScale(const timeval& tv, double scale);
 timeval TimevalDiff(const timeval& tv1, const timeval& tv2);
 timeval TimevalNormalize(const timeval& in_tv);
-*/
+
 
 void        sleep(double time);
-//double      convertObjectIdTimeToDouble(ObjectId id);
-//ObjectId    convertDoubleToObjectIdTime(double value);
-//uint64_t    convertUsecsToFrameTime(uint64_t usecs, double fps);
+double      convertObjectIdTimeToDouble(ObjectId id);
+ObjectId    convertDoubleToObjectIdTime(double value);
+uint64_t    convertUsecsToFrameTime(uint64_t usecs, double fps);
 // std::string convertUsecsToDate(uint64_t usecs);
 std::string getDateAsString();
 

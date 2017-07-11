@@ -89,18 +89,18 @@ SMPTETime Timer::getTimeCode()
 /*!\brief returns the timeCode offset to match system time with global time
  */
 //************************************************************
-/*void Timer::updateTimeCodeOffset(int64_t refTime)
+void Timer::updateTimeCodeOffset(int64_t refTime)
 {
-    
+    /*
     //Get current time
     timeval tv;
     gettimeofday(&tv, NULL);
 
     timeCodeOffset = refTime - convertTimeValToTimeCode( tv, fps );
-
+    */
 
     return;
-}*/
+}
 
 /**
  * Function to return the timeCode offset to match system time with global time
@@ -379,12 +379,61 @@ timeval TimevalSum(const timeval& tv1, const timeval& tv2)
 }
 
 /**
- * Compares two time values
+ *!\brief perform normalization of a timeval
+ * XXX this still needs to be checked for errors if the timeval
+ * or the rate is negative
+ **/
+static inline void timevalNormalizeInPlace(timeval& in_tv)
+{
+    const long div_77777 = (in_tv.tv_usec / 1000000);
+    in_tv.tv_sec += div_77777;
+    in_tv.tv_usec -= (div_77777 * 1000000);
+}
+
+/**
+ *!\brief perform normalization of a timeval
+ **/
+timeval TimevalNormalize(const timeval& in_tv)
+{
+    timeval out_tv = in_tv;
+    timevalNormalizeInPlace(out_tv);
+    return out_tv;
+}
+
+/**
+ *!\brief Calcs the diff between tv1 and tv2.
  *
- * @param tv1 The first timeval
- * @param tv2 The second timeval
- * @return 1 if tv1 is greater than tv2 and 0 otherwise
- */
+ *\return the diff in a timeval struct.
+ * Calcs negative times properly, with the appropriate sign on both tv_sec
+ * and tv_usec (these signs will match unless one of them is 0)
+ **/
+timeval TimevalDiff(const timeval& tv1, const timeval& tv2)
+{
+    timeval tv;
+
+    tv.tv_sec = -tv2.tv_sec;
+    tv.tv_usec = -tv2.tv_usec;
+
+    return TimevalSum(tv1, tv);
+}
+
+/**
+ *!\brief multiplies the timevale by the given structure
+ **/
+timeval TimevalScale(const timeval& tv, double scale)
+{
+    timeval result;
+    result.tv_sec = (long)(tv.tv_sec * scale);
+    result.tv_usec =
+        (long)(tv.tv_usec * scale + fmod(tv.tv_sec * scale, 1.0) * 1000000.0);
+    timevalNormalizeInPlace(result);
+    return result;
+}
+
+/**
+ *!\brief compares two time values
+ *\return 1 if tv1 is greater than tv2;  0 otherwise
+ **/
 bool TimevalGreater(const timeval& tv1, const timeval& tv2)
 {
     if (tv1.tv_sec > tv2.tv_sec) {
@@ -396,83 +445,27 @@ bool TimevalGreater(const timeval& tv1, const timeval& tv2)
     return 0;
 }
 
-/*
- *!\brief perform normalization of a timeval
- * XXX this still needs to be checked for errors if the timeval
- * or the rate is negative
- *
-static inline void timevalNormalizeInPlace(timeval& in_tv)
-{
-    const long div_77777 = (in_tv.tv_usec / 1000000);
-    in_tv.tv_sec += div_77777;
-    in_tv.tv_usec -= (div_77777 * 1000000);
-}
-
-
- *!\brief perform normalization of a timeval
- 
-timeval TimevalNormalize(const timeval& in_tv)
-{
-    timeval out_tv = in_tv;
-    timevalNormalizeInPlace(out_tv);
-    return out_tv;
-}
-
-
- *!\brief Calcs the diff between tv1 and tv2.
- *
- *\return the diff in a timeval struct.
- * Calcs negative times properly, with the appropriate sign on both tv_sec
- * and tv_usec (these signs will match unless one of them is 0)
- 
-timeval TimevalDiff(const timeval& tv1, const timeval& tv2)
-{
-    timeval tv;
-
-    tv.tv_sec = -tv2.tv_sec;
-    tv.tv_usec = -tv2.tv_usec;
-
-    return TimevalSum(tv1, tv);
-}
-
-
- *!\brief multiplies the timevale by the given structure
- 
-timeval TimevalScale(const timeval& tv, double scale)
-{
-    timeval result;
-    result.tv_sec = (long)(tv.tv_sec * scale);
-    result.tv_usec =
-        (long)(tv.tv_usec * scale + fmod(tv.tv_sec * scale, 1.0) * 1000000.0);
-    timevalNormalizeInPlace(result);
-    return result;
-}
-
-
+/**
  *!\brief checks if two timevals are equal
  *
  *\return 1 if tv1 is equal to tv2; 0 otherwise
- 
+ **/
 bool TimevalEqual(const timeval& tv1, const timeval& tv2)
 {
-	return (tv1.tv_sec == tv2.tv_sec && tv1.tv_usec == tv2.tv_usec);
+    if (tv1.tv_sec == tv2.tv_sec && tv1.tv_usec == tv2.tv_usec) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
-/
- *\brief converts the ObjectId time into a double. the m_id field is lost
- **/
-/*double convertObjectIdTimeToDouble(ObjectId id)
-{
-    return (double)id.m_utc + (double) (id.m_step * STEP_SIZE) / TIMER_STEP;
-}
-
-/
+/**
  *\brief converts a double time to an ObjectId time. The m_id field is set to 0
  *\param [in] value time value to set to the object
  *\return ObjectId with the m_utc and m_step set appropriately.
  *
  * **NOTE** - There is a potential for a rounding error to have the step off by 1
- *
+ **/
 ObjectId convertDoubleToObjectIdTime(double value)
 {
     ObjectId result;
@@ -486,14 +479,14 @@ ObjectId convertDoubleToObjectIdTime(double value)
     return result;
 }
 
-/
+/**
  * @brief This function will convert millisecond time to our standard frameTime timestep
  *
  * @param usecs Microseconds since the epoch
  * @param fps The current fps of the camera
  *
  * @return
- 
+ **/
 uint64_t convertUsecsToFrameTime(uint64_t usecs, double fps)
 {
     FrameTime time;
@@ -504,13 +497,13 @@ uint64_t convertUsecsToFrameTime(uint64_t usecs, double fps)
 }
 
 
-
+/**
  * @brief This function will convert usecs time to standard date time
  *
  * @param usecs Microseconds since the epoch
  *
  * @return
- 
+ **/
 std::string convertUsecsToDate(uint64_t usecs)
 {
     // using namespace std;
@@ -532,7 +525,7 @@ std::string convertUsecsToDate(uint64_t usecs)
     // os.fill(fill);
     return "";
  
-}*/
+}
 
 /**
  * Sleeps for the given amount of time

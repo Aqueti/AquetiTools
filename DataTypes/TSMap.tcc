@@ -398,7 +398,7 @@ namespace atl
         size_t numErased = 0;
         std::unique_lock<atl::shared_mutex> lock(m_mutex);
 
-        for (auto it = m_map.begin(); it != m_map.end(); it++) {
+        for (auto it = m_map.begin(); it != m_map.end(); ) {
             if (f(it->first, it->second)) {
                 it = m_map.erase(it);
                 numErased++;
