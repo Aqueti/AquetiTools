@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     bool testSubmodules = true;
     bool testAll = true;
     bool valgrind = false;
-    bool insert = true;
+    //bool insert = true;
 
     //command line options
     int i;
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
             i++;
             unitList.push_back( argv[i]);
         } else if(strcmp(argv[i], "-n") == 0){
-            insert = false;
+            //insert = false;
         } else if(strcmp(argv[i], "-s") == 0){
             testSubmodules = false;
         }

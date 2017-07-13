@@ -71,6 +71,10 @@ execute_process(
   OUTPUT_VARIABLE GIT_COMMIT_HASH
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+if(NOT GIT_COMMIT_HASH MATCHES GIT_COMMIT_HASH_PREV)
+    set(CONFIGURE ON)
+endif()
+set(GIT_COMMIT_HASH_PREV ${GIT_COMMIT_HASH} CACHE STRING "Git Commit Hash" FORCE)
 
 # Get the date
 execute_process(
@@ -79,6 +83,11 @@ execute_process(
    OUTPUT_VARIABLE BUILD_DATE 
    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+message("build: ${BUILD_DATE}, ${BUILD_DATE_PREV}")
+if(NOT BUILD_DATE MATCHES BUILD_DATE_PREV)
+    set(CONFIGURE ON)
+endif()
+set(BUILD_DATE_PREV ${BUILD_DATE} CACHE STRING "Build Date" FORCE)
 
 # Get the date
 execute_process(
@@ -94,11 +103,17 @@ if( "${GIT_BRANCH}" MATCHES "master" )
 else()
    set(VERSION_TAG "${GIT_BRANCH}")
 endif()
+if(NOT GIT_BRANCH MATCHES GIT_BRANCH_PREV)
+    set(CONFIGURE ON)
+endif()
+set(GIT_BRANCH_PREV ${GIT_BRANCH} CACHE STRING "Git Branch" FORCE)
 
-configure_file( 
-   "${CMAKE_SOURCE_DIR}/revision.h.in"
-   "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
-)
+if(CONFIGURE)
+    configure_file( 
+        "${CMAKE_SOURCE_DIR}/revision.h.in"
+        "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
+    )
+endif()
 
 #############################################
 #Specify local compiler options
@@ -184,8 +199,8 @@ add_library( AquetiTools STATIC
 )
 
 target_link_libraries( AquetiTools
-    JsonBox
-    Threads::Threads
+    PRIVATE JsonBox
+    PRIVATE Threads::Threads
 )
 
 list(APPEND TARGET_LIST AquetiTools )
@@ -205,7 +220,7 @@ if(MAKE_TESTS)
       test/TaskManagerTest.cpp
    )
    target_link_libraries( aquetitools_test
-      AquetiTools
+      PRIVATE AquetiTools
    )
    list(APPEND TARGET_LIST aquetitools_test )
 
