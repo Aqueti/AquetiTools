@@ -71,11 +71,10 @@ execute_process(
   OUTPUT_VARIABLE GIT_COMMIT_HASH
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-if(NOT ${GIT_COMMIT_HASH} MATCHES ${GIT_COMMIT_HASH_PREV})
+if(NOT ${GIT_COMMIT_HASH} MATCHES "${GIT_COMMIT_HASH_PREV}")
     set(CONFIGURE ON)
 endif()
-#set(GIT_COMMIT_HASH_PREV ${GIT_COMMIT_HASH} CACHE STRING "Git Commit Hash" FORCE)
-set(GIT_COMMIT_HASH_PREV ${GIT_COMMIT_HASH})
+set(GIT_COMMIT_HASH_PREV ${GIT_COMMIT_HASH} CACHE STRING "Git Commit Hash" FORCE)
 
 # Get the date
 execute_process(
@@ -84,11 +83,10 @@ execute_process(
    OUTPUT_VARIABLE BUILD_DATE 
    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-if(NOT ${BUILD_DATE} MATCHES ${BUILD_DATE_PREV})
+if(NOT ${BUILD_DATE} MATCHES "${BUILD_DATE_PREV}")
     set(CONFIGURE ON)
 endif()
-#set(BUILD_DATE_PREV ${BUILD_DATE} CACHE STRING "Build Date" FORCE)
-set(BUILD_DATE_PREV ${BUILD_DATE})
+set(BUILD_DATE_PREV ${BUILD_DATE} CACHE STRING "Build Date" FORCE)
 
 # Get the date
 execute_process(
@@ -104,16 +102,15 @@ if( "${GIT_BRANCH}" MATCHES "master" )
 else()
    set(VERSION_TAG "${GIT_BRANCH}")
 endif()
-if(NOT ${GIT_BRANCH} MATCHES ${GIT_BRANCH_PREV})
+if(NOT ${GIT_BRANCH} MATCHES "${GIT_BRANCH_PREV}")
     set(CONFIGURE ON)
 endif()
-#set(GIT_BRANCH_PREV ${GIT_BRANCH} CACHE STRING "Git Branch" FORCE)
-set(GIT_BRANCH_PREV ${GIT_BRANCH})
+set(GIT_BRANCH_PREV ${GIT_BRANCH} CACHE STRING "Git Branch" FORCE)
 
 if(CONFIGURE)
     configure_file( 
         "${CMAKE_SOURCE_DIR}/revision.h.in"
-        "${CMAKE_INSTALL_PREFIX}/include/aquetitools/revision.h"
+        "revision.h"
     )
 endif()
 
@@ -138,7 +135,8 @@ find_package(JsonBox CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
 list( APPEND ATOOL_HEADERS 
-   Timer/Timer.h
+    revision.h
+    Timer/Timer.h
 )
 
 include_directories( Timer )
