@@ -8,8 +8,8 @@ project(AquetiTools VERSION "0.0.0.1" )
 ############################################################
 
 #General build options
-option( MAKE_STATIC_LIB "Compile the library statically (off for dynamic)" ON )
-option( MAKE_TESTS "Build test executables" ON )
+option( BUILD_STATIC_LIB "Compile the library statically (off for dynamic)" ON )
+option( BUILD_TESTS "Build test executables" ON )
 option( USE_SUPERBUILD "Build all dependencies in SUPERBUILD mode" ON)
 
 # Doxygen support
@@ -205,7 +205,7 @@ target_link_libraries( AquetiTools
 
 list(APPEND TARGET_LIST AquetiTools )
 
-if(MAKE_TESTS)
+if(BUILD_TESTS)
    #Make a dedicated test library
    add_library( aquetitools_test STATIC
       test/AquetiToolsTest.cpp
