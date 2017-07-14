@@ -108,7 +108,7 @@ if(NOT ${GIT_BRANCH} MATCHES "${GIT_BRANCH_PREV}")
 endif()
 set(GIT_BRANCH_PREV ${GIT_BRANCH} CACHE STRING "Git Branch" FORCE)
 
-if(CONFIGURE)
+if(CONFIGURE OR NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/revision.h)
     configure_file( 
         "${CMAKE_SOURCE_DIR}/revision.h.in"
         "revision.h"
