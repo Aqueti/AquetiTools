@@ -47,6 +47,7 @@ endif(USE_SUPERBUILD)
 include_directories(
    ${CMAKE_INSTALL_PREFIX}/include 
    ${CMAKE_CURRENT_SOURCE_DIR}/include
+   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 #############################################################
@@ -135,7 +136,6 @@ find_package(JsonBox CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
 list( APPEND ATOOL_HEADERS 
-    revision.h
     Timer/Timer.h
 )
 

@@ -11,7 +11,7 @@
 #include <ThreadPool.h>
 #include <LruCache.tcc>
 #include <TSMap.tcc>
-#include <atl/revision.h>
+#include <revision.h>
 #include <iostream>
 #include <fstream>
 #include <string.h>
