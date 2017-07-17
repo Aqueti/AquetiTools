@@ -37,7 +37,7 @@ endmacro(add_external_project)
 
 add_external_project(JsonBox dependencies/JsonBox OFF "" "")
 
-add_external_project(mongoAPI dependencies/mongoAPI OFF "JsonBox" "")
+add_external_project(mongoAPI dependencies/mongoAPI OFF "JsonBox;MongoCXX" "")
 
 #ATL
 ExternalProject_Add(AquetiTools

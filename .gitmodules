@@ -5,3 +5,6 @@
     ignore = dirty
     branch = none
     update = none
+[submodule "dependencies/mongoAPI"]
+	path = dependencies/mongoAPI
+	url = https://github.com/Aqueti/mongoAPI.git
