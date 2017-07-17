@@ -134,6 +134,7 @@ list(APPEND CMAKE_PREFIX_PATH
 
 find_package(JsonBox CONFIG REQUIRED)
 find_package(Threads REQUIRED)
+find_package(mongoAPI CONFIG REQUIRED)
 
 list( APPEND ATOOL_HEADERS 
     Timer/Timer.h
@@ -201,6 +202,7 @@ add_library( AquetiTools STATIC
 target_link_libraries( AquetiTools
     PRIVATE JsonBox
     PRIVATE Threads::Threads
+    PRIVATE mongoAPI
 )
 
 list(APPEND TARGET_LIST AquetiTools )

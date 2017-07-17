@@ -37,6 +37,8 @@ endmacro(add_external_project)
 
 add_external_project(JsonBox dependencies/JsonBox OFF "" "")
 
+add_external_project(mongoAPI dependencies/mongoAPI OFF "JsonBox" "")
+
 #ATL
 ExternalProject_Add(AquetiTools
   SOURCE_DIR ${CMAKE_SOURCE_DIR}
@@ -44,6 +46,6 @@ ExternalProject_Add(AquetiTools
   CMAKE_ARGS ${cmake_common_args} 
   INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
   LOG_INSTALL 1
-  DEPENDS JsonBox
+  DEPENDS JsonBox mongoAPI
 )
 
