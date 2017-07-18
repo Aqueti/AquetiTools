@@ -21,6 +21,7 @@
 #include <CRC.hpp>
 #include <assert.h>
 #include "mongoapi/mongoapi.h"
+#include <ctime>
 
 namespace atl{
 

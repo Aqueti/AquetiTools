@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
             i++;
             unitList.push_back( argv[i]);
         } else if(strcmp(argv[i], "-n") == 0){
-            //insert = false;
+            insert = false;
         } else if(strcmp(argv[i], "-s") == 0){
             testSubmodules = false;
         }
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
         mongoapi::MongoInterface mi;
         bool connected = mi.connect("aqueti");
         if(connected){
-            mi.insertUnitTests("unit_tests", result);
+            std::string id = mi.insertUnitTests("unit_tests", result);
             if(id != "0"){
                 std::cout << "Results inserted in database successfully!" << std::endl;
             }
