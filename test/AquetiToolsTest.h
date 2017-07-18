@@ -20,6 +20,7 @@
 #include "TaskManager.tcc"
 #include <CRC.hpp>
 #include <assert.h>
+#include "mongoapi/mongoapi.h"
 
 namespace atl{
 

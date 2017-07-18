@@ -218,13 +218,13 @@ add_library( AquetiTools STATIC
 )
 
 target_link_libraries( AquetiTools
-    PRIVATE JsonBox
-    PRIVATE mongoapi 
+    mongoapi 
+    JsonBox
     ${MONGOCXX_LIBRARY} 
     ${MONGOC_LIBRARY}
     ${BSONCXX_LIBRARY} 
     ${BSON_LIBRARIES}
-    PRIVATE Threads::Threads
+    Threads::Threads
 )
 
 list(APPEND TARGET_LIST AquetiTools )
@@ -244,7 +244,7 @@ if(BUILD_TESTS)
       test/TaskManagerTest.cpp
    )
    target_link_libraries( aquetitools_test
-      PRIVATE AquetiTools
+        AquetiTools
    )
    list(APPEND TARGET_LIST aquetitools_test )
 

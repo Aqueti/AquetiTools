@@ -22,5 +22,5 @@ find_library(MONGOCXX_LIBRARY NAMES "mongocxx" HINTS
    "${INSTALL_PATH}/lib"
    "${CMAKE_INSTALL_PREFIX}/lib"
 )
-#
+
 find_package_handle_standard_args(MONGOCXX DEFAULT_MSG MONGOCXX_INCLUDE_DIRS MONGOCXX_LIBRARY)
