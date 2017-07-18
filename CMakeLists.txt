@@ -221,7 +221,7 @@ add_library( AquetiTools STATIC
 )
 
 target_link_libraries( AquetiTools
-    mongoapi 
+    mongoAPI 
     JsonBox
     ${MONGOCXX_LIBRARY} 
     ${MONGOC_LIBRARY}
