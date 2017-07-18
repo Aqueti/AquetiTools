@@ -38,6 +38,13 @@ if(USE_SUPERBUILD )
    return()
 endif(USE_SUPERBUILD)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+list(APPEND CMAKE_PREFIX_PATH
+    ${CMAKE_INSTALL_PREFIX}/lib/cmake
+    usr/lib/cmake
+)
+
 
 #############################################
 # Generate the revision.h file to integrate version
@@ -132,9 +139,20 @@ list(APPEND CMAKE_PREFIX_PATH
     usr/lib/cmake
 )
 
+find_package(BSON-1.0 REQUIRED)
+find_package(BSONCxx REQUIRED)
+find_package(MongoC REQUIRED)
+find_package(MongoCxx REQUIRED)
 find_package(JsonBox CONFIG REQUIRED)
+find_package(mongoapi CONFIG REQUIRED)
 find_package(Threads REQUIRED)
-find_package(mongoAPI CONFIG REQUIRED)
+
+include_directories(
+    ${MONGOC_INCLUDE_DIR}
+    ${MONGOCXX_INCLUDE_DIRS}
+    ${BSON_INCLUDE_DIRS}
+    ${BSONCXX_INCLUDE_DIRS}
+)
 
 list( APPEND ATOOL_HEADERS 
     Timer/Timer.h
@@ -201,8 +219,12 @@ add_library( AquetiTools STATIC
 
 target_link_libraries( AquetiTools
     PRIVATE JsonBox
+    PRIVATE mongoapi 
+    ${MONGOCXX_LIBRARY} 
+    ${MONGOC_LIBRARY}
+    ${BSONCXX_LIBRARY} 
+    ${BSON_LIBRARIES}
     PRIVATE Threads::Threads
-    PRIVATE mongoAPI
 )
 
 list(APPEND TARGET_LIST AquetiTools )
