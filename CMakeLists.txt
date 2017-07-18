@@ -144,7 +144,7 @@ find_package(BSONCxx REQUIRED)
 find_package(MongoC REQUIRED)
 find_package(MongoCxx REQUIRED)
 find_package(JsonBox CONFIG REQUIRED)
-find_package(mongoapi CONFIG REQUIRED)
+find_package(mongoAPI CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
 include_directories(
