@@ -210,7 +210,7 @@ list(APPEND TARGET_LIST AquetiTools )
 
 if(BUILD_TESTS)
    #Make a dedicated test library
-   add_library( aquetitools_test STATIC
+   add_library( AquetiTools_test STATIC
       test/AquetiToolsTest.cpp
       test/TimerTest.cpp
       test/ThreadTest.cpp
@@ -222,10 +222,10 @@ if(BUILD_TESTS)
       test/TSMapTest.cpp
       test/TaskManagerTest.cpp
    )
-   target_link_libraries( aquetitools_test
+   target_link_libraries( AquetiTools_test
       PRIVATE AquetiTools
    )
-   list(APPEND TARGET_LIST aquetitools_test )
+   list(APPEND TARGET_LIST AquetiTools_test )
 
    list(APPEND ATOOL_HEADERS test/AquetiToolsTest.h )
 
@@ -234,7 +234,7 @@ if(BUILD_TESTS)
      test/testAquetiTools.cpp
    )
    TARGET_LINK_LIBRARIES(testAquetiTools
-      aquetitools_test
+      AquetiTools_test
    )
    list(APPEND TARGET_LIST testAquetiTools )
 

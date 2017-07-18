@@ -19,8 +19,12 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
     //Get repository
     jsonReturn["component"] = "AquetiTools";
 
-    //Get date/time
-    jsonReturn["date"] = atl::getDateAsString();
+    //get timestamp
+    std::time_t time = std::time(NULL);
+    char mbstr[100];
+    if (std::strftime(mbstr, sizeof(mbstr), "%c", std::localtime(&time))) {
+        jsonReturn["date"] = mbstr;
+    }
 
     //Get /etc/quid
     std::string guid;
@@ -173,7 +177,6 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
 
     //get pass
     jsonReturn["pass"] = pass;
-    std::cout << jsonReturn << std::endl;
     return jsonReturn;
 }
 
