@@ -177,7 +177,6 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
 
     //get pass
     jsonReturn["pass"] = pass;
-    std::cout << jsonReturn << std::endl;
     return jsonReturn;
 }
 
