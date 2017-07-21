@@ -11,10 +11,10 @@ std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "Thre
  **/
 bool printHelp(void)
 {
-    std::cout << "ATLTest" << std::endl;
+    std::cout << "testAquetiTools" << std::endl;
     //AquetiTool::printVersion();
     std::cout << std::endl;
-    std::cout << "Usage: ./ATLTest <options>" << std::endl;
+    std::cout << "Usage: ./testAquetiTools <options>" << std::endl;
     std::cout << "Options: " << std::endl;
     std::cout << "\t-h    prints this help menu and exits" << std::endl;
     std::cout << "\t-t    is followed by name of method to be tested, then performs test and exits" << std::endl;
