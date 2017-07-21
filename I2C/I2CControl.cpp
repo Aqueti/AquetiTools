@@ -6,11 +6,15 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <CRC.hpp>
 #include "I2CControl.hpp"
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
 #include <sys/ioctl.h>
+#endif
 
 #include <string.h>
 
@@ -69,6 +73,11 @@ namespace atl
       }
    
       //Set I2C control settings
+#ifdef _WIN32
+      /// @todo
+      std::cerr << "I2CControl::connect: Not implemented in Windows" << std::endl;
+      return false;
+#else
       if(ioctl(fd, I2C_SLAVE, addr) < 0) {
          std::cout << "I2CControl Failed to acquire bus access and/or communicate with "
                    << filename << ":"
@@ -76,7 +85,8 @@ namespace atl
                    <<std::endl;
          return false;
       }
-   
+#endif
+
       //Add the device to the map
       m_mCamToDeviceMap[deviceId] = std::make_pair(fd, addr);
    
@@ -231,10 +241,16 @@ namespace atl
    {
       uint8_t * addr = (uint8_t *)(&address);
    
+#ifdef _WIN32
+      /// @todo
+      std::cerr << "I2CControl::setPointer: Not implemented in Windows" << std::endl;
+      return false;
+#else
       if(i2c_smbus_write_byte_data( fd, addr[0], addr[1] ) < 0) {
          std::cout << "Unable to set pointer to file "<< fd << std::endl;
          return false;
       }
+#endif
    
       return true;
    }
