@@ -4,7 +4,9 @@
 
 #pragma once
 
+#ifndef _WIN32
 #include <linux/i2c-dev.h>
+#endif
 #include <string>
 #include <vector>
 #include <map>

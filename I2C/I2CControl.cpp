@@ -6,11 +6,15 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <CRC.hpp>
 #include "I2CControl.hpp"
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
 #include <sys/ioctl.h>
+#endif
 
 #include <string.h>
 
@@ -69,6 +73,11 @@ namespace atl
       }
    
       //Set I2C control settings
+#ifdef _WIN32
+      /// @todo
+      std::cerr << "I2CControl::connect: Not implemented in Windows" << std::endl;
+      return false;
+#else
       if(ioctl(fd, I2C_SLAVE, addr) < 0) {
          std::cout << "I2CControl Failed to acquire bus access and/or communicate with "
                    << filename << ":"
@@ -76,7 +85,8 @@ namespace atl
                    <<std::endl;
          return false;
       }
-   
+#endif
+
       //Add the device to the map
       m_mCamToDeviceMap[deviceId] = std::make_pair(fd, addr);
    
@@ -111,8 +121,8 @@ namespace atl
 
       int fd = m_mCamToDeviceMap[deviceId].first;
 
-      uint8_t buffer[nbytes];
-      int count = read( fd, buffer, nbytes);
+      std::vector<uint8_t> buffer(nbytes);
+      int count = read( fd, buffer.data(), nbytes);
 
       int start = -1;
       int end = -1;
@@ -166,8 +176,6 @@ namespace atl
       for(int i = payload; i < end ; i++) {
          message.push_back( buffer[i]);
       }
-
-
    
       return message;
    }
@@ -187,7 +195,7 @@ namespace atl
 
       //Calculate the message
       size_t messageSize = nbytes + 4;
-      uint8_t message[messageSize];
+      std::vector<uint8_t> message(messageSize);
  
       //Calculate crc
       CRCMap crcMap;
@@ -210,8 +218,8 @@ namespace atl
       }
       
       int fd = m_mCamToDeviceMap[deviceId].first;
-      if(write(fd, message, messageSize) != (int)messageSize) { 
-         std::cout << "Failed to write " << messageSize 
+      if(write(fd, message.data(), messageSize) != (int)messageSize) {
+         std::cout << "Failed to write " << messageSize
                     << " bytes to device "<< deviceId << std::endl;
          return false;
       }
@@ -231,10 +239,16 @@ namespace atl
    {
       uint8_t * addr = (uint8_t *)(&address);
    
+#ifdef _WIN32
+      /// @todo
+      std::cerr << "I2CControl::setPointer: Not implemented in Windows" << std::endl;
+      return false;
+#else
       if(i2c_smbus_write_byte_data( fd, addr[0], addr[1] ) < 0) {
          std::cout << "Unable to set pointer to file "<< fd << std::endl;
          return false;
       }
+#endif
    
       return true;
    }
