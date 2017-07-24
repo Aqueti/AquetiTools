@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
     bool testSubmodules = true;
     bool testAll = true;
     bool valgrind = false;
+    bool printFlag = true;
+    bool assertFlag = false;
     //bool insert = true;
 
     //command line options
@@ -67,7 +69,7 @@ int main(int argc, char *argv[])
 
     //run tests
     std::cout << "Testing AquetiTools..." << std::endl;
-    JsonBox::Value result = atl::testAquetiTools(testSubmodules, true, false, valgrind, unitList);
+    JsonBox::Value result = atl::testAquetiTools(testSubmodules, printFlag, assertFlag, valgrind, unitList);
     if(result["pass"] == true){
         std::cout << "AquetiTools passed successfully!" << std::endl;
     }
