@@ -34,9 +34,9 @@ namespace atl{
  * @param valgrind The boolean, if true run with valgrind settings.
  * @return JsonBox value of the test results
  */
-JsonBox::Value testAquetiTools(std::vector<std::string> unitList = {"Timer", "CRC", 
-	"Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager"}, 
-	bool testSubmodules = true, bool printFlag = true, bool assertFlag = false, bool valgrind = false);
+JsonBox::Value testAquetiTools(bool testSubmodules = true, bool printFlag = true, bool assertFlag = false, bool valgrind = false, 
+	std::vector<std::string> unitList = {"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", 
+	"LruCache", "TSMap", "TSQueue", "TaskManager"});
 
 /**
  * Runs the tests for Timer

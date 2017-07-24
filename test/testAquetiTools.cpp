@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
     //run tests
     std::cout << "Testing AquetiTools..." << std::endl;
-    JsonBox::Value result = atl::testAquetiTools(unitList, testSubmodules, valgrind);
+    JsonBox::Value result = atl::testAquetiTools(testSubmodules, true, false, valgrind, unitList);
     if(result["pass"] == true){
         std::cout << "AquetiTools passed successfully!" << std::endl;
     }
