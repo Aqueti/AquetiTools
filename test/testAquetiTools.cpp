@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
             testSubmodules = false;
         } else if(strcmp(argv[i], "-h") == 0){
             printHelp();
-            return 1;
+            return 0;
         } else {
             std::cout << "Bad option used..." << std::endl;
             std::cout << "Exiting!" << std::endl;
@@ -72,9 +72,11 @@ int main(int argc, char *argv[])
     JsonBox::Value result = atl::testAquetiTools(testSubmodules, printFlag, assertFlag, valgrind, unitList);
     if(result["pass"] == true){
         std::cout << "AquetiTools passed successfully!" << std::endl;
+        return 0;
     }
     else{
         std::cout << "AquetiTools failed to pass!" << std::endl;
+        return 1;
     }
 
 
