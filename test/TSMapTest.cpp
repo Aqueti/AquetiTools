@@ -401,8 +401,8 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
 
     const int numReads = valgrind ? 5 : 10;
     std::thread readThreads[10];
-    std::vector<bool> readFlags(numReads);
-    std::vector<bool> readSuccess(numReads);
+    std::vector<std::atomic<bool>> readFlags(numReads);
+    std::vector<std::atomic<bool>> readSuccess(numReads);
 
     for (int i = 0; i < numReads; i++) {
         readFlags[i] = false;
@@ -418,7 +418,7 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
                                   << std::endl;
                         readFlags[i] = true;
                     });
-        } else if (i > 1) {
+        } else if (i >= 1) {
             readThreads[i] = std::thread( 
                     [&,i](){ 
                         readSuccess[i] = find_random_from_map(std::ref(testMap), 
@@ -506,8 +506,8 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
     const int reads = valgrind ? 3 : 8;
     const int counts = valgrind ? 1 : 2;
     std::thread sThreads[15];
-    std::vector<bool> sFlags(writes + reads + counts);
-    std::vector<bool> sSuccess(writes + reads + counts);
+    std::vector<std::atomic<bool>> sFlags(writes + reads + counts);
+    std::vector<std::atomic<bool>> sSuccess(writes + reads + counts);
 
     for (int i = 0; i < writes+reads+counts; i++) {
         sFlags[i] = false;
@@ -614,8 +614,8 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         int numReadIterations = 500000;
         const int sReads = 4;
         std::thread sReadThreads[sReads];
-        bool sReadFlags[sReads];
-        bool sReadSuccess[sReads];
+        std::atomic<bool> sReadFlags[sReads];
+        std::atomic<bool> sReadSuccess[sReads];
 
         for (int i = 0; i < sReads; i++) {
             sReadFlags[i] = false;
@@ -725,13 +725,13 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
 
     int numDeleted = testMap2.delete_if(
             [&](int k, std::string& v) -> bool{
-                if (v.find(truePrefix) != std::string::npos) {
+                if(v.find(truePrefix) != std::string::npos) {
                     if (printFlag) {
-                        std::cout << "Delete attempt failed" << std::endl;
+                        std::cout << "Found entry to delete: " << v << std::endl;
                     }
-                    return false;
+                    return true;
                 }
-                return true;
+                return false;
             }
     );
 
@@ -776,7 +776,7 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
     int numFEntries = valgrind ? 10000 : 100000;
     const int numCounters = 4;
     std::thread countThreads[numCounters];
-    bool countFlags[numCounters];
+    std::atomic<bool> countFlags[numCounters];
     size_t countReturns[numCounters];
     int counters[numCounters];
 

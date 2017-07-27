@@ -118,7 +118,7 @@ JsonBox::Value testAquetiTools(bool testSubmodules, bool printFlag, bool assertF
                 std::cout << "LruCache failed to pass!" << std::endl;
                 pass = pass && false;
             } 
-        } /*
+        } 
         else if(!it->compare("TSMap")) {
             std::cout << "Testing TSMap" <<std::endl;
             jsonValue = atl::testTSMap(printFlag, assertFlag, valgrind);
@@ -132,7 +132,7 @@ JsonBox::Value testAquetiTools(bool testSubmodules, bool printFlag, bool assertF
                 std::cout << "TSMap failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        }*/ 
+        } 
         else if (!it->compare("TSQueue")) {
             std::cout << "Testing TSQueue..." <<std::endl;
             jsonValue = atl::testTSQueue();
