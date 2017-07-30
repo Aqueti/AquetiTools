@@ -147,17 +147,6 @@ set(Timer_SRC
    Timer/Timer.cpp
 )
 
-list( APPEND ATOOL_HEADERS 
-   I2C/CRC.hpp
-   I2C/I2CControl.hpp
-)
-include_directories( I2C ) 
-
-set( I2C_SRC
-   I2C/CRC.cpp
-   I2C/I2CControl.cpp
-)
-
 include_directories( Thread )
 set(Thread_SRC
    Thread/Thread.cpp
