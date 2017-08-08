@@ -18,7 +18,6 @@
 #include <TSQueue.tcc>
 #include "ThreadPool.h"
 #include "TaskManager.tcc"
-#include <CRC.hpp>
 #include <assert.h>
 #include <ctime>
 
@@ -89,13 +88,6 @@ JsonBox::Value testLruCache(unsigned int numThreads = 100, bool printFlag = true
  * @return JsonBox value of the test results
  */
 JsonBox::Value testTSQueue(unsigned int numThreads = 20, bool printFlag = true, bool assertFlag = false);
-
-/**
- * Runs the tests for CRC
- *
- * @return JsonBox value of the test results
- */
-JsonBox::Value testCRC();
 
 /**
  * Runs the tests for TSMap
