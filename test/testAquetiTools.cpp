@@ -7,6 +7,29 @@
 std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager"}; //!< List of units that tests must be run on 
 
 /**
+ * \brief prints out help to user
+ **/
+bool printHelp(void)
+{
+    std::cout << "testAquetiTools" << std::endl;
+    //AquetiTool::printVersion();
+    std::cout << std::endl;
+    std::cout << "Usage: ./testAquetiTools <options>" << std::endl;
+    std::cout << "Options: " << std::endl;
+    std::cout << "\t-h    prints this help menu and exits" << std::endl;
+    std::cout << "\t-t    is followed by name of method to be tested, then performs test and exits" << std::endl;
+    std::cout << "\t-v    indicates that valgrind is being used" << std::endl;
+    std::cout << "\t-n    indicates that output should not be inserted into database" << std::endl;
+    std::cout << "\t-s    indicates submodules are not to be tested" << std::endl;
+    //std::cout << "\t--version prints ATL version information\n"<< std::endl;
+    std::cout << "Method names to follow t are: Timer, Thread, "
+         << "MultiThread, ThreadPool, TaskManager, TSQueue, "
+         << "TSMap, " << std::endl;
+    std::cout << std::endl;
+    return 1;
+}
+
+/**
  * \brief main function
  **/
 int main(int argc, char *argv[])
@@ -15,13 +38,16 @@ int main(int argc, char *argv[])
     bool testAll = true;
     bool valgrind = false;
     bool insert = true;
+    bool printFlag = true;
+    bool assertFlag = false;
+    //bool insert = true;
 
     //command line options
     int i;
     for(i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-v")) {
             valgrind = true;
-        } else if(!strcmp(argv[i], "-u")) {
+        } else if(!strcmp(argv[i], "-t")) {
             if (testAll) {
                 unitList.clear();
                 testAll = false;
@@ -32,17 +58,26 @@ int main(int argc, char *argv[])
             insert = false;
         } else if(strcmp(argv[i], "-s") == 0){
             testSubmodules = false;
+        } else if(strcmp(argv[i], "-h") == 0){
+            printHelp();
+            return 0;
+        } else {
+            std::cout << "Bad option used..." << std::endl;
+            std::cout << "Exiting!" << std::endl;
+            return 1;
         }
     }
 
     //run tests
     std::cout << "Testing AquetiTools..." << std::endl;
-    JsonBox::Value result = atl::testAquetiTools(unitList, testSubmodules, valgrind);
+    JsonBox::Value result = atl::testAquetiTools(testSubmodules, printFlag, assertFlag, valgrind, unitList);
     if(result["pass"] == true){
         std::cout << "AquetiTools passed successfully!" << std::endl;
+        return 0;
     }
     else{
         std::cout << "AquetiTools failed to pass!" << std::endl;
+        return 1;
     }
 
 

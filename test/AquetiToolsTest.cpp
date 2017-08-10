@@ -6,7 +6,7 @@
 
 namespace atl{
 
-JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmodules, bool printFlag, bool assertFlag, bool valgrind)
+JsonBox::Value testAquetiTools(bool testSubmodules, bool printFlag, bool assertFlag, bool valgrind, std::vector<std::string> unitList)
 {
     JsonBox::Value jsonReturn;
     JsonBox::Value jsonUnits;
@@ -118,7 +118,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 std::cout << "LruCache failed to pass!" << std::endl;
                 pass = pass && false;
             } 
-        } /*
+        } 
         else if(!it->compare("TSMap")) {
             std::cout << "Testing TSMap" <<std::endl;
             jsonValue = atl::testTSMap(printFlag, assertFlag, valgrind);
@@ -132,7 +132,7 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 std::cout << "TSMap failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        }*/ 
+        } 
         else if (!it->compare("TSQueue")) {
             std::cout << "Testing TSQueue..." <<std::endl;
             jsonValue = atl::testTSQueue();
@@ -146,22 +146,14 @@ JsonBox::Value testAquetiTools(std::vector<std::string> unitList, bool testSubmo
                 std::cout << "TSQueue failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        } else if (!it->compare("CRC")) {
-            std::cout << "Testing CRC..." <<std::endl;
-            jsonValue = atl::testCRC();
-            jsonUnits["CRC"] = jsonValue;
-            jsonReturn["units"] = jsonUnits;
-            
-            if(jsonValue["pass"].getBoolean()) {
-                std::cout << "CRC passed successfully!" << std::endl;
-                pass = pass && true;
-            } else {
-                std::cout << "CRC failed to pass!" << std::endl;
-                pass = pass && false;
-            }
         } else if (!it->compare("TaskManager")) {
             std::cout << "Testing TaskManager..." <<std::endl;
-            jsonValue = atl::testTaskManager();
+            if(valgrind){
+                jsonValue = atl::testTaskManager(50);
+            } 
+            else {
+                jsonValue = atl::testTaskManager();
+            }
             jsonUnits["TaskManager"] = jsonValue;
             jsonReturn["units"] = jsonUnits;
             
