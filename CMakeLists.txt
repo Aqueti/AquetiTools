@@ -147,7 +147,7 @@ find_package(BSONCxx REQUIRED)
 find_package(MongoC REQUIRED)
 find_package(MongoCxx REQUIRED)
 find_package(JsonBox CONFIG REQUIRED)
-find_package(mongoAPI CONFIG REQUIRED)
+#find_package(mongoAPI CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
 include_directories(
@@ -209,7 +209,6 @@ add_library( AquetiTools STATIC
 )
 
 target_link_libraries( AquetiTools
-    mongoAPI 
     JsonBox
     ${MONGOCXX_LIBRARY} 
     ${MONGOC_LIBRARY}
