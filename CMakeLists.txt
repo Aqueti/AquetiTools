@@ -48,12 +48,6 @@ list(APPEND CMAKE_PREFIX_PATH
     usr/lib/cmake
 )
 
-
-#############################################
-# Generate the revision.h file to integrate version
-# information.
-#############################################
-
 include_directories(
    ${CMAKE_INSTALL_PREFIX}/include 
    ${CMAKE_CURRENT_SOURCE_DIR}/include
