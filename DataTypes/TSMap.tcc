@@ -274,8 +274,10 @@ namespace atl
         auto it = m_map.find(k);
 
         if (it != m_map.end()) {
+            // Make pair before erasing
+            auto ret = std::make_pair(it->second, true);
             m_map.erase(k);
-            return std::make_pair(it->second, true);
+            return ret;
         }
         return std::make_pair(Value{}, false);
     }
