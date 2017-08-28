@@ -36,6 +36,7 @@ namespace atl
     
         public:
             // read functions
+            ~TSMap();
             std::pair<Value, bool>  find(Key k) const;
             std::pair<Value, bool>  lower_bound(Key k) const;
             std::pair<std::pair<Key,Value>, bool> lower_bound_key(Key k) const;
@@ -61,6 +62,13 @@ namespace atl
             size_t delete_if(std::function<bool(Key k, Value& v)> f);
     };
 
+    /**
+     * @brief Destructor. Clears the map
+     */
+    template<typename Key, typename Value> TSMap<Key, Value>::~TSMap()
+    {
+        clear();
+    }
 
     ////////////////////////////////////////
     //            READ METHODS            //
@@ -75,16 +83,13 @@ namespace atl
     template<typename Key, typename Value> std::pair<Value, bool> TSMap<Key, Value>::
             find(Key k) const
     {
-        bool rc = false;
-        Value v{};
         atl::shared_lock lock(m_mutex);
         auto it = m_map.find(k);
         
         if (it != m_map.end()){
-            rc = true;
-            v = it->second;
+            return std::make_pair(it->second, true);
         }
-        return std::make_pair(v, rc);
+        return std::make_pair(Value{}, false);
     }
     
     /*
@@ -97,16 +102,13 @@ namespace atl
     template<typename Key, typename Value> std::pair<Value, bool> TSMap<Key, Value>::
             lower_bound(Key k) const
     {
-        bool rc = false;
-        Value v{};
         atl::shared_lock lock(m_mutex);
         auto it = m_map.lower_bound(k);
 
         if (it != m_map.end()){
-            rc = true;
-            v = it->second;
+            return std::make_pair(it->second, true);
         }
-        return std::make_pair(v, rc);
+        return std::make_pair(Value{}, false);
     }
     
     /*
@@ -120,18 +122,13 @@ namespace atl
             std::pair<std::pair<Key, Value>, bool> TSMap<Key, Value>::
             lower_bound_key(Key k) const
     {
-        bool rc = false;
-        Key returnKey{};
-        Value v{};
         atl::shared_lock lock(m_mutex);
         auto it = m_map.lower_bound(k);
 
         if (it != m_map.end()){
-            rc = true;
-            returnKey = it->first;
-            v = it->second;
+            return std::make_pair(std::make_pair(it->first, it->second), true);
         }
-        return std::make_pair(std::make_pair(returnKey, v), rc);
+        return std::make_pair(std::make_pair(Key{}, Value{}), false);
     }
     
     /*
@@ -152,8 +149,7 @@ namespace atl
             empty() const
     {
         atl::shared_lock lock(m_mutex);
-        bool rc = m_map.empty();
-        return rc;
+        return m_map.empty();
     }
 
     template<typename Key, typename Value> std::vector<Key> TSMap<Key, Value>::
@@ -228,7 +224,7 @@ namespace atl
     {
         std::unique_lock<atl::shared_mutex> lock(m_mutex);
         Value newVal = v;
-        auto it = m_map.emplace(k, v);
+        auto it = m_map.emplace(k, newVal);
 
         if (!it.second) {
             newVal = it.first->second;
@@ -257,9 +253,9 @@ namespace atl
             return false;
         }
 
+        // remove the element if no function or if function returns true
         if (!f || f(k, it->second)) {
-            size_t rc = m_map.erase(k);
-            return rc == 1;
+            return m_map.erase(k) == 1;
         } else {
             return false;
         }
@@ -275,16 +271,13 @@ namespace atl
             remove(Key k)
     {
         std::unique_lock<atl::shared_mutex> lock(m_mutex);
-        bool rc = false;
-        Value v{};
         auto it = m_map.find(k);
 
         if (it != m_map.end()) {
-            rc = true;
-            v = it->second;
             m_map.erase(k);
+            return std::make_pair(it->second, true);
         }
-        return std::make_pair(v, rc);
+        return std::make_pair(Value{}, false);
     }
     
     /*
