@@ -147,17 +147,6 @@ set(Timer_SRC
    Timer/Timer.cpp
 )
 
-list( APPEND ATOOL_HEADERS 
-   I2C/CRC.hpp
-   I2C/I2CControl.hpp
-)
-include_directories( I2C ) 
-
-set( I2C_SRC
-   I2C/CRC.cpp
-   I2C/I2CControl.cpp
-)
-
 include_directories( Thread )
 set(Thread_SRC
    Thread/Thread.cpp
@@ -195,7 +184,6 @@ list(APPEND ATOOL_HEADERS
 
 add_library( AquetiTools STATIC  
    ${Timer_SRC}
-   ${I2C_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
    ${DataTypes_SRC}
@@ -218,7 +206,6 @@ if(BUILD_TESTS)
       test/ThreadPoolTest.cpp
       test/LruCacheTest.cpp
       test/TSQueueTest.cpp
-      test/CRCTest.cpp
       test/TSMapTest.cpp
       test/TaskManagerTest.cpp
    )
@@ -237,15 +224,6 @@ if(BUILD_TESTS)
       AquetiTools_test
    )
    list(APPEND TARGET_LIST testAquetiTools )
-
-   #i2C Test application
-   add_executable( i2CControl
-     test/testI2CControl.cpp
-   )
-   target_link_libraries( i2CControl 
-      AquetiTools
-   )
-   LIST( APPEND TARGET_LIST i2CControl)
 endif()
 
 #############################################

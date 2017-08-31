@@ -4,10 +4,10 @@
 
 #pragma once
 
-#ifdef __linux__
-#include <sys/time.h>
-#else
+#ifdef _WIN32
 #include <Winsock2.h>
+#else
+#include <sys/time.h>
 #endif
 
 #include <chrono>

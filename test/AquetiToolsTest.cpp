@@ -146,19 +146,6 @@ JsonBox::Value testAquetiTools(bool testSubmodules, bool printFlag, bool assertF
                 std::cout << "TSQueue failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        } else if (!it->compare("CRC")) {
-            std::cout << "Testing CRC..." <<std::endl;
-            jsonValue = atl::testCRC();
-            jsonUnits["CRC"] = jsonValue;
-            jsonReturn["units"] = jsonUnits;
-            
-            if(jsonValue["pass"].getBoolean()) {
-                std::cout << "CRC passed successfully!" << std::endl;
-                pass = pass && true;
-            } else {
-                std::cout << "CRC failed to pass!" << std::endl;
-                pass = pass && false;
-            }
         } else if (!it->compare("TaskManager")) {
             std::cout << "Testing TaskManager..." <<std::endl;
             if(valgrind){
