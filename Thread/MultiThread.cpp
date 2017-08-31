@@ -5,6 +5,7 @@
 #include "MultiThread.h"
 #include <iostream>
 #include <fstream>
+#include <future>
 #include <system_error>
 
 std::ofstream multiThreadTest;
@@ -45,10 +46,13 @@ bool MultiThread::Start(bool* runFlag)
         m_running = runFlag;
     }
 
+    std::promise<void> p;
+    auto f = std::make_shared<std::shared_future<void>>(p.get_future().share());
     for(unsigned i = 0; i < m_numThreads; i++) {
-        m_threads.emplace_back([this] {Execute();});
+        m_threads.emplace_back([this, f] {f->get(); Execute();});
         m_idMap.emplace(m_threads.crbegin()->get_id(), i);
     }
+    p.set_value();
     return true;
 }
 
