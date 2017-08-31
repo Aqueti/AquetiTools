@@ -4,7 +4,7 @@
 
 #pragma once
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <Winsock2.h>
 #else
 #include <sys/time.h>

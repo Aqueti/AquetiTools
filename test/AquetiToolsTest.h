@@ -35,7 +35,7 @@ namespace atl{
  * @return JsonBox value of the test results
  */
 JsonBox::Value testAquetiTools(bool testSubmodules = true, bool printFlag = true, bool assertFlag = false, bool valgrind = false, 
-	std::vector<std::string> unitList = {"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", 
+	std::vector<std::string> unitList = {"Timer", "Thread", "MultiThread", "ThreadPool", 
 	"LruCache", "TSMap", "TSQueue", "TaskManager"});
 
 /**

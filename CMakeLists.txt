@@ -241,7 +241,6 @@ if(BUILD_TESTS)
       AquetiTools_test
    )
    list(APPEND TARGET_LIST testAquetiTools )
-
 endif()
 
 #############################################
