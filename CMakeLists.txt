@@ -136,20 +136,14 @@ list(APPEND CMAKE_PREFIX_PATH
     usr/lib/cmake
 )
 
-find_package(BSON-1.0 REQUIRED)
-find_package(BSONCxx REQUIRED)
-find_package(MongoC REQUIRED)
-find_package(MongoCxx REQUIRED)
-find_package(JsonBox CONFIG REQUIRED)
-find_package(mongoAPI CONFIG REQUIRED)
 find_package(Threads REQUIRED)
+find_package(JsonBox CONFIG REQUIRED)
 
-include_directories(
-    ${MONGOC_INCLUDE_DIR}
-    ${MONGOCXX_INCLUDE_DIRS}
-    ${BSON_INCLUDE_DIRS}
-    ${BSONCXX_INCLUDE_DIRS}
-)
+find_package(mongoAPI CONFIG)
+
+if(mongoAPI_FOUND)
+    add_definitions(-DUSE_MONGO)
+endif(mongoAPI_FOUND)
 
 list( APPEND ATOOL_HEADERS 
     Timer/Timer.h
@@ -204,10 +198,6 @@ add_library( AquetiTools STATIC
 
 target_link_libraries( AquetiTools
     JsonBox
-    ${MONGOCXX_LIBRARY} 
-    ${MONGOC_LIBRARY}
-    ${BSONCXX_LIBRARY} 
-    ${BSON_LIBRARIES}
     Threads::Threads
 )
 
@@ -228,6 +218,7 @@ if(BUILD_TESTS)
    )
    target_link_libraries( AquetiTools_test
         AquetiTools
+        mongoAPI
    )
    list(APPEND TARGET_LIST AquetiTools_test )
 
