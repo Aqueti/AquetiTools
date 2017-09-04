@@ -83,6 +83,7 @@ int main(int argc, char *argv[])
 
     //connect to database and insert JsonValue if "-n" was not used
     if(insert){
+#ifdef USE_MONGO
         std::cout << "Inserting unit test results in database..." << std::endl;
         mongoapi::MongoInterface mi;
         bool connected = mi.connect("aqueti");
@@ -96,6 +97,10 @@ int main(int argc, char *argv[])
             std::cout << "Failed to insert unit test results!" << std::endl;
             return 0;
         }
+#else
+        std::cout << "Failed to insert unit test results - Mongo not found" << std::endl;
+        return 0;
+#endif //USE_MONGO
     }
 
     return 0;

@@ -141,10 +141,6 @@ find_package(JsonBox CONFIG REQUIRED)
 
 find_package(mongoAPI CONFIG)
 
-if(mongoAPI_FOUND)
-    add_definitions(-DUSE_MONGO)
-endif(mongoAPI_FOUND)
-
 list( APPEND ATOOL_HEADERS 
     Timer/Timer.h
 )
@@ -217,9 +213,15 @@ if(BUILD_TESTS)
       test/TaskManagerTest.cpp
    )
    target_link_libraries( AquetiTools_test
-        AquetiTools
-        mongoAPI
+      AquetiTools
    )
+   if(mongoAPI_FOUND)
+      add_definitions(-DUSE_MONGO)
+      target_link_libraries( AquetiTools_test
+         mongoAPI
+      )
+   endif(mongoAPI_FOUND)
+
    list(APPEND TARGET_LIST AquetiTools_test )
 
    list(APPEND ATOOL_HEADERS test/AquetiToolsTest.h )
