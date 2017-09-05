@@ -67,6 +67,6 @@ ExternalProject_Add(AquetiTools
   CMAKE_ARGS ${cmake_common_args} 
   INSTALL_DIR ${CMAKE_BINARY_DIR}/INSTALL
   LOG_INSTALL 1
-  DEPENDS JsonBox mongoAPI submodule_init
+  DEPENDS JsonBox submodule_init mongoAPI
 )
 

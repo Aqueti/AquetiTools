@@ -19,8 +19,11 @@
 #include "ThreadPool.h"
 #include "TaskManager.tcc"
 #include <assert.h>
-#include "mongoapi/mongoapi.h"
 #include <ctime>
+
+#ifdef USE_MONGO
+#include "mongoapi/mongoapi.h"
+#endif //USE_MONGO
 
 namespace atl{
 
