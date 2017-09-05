@@ -560,7 +560,7 @@ std::string getDateAsString() {
 #else
   if (::gmtime_r(&as_time_t, &tm))
 #endif
-    if (std::strftime(some_buffer, sizeof(some_buffer), "%F_%H:%M:%S%p", timeInfo))
+    if (std::strftime(some_buffer, sizeof(some_buffer), "%F_%H_%M_%S%p", timeInfo))
       return std::string{some_buffer};
   throw std::runtime_error("Failed to get current date as string");
 }
