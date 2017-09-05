@@ -139,6 +139,9 @@ bool add_to_map(TSMap<std::string, int>& map,
 
 namespace atl {
 
+/**
+ * \brief unit test function for the TSMap 
+ **/ 
 JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
 {
     JsonBox::Value resultString; //!< Brief JsonBox value with unit test results
@@ -1091,11 +1094,13 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
         resultString["getKeyList()"] = "pass";
     }
 
-    std::cout << "TSMap Unit Test passed!\n" << std::endl;
 
     if (resultString["pass"] == false) {
+        std::cout << "TSMap Unit Test failed!\n" << std::endl;
         return resultString;
     }
+
+    std::cout << "TSMap Unit Test passed!\n" << std::endl;
     resultString["pass"] = true;
     return resultString;
 }

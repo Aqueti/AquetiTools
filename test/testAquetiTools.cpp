@@ -39,10 +39,10 @@ int main(int argc, char *argv[])
     bool testSubmodules = true;
     bool testAll = true;
     bool valgrind = false;
-    bool insert = true;
+//    bool insert = true;
     bool printFlag = true;
     bool assertFlag = false;
-    //bool insert = true;
+    int pass = 0;
 
     //command line options
     int i;
@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
             }
             i++;
             unitList.push_back( argv[i]);
-        } else if(strcmp(argv[i], "-n") == 0){
-            insert = false;
+//        } else if(strcmp(argv[i], "-n") == 0){
+//            insert = false;
         } else if( !strcmp(argv[i], "-i" )) {
            if( argc <= ++i ) {
               std::cout << "-i option must have a specified value!"<<std::endl;
@@ -84,10 +84,11 @@ int main(int argc, char *argv[])
        std::cout << "AquetiTools test "<<i+1<<" of "<<iterations<<"..." << std::endl;
        JsonBox::Value result = atl::testAquetiTools(testSubmodules, printFlag, assertFlag, valgrind, unitList);
        if(result["pass"] == true){
-           std::cout << "AquetiTools test "<<i+1<<" of "<<iterations<<" passed!" << std::endl;
+           pass++;
+           std::cout << "AquetiTools test "<<i+1<<" of "<<iterations<<" passed! ("<<pass<<"/"<<i<<"="<<double(pass)/double(i)<<"%)" << std::endl;
        }
        else{
-           std::cout << "AquetiTools test "<<i+1<<" of "<<iterations<<" failed!" << std::endl;
+           std::cout << "AquetiTools test "<<i+1<<" of "<<iterations<<" failed! ("<<pass<<"/"<<i<<"="<<double(pass)/double(i)<<"%)" << std::endl;
            return 1;
        }
     }
