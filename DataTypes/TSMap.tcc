@@ -146,15 +146,18 @@ namespace atl
         atl::shared_lock lock(m_mutex);
         auto it = m_map.lower_bound(k);
 
-        // if the iterator has the same key, return its value
+        // If the iterator has the same key, return its value
         if( it != m_map.end() && it->first == k ){
             return std::make_pair(it->second, true);
         } 
-        // else decrement the iterator to get the previous element
-        else if( --it != m_map.begin() ){
+        // Else if the iterator is the first element, then either the map 
+        // is empty or the first element is greater than the search key
+        else if( it == m_map.begin() ){
+            return std::make_pair(Value{}, false);
+        } else{ // else, we decrement the iterator and return its value
+            it--;
             return std::make_pair(it->second, true);
         }
-        return std::make_pair(Value{}, false);
     }
 
     /*
