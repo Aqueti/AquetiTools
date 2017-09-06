@@ -40,6 +40,7 @@ namespace atl
             std::pair<Value, bool>  find(Key k) const;
             std::pair<Value, bool>  lower_bound(Key k) const;
             std::pair<std::pair<Key,Value>, bool> lower_bound_key(Key k) const;
+            std::pair<Value, bool>  findInfimum(Key k) const;
             size_t                  size() const;
             bool                    empty() const;
             std::vector<Key>        getKeyList() const;
@@ -131,6 +132,31 @@ namespace atl
         return std::make_pair(std::make_pair(Key{}, Value{}), false);
     }
     
+    /**
+     * \brief Returns the Value corresponding to the greatest key 
+     *        less than or equal to the given key
+     * \param k The Key to search for
+     * \return A std::pair of a Value and a bool. The Value is the return
+     *         Value, if found. The bool is true if a Value is found, 
+     *         else false if none is found
+     **/
+    template<typename Key,typename Value> 
+            std::pair<Value,bool> TSMap<Key,Value>::findInfimum(Key k) const
+    {
+        atl::shared_lock lock(m_mutex);
+        auto it = m_map.lower_bound(k);
+
+        // if the iterator has the same key, return its value
+        if( it != m_map.end() && it->first == k ){
+            return std::make_pair(it->second, true);
+        } 
+        // else decrement the iterator to get the previous element
+        else if( --it != m_map.begin() ){
+            return std::make_pair(it->second, true);
+        }
+        return std::make_pair(Value{}, false);
+    }
+
     /*
      * \brief returns the number of entries in the map
      */
