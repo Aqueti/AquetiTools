@@ -139,6 +139,23 @@ list(APPEND CMAKE_PREFIX_PATH
 find_package(Threads REQUIRED)
 find_package(JsonBox CONFIG REQUIRED)
 
+find_package(BSON-1.0 REQUIRED)
+find_package(BSONCxx REQUIRED)
+find_package(MongoC REQUIRED)
+find_package(MongoCxx REQUIRED)
+find_package(JsonBox CONFIG REQUIRED)
+
+include_directories(
+    ${MONGOC_INCLUDE_DIR}
+    ${MONGOCXX_INCLUDE_DIRS}
+    ${BSON_INCLUDE_DIRS}
+    ${BSONCXX_INCLUDE_DIRS}
+)
+
+
+
+
+
 find_package(mongoAPI CONFIG)
 
 list( APPEND ATOOL_HEADERS 
