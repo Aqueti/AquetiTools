@@ -38,6 +38,7 @@ Thread::~Thread()
  **/
 bool Thread::Start( bool* runFlag )
 {
+    std::unique_lock<std::mutex> guard (m_threadMutex);
     if( (m_running && *m_running) || m_threadObj.joinable() ) {
         std::cerr << "WARNING: Thread threadObject already running" << std::endl;
         return false;
@@ -87,12 +88,12 @@ void Thread::mainLoop(void)
  **/
 bool Thread::Detach()
 {
-    if( !m_threadObj.joinable() || m_threadObj.get_id() == std::this_thread::get_id()) { //Don't join yourself!
+    try {
+        m_threadObj.detach();
+    } catch (const std::system_error& e) {
+        std::cerr << "Warning: Join could not detach: " << e.what() << std::endl;
         return false;
     }
-
-    m_threadObj.detach();
-
     return true;
 }
 
@@ -103,8 +104,29 @@ bool Thread::Detach()
  **/
 bool Thread::Join()
 {
-    if( m_threadObj.joinable() && m_threadObj.get_id() != std::this_thread::get_id()) { //Don't join yourself!
+    bool rc;
+    try {
         m_threadObj.join();
+    } catch (const std::system_error& e) {
+        if(e.code() == std::errc::resource_deadlock_would_occur) {
+            std::cerr << "Warning: Can't join yourself! detaching..." << std::endl;
+            /*try {
+                m_threadObj.detach();
+            } catch (const std::system_error& e) {
+                std::cerr << "Warning: Join could not detach: " << e.what() << std::endl;
+                rc = false;
+            }*/
+        } else if(e.code() == std::errc::no_such_process) {
+            std::cerr << "Warning: Thread not valid: " << e.what() << std::endl;
+            rc = false;
+        } else if(e.code() == std::errc::invalid_argument) {
+            // this just means the thread isn't running
+            //std::cerr << "Warning: Thread not joinable: " << e.what() << std::endl;
+            rc = false;
+        } else {
+            std::cerr << "Warning: Unknown thread error occurred: " << e.what() << std::endl;
+            rc = false;
+        }
     }
 
     std::unique_lock<std::mutex> guard (m_threadMutex);
@@ -114,7 +136,7 @@ bool Thread::Join()
     }
     m_deletePtr = false;
 
-    return true;
+    return rc;
 }
 
 /**
