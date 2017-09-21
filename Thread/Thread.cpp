@@ -48,6 +48,9 @@ bool Thread::Start()
         return false;
     }
 
+    if(m_threadObj.joinable()) {
+        Join();
+    }
     m_threadObj = std::thread([this] {Execute();});
     return true;
 }
