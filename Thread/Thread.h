@@ -5,6 +5,7 @@
 #pragma once
 #include <thread>
 #include <mutex>
+#include <atomic>
 #include "JsonBox.h"
 
 namespace atl
@@ -18,18 +19,17 @@ namespace atl
 class Thread
 {
 protected:
-    std::mutex    m_threadMutex;         //!< Mutex to signal closure
-    std::thread   m_threadObj;           //!< Thread variable
-    bool*         m_running = nullptr;   //!< Flag to stop running by a shared pointer
-    bool          m_deletePtr = false;   //!< If true, delete pointer on destruction
+    std::thread         m_threadObj;    //!< Thread variable
+    std::atomic_bool    m_running;      //!< Flag to stop running by a shared pointer
 
     virtual void  Execute(void);
     virtual void  mainLoop(void);
 
 public:
+                  Thread();
     virtual       ~Thread();
 
-    virtual bool  Start(bool* runFlag=NULL );
+    virtual bool  Start(void);
     virtual void  Stop(void);
     virtual bool  Join(void);
     virtual bool  Detach(void);

@@ -32,18 +32,14 @@ MultiThread::~MultiThread()
  *
  * @return
  */
-bool MultiThread::Start(bool* runFlag)
+bool MultiThread::Start()
 {
-    if(m_running && *m_running) {
+    bool running = false;
+    m_running.compare_exchange_strong(running, true);
+
+    if(running) {
         std::cerr << "WARNING: Threads already running." << std::endl;
         return false;
-    }
-
-    if(!runFlag) {
-        m_deletePtr = true;
-        m_running = new bool(true);
-    } else {
-        m_running = runFlag;
     }
 
     std::promise<void> p;
@@ -63,6 +59,8 @@ bool MultiThread::Start(bool* runFlag)
  */
 bool MultiThread::Join()
 {
+    // Move threads into separate vector atomically before joining
+    // Don't want to join from within mutex lock
     std::unique_lock<std::mutex> guard (m_threadMutex);
     auto deleteThreads = std::move(m_threads);
     guard.unlock();
@@ -70,7 +68,11 @@ bool MultiThread::Join()
     bool rc = true;
     for(auto&& t: deleteThreads) {
         try {
+            auto id = t.get_id();
             t.join();
+            // Don't erase detached threads
+            m_idMap.erase(id);
+
         } catch (const std::system_error& e) {
             if(e.code() == std::errc::resource_deadlock_would_occur) {
                 //std::cerr << "Warning: Can't join yourself! detaching..." << std::endl;
@@ -96,27 +98,24 @@ bool MultiThread::Join()
         }
     }
 
-    guard.lock();
-    if(m_deletePtr && m_running) {
-        delete m_running;
-        m_running = nullptr;
-    }
-    m_deletePtr = false;
-
-    m_idMap.clear();
+    // no need to set running false.  If joined, must be false
 
     return rc;
 }
 
 /**
- * @brief Waits for all threads to complete before returning
+ * @brief Detaches all threads and removes them from map
  *
- * @return true if all threads were able to join
+ * @return true if all threads were able to detach
  */
 bool MultiThread::Detach()
 {
+    std::unique_lock<std::mutex> guard (m_threadMutex);
+    auto deleteThreads = std::move(m_threads);
+    guard.unlock();
+
     bool rc = true;
-    for(auto&& t: m_threads) {
+    for(auto&& t: deleteThreads) {
         try {
             t.detach();
         } catch (const std::system_error& e) {
@@ -124,6 +123,8 @@ bool MultiThread::Detach()
             rc = false;
         }
     }
+
+    // Keeping idmap around in case it's used
 
     return rc;
 }

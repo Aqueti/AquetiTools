@@ -61,11 +61,13 @@ bool find_nonexistent(TSMap<std::string, int>& map, int iter, bool print)
 * @param print The boolean to determine if a message is printed out
 * @return True if the function performed correctly, false if the map size changed
 */
-bool check_size_constant(TSMap<std::string, int>& map, int iter, bool print)
+bool check_size_constant(TSMap<std::string, int>& map, bool valgrind, int iter, bool print)
 {
     size_t size = map.size();
     for (int i = 0; i < iter; i++) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if(!valgrind) {
+            std::this_thread::yield();
+        }
         size_t s = map.size();
         if (size != s) {
             if (print) {
@@ -88,11 +90,13 @@ bool check_size_constant(TSMap<std::string, int>& map, int iter, bool print)
 * @param print The boolean to determine if a message is printed out
 * @return True if the function performed correctly, false if the map size didnt increase
 */
-bool check_size_increasing(TSMap<std::string, int>& map, int iter, int max, bool print)
+bool check_size_increasing(TSMap<std::string, int>& map, bool valgrind, int iter, int max, bool print)
 {
     size_t size = map.size();
     for (int i = 0; i < iter; i++) {
-        std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+        if(!valgrind) {
+            std::this_thread::yield();
+        }
         size_t s = map.size();
         if ((int)s == max) {
             break;
@@ -322,8 +326,8 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
     }
 
     std::thread writeThreads[numWrites];
-    bool writeFlags[numWrites];
-    bool writeSuccess[numWrites];
+    std::atomic_bool writeFlags[numWrites];
+    std::atomic_bool writeSuccess[numWrites];
 
     for (int i = 0; i < numWrites; i++) {
         writeFlags[i] = false;
@@ -403,13 +407,13 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
     }
 
     const int numReads = valgrind ? 5 : 10;
-    std::thread readThreads[10];
+    std::thread readThreads[numReads];
     std::vector<std::atomic<bool>> readFlags(numReads);
     std::vector<std::atomic<bool>> readSuccess(numReads);
 
     for (int i = 0; i < numReads; i++) {
         readFlags[i] = false;
-        if (i > (numReads/5 * 4)) {
+        if (i >= (numReads/5 * 4)) {
             readThreads[i] = std::thread( 
                     [&,i](){ 
                         readSuccess[i] = find_nonexistent(std::ref(testMap), 
@@ -421,7 +425,21 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
                                   << std::endl;
                         readFlags[i] = true;
                     });
-        } else if (i >= 1) {
+        //} else if (!valgrind && i == 0){
+        } else if (i == 0){
+            readThreads[i] = std::thread( 
+                    [&,i](){ 
+                        readSuccess[i] = check_size_constant(std::ref(testMap),
+                                                             valgrind,
+                                                             valgrind ? 25 : 1000, 
+                                                             printFlag);
+                        std::cout << "readThread " << i 
+                                  << " (size checker) exited with status " 
+                                  << readSuccess[i]
+                                  << std::endl;
+                        readFlags[i] = true;
+                    });
+        } else {
             readThreads[i] = std::thread( 
                     [&,i](){ 
                         readSuccess[i] = find_random_from_map(std::ref(testMap), 
@@ -430,18 +448,6 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
                                                              printFlag);
                         std::cout << "readThread " << i 
                                   << " exited with status " << readSuccess[i]
-                                  << std::endl;
-                        readFlags[i] = true;
-                    });
-        } else {
-            readThreads[i] = std::thread( 
-                    [&,i](){ 
-                        readSuccess[i] = check_size_constant(std::ref(testMap), 
-                                                             valgrind ? 25 : 1000, 
-                                                             printFlag);
-                        std::cout << "readThread " << i 
-                                  << " (size checker) exited with status " 
-                                  << readSuccess[i]
                                   << std::endl;
                         readFlags[i] = true;
                     });
@@ -541,6 +547,7 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
             sThreads[i] = std::thread(
                     [&,i](){
                         sSuccess[i] = check_size_increasing(std::ref(testMap),
+                                                            valgrind,
                                                             valgrind ? 400 : 1000,
                                                             numTests*numWrites + tests*writes,
                                                             printFlag);

@@ -41,8 +41,6 @@ if(USE_SUPERBUILD )
    return()
 endif(USE_SUPERBUILD)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-
 list(APPEND CMAKE_PREFIX_PATH
     ${CMAKE_INSTALL_PREFIX}/lib/cmake
     usr/lib/cmake
@@ -124,17 +122,29 @@ endif()
 #############################################
 #Determine Compiler options
 if (NOT WIN32)
-   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-parameter -std=c++11 -fPIC -O0") #Compile faster on debug, with warnings
-   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -std=c++11 -fPIC") #Optimize compilation, no warnings
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -fPIC -O2") #Else slightly optimize, with warnings
+   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-parameter -std=c++11 -fPIC") #Compile faster on debug, with warnings
+   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11 -fPIC") #Optimize compilation, no warnings
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -fPIC") #Else slightly optimize, with warnings
 
    add_definitions(-DUNIX)
 endif(NOT WIN32)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 list(APPEND CMAKE_PREFIX_PATH
     ${CMAKE_INSTALL_PREFIX}/lib/cmake
     usr/lib/cmake
 )
+
+# If we're debugging, link in helgrind
+string(TOLOWER "${CMAKE_BUILD_TYPE}" type_lower)
+if(type_lower MATCHES "debug")
+    find_package(Helgrind)
+    if(Helgrind_FOUND)
+        add_definitions(-DUSE_HELGRIND)
+        include_directories(${Helgrind_INCLUDE_DIR})
+    endif(Helgrind_FOUND)
+endif(type_lower MATCHES "debug")
 
 find_package(Threads REQUIRED)
 find_package(JsonBox CONFIG REQUIRED)
@@ -151,10 +161,6 @@ include_directories(
     ${BSON_INCLUDE_DIRS}
     ${BSONCXX_INCLUDE_DIRS}
 )
-
-
-
-
 
 find_package(mongoAPI CONFIG)
 
