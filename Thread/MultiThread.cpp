@@ -20,8 +20,8 @@ namespace atl
  **/
 MultiThread::~MultiThread()
 {
-    Stop();
-    Join();
+    MultiThread::Stop();
+    MultiThread::Join();
 }
 
 /**
@@ -75,13 +75,13 @@ bool MultiThread::Join()
 
         } catch (const std::system_error& e) {
             if(e.code() == std::errc::resource_deadlock_would_occur) {
-                //std::cerr << "Warning: Can't join yourself! detaching..." << std::endl;
+                /*std::cerr << "Warning: Can't join yourself! detaching..." << std::endl;
                 try {
                     t.detach();
                 } catch (const std::system_error& e) {
                     std::cerr << "Warning: Join could not detach: " << e.what() << std::endl;
                     rc = false;
-                }
+                }*/
             } else if(e.code() == std::errc::no_such_process) {
                 std::cerr << "Warning: Thread not valid: " << e.what() << std::endl;
                 rc = false;
