@@ -28,7 +28,7 @@ Thread::Thread() : m_running(false) {}
  **/
 Thread::~Thread()
 {
-    Stop();
+    Thread::Stop();
     Thread::Join();
 }
 
@@ -109,7 +109,7 @@ bool Thread::Join()
         m_threadObj.join();
     } catch (const std::system_error& e) {
         if(e.code() == std::errc::resource_deadlock_would_occur) {
-            //std::cerr << "Warning: Can't join yourself! detaching..." << std::endl;
+            std::cerr << "Warning: Can't join yourself!" << std::endl;
             /*try {
                 m_threadObj.detach();
             } catch (const std::system_error& e) {
@@ -122,6 +122,7 @@ bool Thread::Join()
         } else if(e.code() == std::errc::invalid_argument) {
             // this just means the thread isn't running
             //std::cerr << "Warning: Thread not joinable: " << e.what() << std::endl;
+            //std::cerr << "joinable: " << std::boolalpha << m_threadObj.joinable() << std::endl;
             rc = false;
         } else {
             std::cerr << "Warning: Unknown thread error occurred: " << e.what() << std::endl;

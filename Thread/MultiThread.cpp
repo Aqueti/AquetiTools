@@ -75,8 +75,8 @@ bool MultiThread::Join()
 
         } catch (const std::system_error& e) {
             if(e.code() == std::errc::resource_deadlock_would_occur) {
-                /*std::cerr << "Warning: Can't join yourself! detaching..." << std::endl;
-                try {
+                std::cerr << "Warning: Can't join yourself! detaching..." << std::endl;
+                /*try {
                     t.detach();
                 } catch (const std::system_error& e) {
                     std::cerr << "Warning: Join could not detach: " << e.what() << std::endl;
