@@ -104,7 +104,7 @@ bool Thread::Detach()
  **/
 bool Thread::Join()
 {
-    bool rc;
+    bool rc = true;
     try {
         m_threadObj.join();
     } catch (const std::system_error& e) {
