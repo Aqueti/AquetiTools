@@ -257,6 +257,16 @@ if(BUILD_TESTS)
       AquetiTools_test
    )
    list(APPEND TARGET_LIST testAquetiTools )
+
+   #Add AquetiTools test as an executavble
+   add_executable( MongoTest 
+     test/MongoTest.cpp
+   )
+   TARGET_LINK_LIBRARIES(MongoTest
+      AquetiTools
+      mongoAPI
+   )
+   list(APPEND TARGET_LIST MongoTest )
 endif()
 
 #############################################
