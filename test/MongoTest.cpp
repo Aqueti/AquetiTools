@@ -9,7 +9,7 @@
 #include <JsonBox.h>
 
 #include "mongoapi/mongoapi.h"
-#include <atl/Timer.h>
+#include <Timer.h>
 
 /**
  * \brief Thread to write multiple records to a databasea
