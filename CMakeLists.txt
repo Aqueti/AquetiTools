@@ -149,21 +149,6 @@ endif(type_lower MATCHES "debug")
 find_package(Threads REQUIRED)
 find_package(JsonBox CONFIG REQUIRED)
 
-find_package(BSON-1.0 REQUIRED)
-find_package(BSONCxx REQUIRED)
-find_package(MongoC REQUIRED)
-find_package(MongoCxx REQUIRED)
-find_package(JsonBox CONFIG REQUIRED)
-
-include_directories(
-    ${MONGOC_INCLUDE_DIR}
-    ${MONGOCXX_INCLUDE_DIRS}
-    ${BSON_INCLUDE_DIRS}
-    ${BSONCXX_INCLUDE_DIRS}
-)
-
-find_package(mongoAPI CONFIG)
-
 list( APPEND ATOOL_HEADERS 
     Timer/Timer.h
 )
@@ -238,13 +223,6 @@ if(BUILD_TESTS)
    target_link_libraries( AquetiTools_test
       AquetiTools
    )
-   if(mongoAPI_FOUND)
-      add_definitions(-DUSE_MONGO)
-      target_link_libraries( AquetiTools_test
-         mongoAPI
-      )
-   endif(mongoAPI_FOUND)
-
    list(APPEND TARGET_LIST AquetiTools_test )
 
    list(APPEND ATOOL_HEADERS test/AquetiToolsTest.h )
@@ -259,14 +237,6 @@ if(BUILD_TESTS)
    list(APPEND TARGET_LIST testAquetiTools )
 
    #Add AquetiTools test as an executavble
-   add_executable( MongoTest 
-     test/MongoTest.cpp
-   )
-   TARGET_LINK_LIBRARIES(MongoTest
-      AquetiTools
-      mongoAPI
-   )
-   list(APPEND TARGET_LIST MongoTest )
 endif()
 
 #############################################

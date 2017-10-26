@@ -5,11 +5,6 @@
     ignore = dirty
     branch = none
     update = none
-[submodule "dependencies/mongoAPI"]
-	path = dependencies/mongoAPI
-	url = https://github.com/Aqueti/mongoAPI.git
-    fetchRecurseSubmodules = false
-    branch = master
 [submodule "dependencies/mongo-cxx-driver"]
 	path = dependencies/mongo-cxx-driver
 	url = https://github.com/mongodb/mongo-cxx-driver
