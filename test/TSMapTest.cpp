@@ -407,7 +407,7 @@ JsonBox::Value testTSMap(bool printFlag, bool assertFlag, bool valgrind)
     }
 
     const int numReads = valgrind ? 5 : 10;
-    std::thread readThreads[numReads];
+    std::vector<std::thread> readThreads(numReads);
     std::vector<std::atomic<bool>> readFlags(numReads);
     std::vector<std::atomic<bool>> readSuccess(numReads);
 
