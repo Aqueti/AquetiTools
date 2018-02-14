@@ -119,18 +119,48 @@ int64_t Timer::getTimeCodeOffset()
 void Timer::start()
 {
     m_startTime = getTime();
+    if( m_stopTime != 0 ) {
+       m_stopTime = 0;
+    }
     return;
 }
 
+void Timer::reset()
+{
+   m_stopTime = 0;
+}
+
+/** 
+ * \brief Function to stop the timer. 
+ **/
+void Timer::stop()
+{
+   m_stopTime = getTime();
+}
+
 /**
- * Function to determine the time elapsed since the timer was started
+ * \brief Function to reset the timer
+ **/
+void Timer::reset()
+{
+   m_startTime = 0;
+   m_stopTime  = 0;
+}
+
+/**
+ * \brief Function to determine the time elapsed since the timer was started
  *
  * @return The stop time minus the start time
  */
 double Timer::elapsed()
 {
-    double m_stopTime = getTime();
-    return  m_stopTime - m_startTime;
+    if( m_stopTime == 0 ) {
+       return  getTime() - m_startTime;
+    } 
+    else  {
+       return  stopTime - m_startTime;
+    }
+   
 }
 
 /**
