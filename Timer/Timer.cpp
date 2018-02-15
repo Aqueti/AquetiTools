@@ -125,11 +125,6 @@ void Timer::start()
     return;
 }
 
-void Timer::reset()
-{
-   m_stopTime = 0;
-}
-
 /** 
  * \brief Function to stop the timer. 
  **/
@@ -158,7 +153,7 @@ double Timer::elapsed()
        return  getTime() - m_startTime;
     } 
     else  {
-       return  stopTime - m_startTime;
+       return  m_stopTime - m_startTime;
     }
    
 }
