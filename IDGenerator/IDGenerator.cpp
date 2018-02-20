@@ -17,11 +17,11 @@ namespace atl {
 
 std::string IDGenerator::genAlphanumericString(int len)
 {
-    string alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    std::string alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     std::uniform_int_distribution<int> d(0, alphabet.size() - 1);
     std::random_device rd;
 
-    string str;
+    std::string str;
     int pos;
     while (str.size() <= len) {
         pos = d(rd);
