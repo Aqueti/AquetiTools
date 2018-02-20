@@ -25,7 +25,7 @@ std::string IDGenerator::genAlphanumericString(int len)
     int pos;
     while (str.size() <= len) {
         pos = d(rd);
-        str += str.substr(pos,1);
+        str += alphabet.substr(pos,1);
     }
 
     return str;
