@@ -199,7 +199,7 @@ set( IDGenerator_SRC
     IDGenerator/IDGenerator.cpp
 )
 list( APPEND ATOOL_HEADERS
-    IDGenerator/IDGenerator.cpp
+    IDGenerator/IDGenerator.hpp
 )
 
 
