@@ -139,7 +139,7 @@ list(APPEND CMAKE_PREFIX_PATH
 find_package(Threads REQUIRED)
 find_package(JsonBox CONFIG REQUIRED)
 
-find_package(mongoAPI CONFIG)
+#find_package(mongoAPI CONFIG)
 
 list( APPEND ATOOL_HEADERS 
     Timer/Timer.h
@@ -215,12 +215,13 @@ if(BUILD_TESTS)
    target_link_libraries( AquetiTools_test
       AquetiTools
    )
-   if(mongoAPI_FOUND)
-      add_definitions(-DUSE_MONGO)
-      target_link_libraries( AquetiTools_test
-         mongoAPI
-      )
-   endif(mongoAPI_FOUND)
+
+#   if(mongoAPI_FOUND)
+#      add_definitions(-DUSE_MONGO)
+#      target_link_libraries( AquetiTools_test
+#         mongoAPI
+#      )
+#   endif(mongoAPI_FOUND)
 
    list(APPEND TARGET_LIST AquetiTools_test )
 

@@ -22,7 +22,7 @@
 #include <ctime>
 
 #ifdef USE_MONGO
-#include "mongoapi/mongoapi.h"
+#include "mongoapi/MongoAPI.h"
 #endif //USE_MONGO
 
 namespace atl{
