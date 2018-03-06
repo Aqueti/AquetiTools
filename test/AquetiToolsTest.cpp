@@ -164,7 +164,20 @@ JsonBox::Value testAquetiTools(bool testSubmodules, bool printFlag, bool assertF
                 std::cout << "TaskManager failed to pass!" << std::endl;
                 pass = pass && false;
             }
-        }
+        } else if( !it->compare("StringTools")) {
+            std::cout << "Testing StringTools..." <<std::endl;
+            jsonValue = atl::testStringTools();
+            jsonUnits["StringTools"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            
+            if (jsonValue["pass"].getBoolean()) {
+                std::cout << "StringTools passed successfully!" << std::endl;
+                pass = pass && true;
+            } else {
+                std::cout << "StringTools failed to pass!" << std::endl;
+                pass = pass && false;
+            }
+        } 
     }
 
     //get pass

@@ -4,7 +4,7 @@
 
 #include "AquetiToolsTest.h"
 
-std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager"}; //!< List of units that tests must be run on 
+std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager", "StringTools"}; //!< List of units that tests must be run on 
 
 /**
  * \brief prints out help to user
@@ -23,9 +23,11 @@ bool printHelp(void)
     std::cout << "\t-n         indicates that output should not be inserted into database" << std::endl;
     std::cout << "\t-s         indicates submodules are not to be tested" << std::endl;
     //std::cout << "\t--version prints ATL version information\n"<< std::endl;
-    std::cout << "Method names to follow t are: Timer, Thread, "
-         << "MultiThread, ThreadPool, TaskManager, TSQueue, "
-         << "TSMap, " << std::endl;
+    std::cout << "Method names to follow t are:\n";
+    for( auto it = unitList.begin(); it != unitList.end(); ++it ) {
+       std::cout << "\t"<<*it<<"\n";
+    }
+
     std::cout << std::endl;
     return 1;
 }

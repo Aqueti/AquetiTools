@@ -176,6 +176,13 @@ list( APPEND ATOOL_HEADERS
    DataTypes/TSQueue.tcc
 )
 
+include_directories( Tools ) 
+set( Tools_SRC
+   Tools/StringTools.cpp
+)
+list( APPEND ATOOL_HEADERS 
+   Tools/StringTools.h
+)
 
 include_directories( Mutex )
 set( Mutex_SRC
@@ -190,6 +197,7 @@ add_library( AquetiTools STATIC
    ${Thread_SRC}
    ${Mutex_SRC}
    ${DataTypes_SRC}
+   ${Tools_SRC}
 )
 
 target_link_libraries( AquetiTools
@@ -211,6 +219,7 @@ if(BUILD_TESTS)
       test/TSQueueTest.cpp
       test/TSMapTest.cpp
       test/TaskManagerTest.cpp
+      test/StringToolsTest.cpp
    )
    target_link_libraries( AquetiTools_test
       AquetiTools
