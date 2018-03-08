@@ -200,12 +200,23 @@ list(APPEND ATOOL_HEADERS
    Mutex/shared_mutex.h
 )
 
+
+include_directories( IDGenerator )
+set( IDGenerator_SRC
+    IDGenerator/IDGenerator.cpp
+)
+list( APPEND ATOOL_HEADERS
+    IDGenerator/IDGenerator.hpp
+)
+
+
 add_library( AquetiTools STATIC  
    ${Timer_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
    ${DataTypes_SRC}
    ${Tools_SRC}
+   ${IDGenerator_SRC}
 )
 
 target_link_libraries( AquetiTools
