@@ -5,27 +5,3 @@
     ignore = dirty
     branch = none
     update = none
-<<<<<<< HEAD
-=======
-[submodule "dependencies/mongo-cxx-driver"]
-	path = dependencies/mongo-cxx-driver
-	url = https://github.com/mongodb/mongo-cxx-driver
-    fetchRecurseSubmodules = false
-    ignore = dirty
-    branch = none
-    update = none
-[submodule "dependencies/mongo-c-driver"]
-	path = dependencies/mongo-c-driver
-	url = https://github.com/mongodb/mongo-c-driver
-    fetchRecurseSubmodules = false
-    ignore = dirty
-    branch = none
-    update = none
-[submodule "dependencies/libbson"]
-	path = dependencies/libbson
-	url = https://github.com/mongodb/libbson
-    fetchRecurseSubmodules = false
-    ignore = dirty
-    branch = none
-    update = none
->>>>>>> 30ed7e8ae6df9b6333f5ca7b62caae3f322760f5
