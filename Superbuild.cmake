@@ -40,8 +40,6 @@ macro(add_external_project MYNAME LOCATION MASTER DEPENDS ARGS)
     )
 endmacro(add_external_project)
 
-add_external_project(mongoAPI dependencies/mongoAPI OFF "JsonBox;MongoCXX" "")
-
 if( USE_SUPERBUILD ) 
    add_external_project(JsonBox dependencies/JsonBox OFF "" "")
 endif()
