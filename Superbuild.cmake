@@ -40,37 +40,20 @@ macro(add_external_project MYNAME LOCATION MASTER DEPENDS ARGS)
     )
 endmacro(add_external_project)
 
-#set(MONGOC_ARGS
-#    -DENABLE_TESTS:BOOL=OFF
-#    -DENABLE_EXAMPLES:BOOL=OFF
-#    -DENABLE_SASL:BOOL=OFF
-#)
-#set(MONGOCXX_ARGS
-#    -DLIBMONGOC_DIR=${CMAKE_BINARY_DIR}/INSTALL
-#    -DLIBBSON_DIR=${CMAKE_BINARY_DIR}/INSTALL
-#    -DCMAKE_PREFIX_PATH:PATH=${CMAKE_BINARY_DIR}/INSTALL
-#)
-#set(BSON_ARGS
-#    -DENABLE_TESTS:BOOL=OFF
-#)
-#
-#add_external_project(libbson dependencies/libbson OFF "" "${BSON_ARGS}")
-#add_external_project(MongoC dependencies/mongo-c-driver OFF "libbson" "${MONGOC_ARGS}")
-#add_external_project(MongoCXX dependencies/mongo-cxx-driver OFF "MongoC;libbson" "${MONGOCXX_ARGS}")
-#add_external_project(JsonBox dependencies/JsonBox OFF "" "")
-#add_external_project(mongoAPI dependencies/mongoAPI OFF "JsonBox;MongoCXX" "")
+add_external_project(mongoAPI dependencies/mongoAPI OFF "JsonBox;MongoCXX" "")
 
 if( USE_SUPERBUILD ) 
    add_external_project(JsonBox dependencies/JsonBox OFF "" "")
 endif()
 
-#ATL
+#AquetiTools
+#This depedns on JsonBox only if JsonBox is defined
 ExternalProject_Add(AquetiTools
   SOURCE_DIR ${CMAKE_SOURCE_DIR}
   BUILD_ALWAYS 1
   CMAKE_ARGS ${cmake_common_args} 
   INSTALL_DIR ${CMAKE_BINARY_DIR}/INSTALL
   LOG_INSTALL 1
-  DEPENDS JsonBox submodule_init 
+  DEPENDS JsonBox submodule_init
 )
 

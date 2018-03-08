@@ -149,10 +149,10 @@ JsonBox::Value testAquetiTools(bool testSubmodules, bool printFlag, bool assertF
         } else if (!it->compare("TaskManager")) {
             std::cout << "Testing TaskManager..." <<std::endl;
             if(valgrind){
-                jsonValue = atl::testTaskManager(50);
+                jsonValue = atl::testTaskManager(50, printFlag, assertFlag, valgrind);
             } 
             else {
-                jsonValue = atl::testTaskManager();
+                jsonValue = atl::testTaskManager(1000, printFlag, assertFlag, valgrind);
             }
             jsonUnits["TaskManager"] = jsonValue;
             jsonReturn["units"] = jsonUnits;

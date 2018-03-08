@@ -19,25 +19,16 @@ JsonBox::Value testThread(bool printFlag)
         std::cout << "Test Stop function" << std::endl;
     }
 
-    cThread.Start(NULL);
+    cThread.Start();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     cThread.Stop();
     cThread.Join();
 
-    if (printFlag) {
-        std::cout << "Test running flag" << std::endl;
-    }
-
-    static bool running = true;
-    cThread.Start(&running);
+    cThread.Start();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    if (printFlag) {
-        std::cout << "Running being set to false!" << std::endl;
-    }
-
     //Test join
-    running = false;
+    cThread.Stop();
     rc = cThread.Join();
 
     if (!rc) {
@@ -57,7 +48,6 @@ JsonBox::Value testThread(bool printFlag)
 
     //Vector tests (timed)
     size_t threadCount = 50;
-    running = true;
     std::vector<Thread> threadVect(threadCount);
 
     if (printFlag) {
@@ -66,25 +56,25 @@ JsonBox::Value testThread(bool printFlag)
 
     //Spawn threadCount threads
     for (uint16_t i = 0; i < threadCount; i++) {
-        threadVect[i].Start(&running);
+        threadVect[i].Start();
     }
 
-    //Stop running
-    running = false;
 
     //Join all
     for (uint16_t i = 0; i < threadCount; i++) {
+        threadVect[i].Stop();
         threadVect[i].Join();
     }
 
     //ReSpawn threadCount threads
     for (uint16_t i = 0; i < threadCount; i++) {
-        threadVect[i].Start(&running);
+        threadVect[i].Start();
     }
 
     //Stop threadCount threads
     for (unsigned int i = 0; i < threadCount; i++) {
         threadVect[i].Stop();
+        threadVect[i].Join();
     }
 
     if (resultString["pass"] == false) {

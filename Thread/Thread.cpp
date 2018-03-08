@@ -18,6 +18,8 @@ std::ofstream threadTest;
 namespace atl
 {
 
+Thread::Thread() : m_running(false) {}
+
 /**
  * \brief  Destructor
  *
@@ -26,7 +28,7 @@ namespace atl
  **/
 Thread::~Thread()
 {
-    Stop();
+    Thread::Stop();
     Thread::Join();
 }
 
@@ -36,20 +38,19 @@ Thread::~Thread()
  * \param [in] runFlag boolean pointer to terminate thread execution
  * \return std::thread object for this threads
  **/
-bool Thread::Start( bool* runFlag )
+bool Thread::Start()
 {
-    if( (m_running && *m_running) || m_threadObj.joinable() ) {
+    bool running = false;
+    m_running.compare_exchange_strong(running, true);
+
+    if(running) {
         std::cerr << "WARNING: Thread threadObject already running" << std::endl;
         return false;
     }
 
-    if(!runFlag) {
-        m_deletePtr = true;
-        m_running = new bool(true);
-    } else {
-        m_running = runFlag;
+    if(m_threadObj.joinable()) {
+        Join();
     }
-
     m_threadObj = std::thread([this] {Execute();});
     return true;
 }
@@ -75,7 +76,7 @@ void Thread::Execute()
  **/
 void Thread::mainLoop(void)
 {
-    threadTest << m_threadObj.get_id() <<": Thread mainLoop"<<std::endl;
+    threadTest << std::this_thread::get_id() <<": Thread mainLoop"<<std::endl;
     std::cerr << "WARNING: thread mainLoop method not overridden" << std::endl;
     sleep(1);
 }
@@ -87,12 +88,12 @@ void Thread::mainLoop(void)
  **/
 bool Thread::Detach()
 {
-    if( !m_threadObj.joinable() || m_threadObj.get_id() == std::this_thread::get_id()) { //Don't join yourself!
+    try {
+        m_threadObj.detach();
+    } catch (const std::system_error& e) {
+        std::cerr << "Warning: Join could not detach: " << e.what() << std::endl;
         return false;
     }
-
-    m_threadObj.detach();
-
     return true;
 }
 
@@ -103,18 +104,34 @@ bool Thread::Detach()
  **/
 bool Thread::Join()
 {
-    if( m_threadObj.joinable() && m_threadObj.get_id() != std::this_thread::get_id()) { //Don't join yourself!
+    bool rc = true;
+    try {
         m_threadObj.join();
+    } catch (const std::system_error& e) {
+        if(e.code() == std::errc::resource_deadlock_would_occur) {
+            std::cerr << "Warning: Can't join yourself!" << std::endl;
+            /*try {
+                m_threadObj.detach();
+            } catch (const std::system_error& e) {
+                std::cerr << "Warning: Join could not detach: " << e.what() << std::endl;
+                rc = false;
+            }*/
+        } else if(e.code() == std::errc::no_such_process) {
+            std::cerr << "Warning: Thread not valid: " << e.what() << std::endl;
+            rc = false;
+        } else if(e.code() == std::errc::invalid_argument) {
+            // this just means the thread isn't running
+            //std::cerr << "Warning: Thread not joinable: " << e.what() << std::endl;
+            //std::cerr << "joinable: " << std::boolalpha << m_threadObj.joinable() << std::endl;
+            rc = false;
+        } else {
+            std::cerr << "Warning: Unknown thread error occurred: " << e.what() << std::endl;
+            rc = false;
+        }
     }
 
-    std::unique_lock<std::mutex> guard (m_threadMutex);
-    if(m_deletePtr && m_running) {
-        delete m_running;
-        m_running = nullptr;
-    }
-    m_deletePtr = false;
-
-    return true;
+    // no need to set running false.  If joined, must be false
+    return rc;
 }
 
 /**
@@ -122,10 +139,7 @@ bool Thread::Join()
  **/
 void Thread::Stop()
 {
-    std::lock_guard<std::mutex> guard (m_threadMutex);
-    if(m_running) {
-        *m_running = false;
-    }
+    m_running = false;
 }
 
 /**
@@ -133,12 +147,7 @@ void Thread::Stop()
  */
 bool Thread::isRunning()
 {
-    std::lock_guard<std::mutex> guard (m_threadMutex);
-    if(m_running) {
-        return *m_running;
-    } else {
-        return false;
-    }
+    return m_running;
 }
 }
 

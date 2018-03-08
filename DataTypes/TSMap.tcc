@@ -40,6 +40,8 @@ namespace atl
             std::pair<Value, bool>  find(Key k) const;
             std::pair<Value, bool>  lower_bound(Key k) const;
             std::pair<std::pair<Key,Value>, bool> lower_bound_key(Key k) const;
+            std::pair<Value, bool>  findInfimum(Key k) const;
+            std::pair<std::pair<Key,Value>, bool>  findInfimum_key(Key k) const;
             size_t                  size() const;
             bool                    empty() const;
             std::vector<Key>        getKeyList() const;
@@ -131,6 +133,62 @@ namespace atl
         return std::make_pair(std::make_pair(Key{}, Value{}), false);
     }
     
+    /**
+     * \brief Returns the Value corresponding to the greatest key 
+     *        less than or equal to the given key
+     * \param k The Key to search for
+     * \return A std::pair of a Value and a bool. The Value is the return
+     *         Value, if found. The bool is true if a Value is found, 
+     *         else false if none is found
+     **/
+    template<typename Key,typename Value> 
+            std::pair<Value,bool> TSMap<Key,Value>::findInfimum(Key k) const
+    {
+        atl::shared_lock lock(m_mutex);
+        auto it = m_map.lower_bound(k);
+
+        // If the iterator has the same key, return its value
+        if( it != m_map.end() && it->first == k ){
+            return std::make_pair(it->second, true);
+        } 
+        // Else if the iterator is the first element, then either the map 
+        // is empty or the first element is greater than the search key
+        else if( it == m_map.begin() ){
+            return std::make_pair(Value{}, false);
+        } else{ // else, we decrement the iterator and return its value
+            it--;
+            return std::make_pair(it->second, true);
+        }
+    }
+
+    /**
+     * \brief Returns the Value corresponding to the greatest key 
+     *        less than or equal to the given key
+     * \param k The Key to search for
+     * \return A std::pair of a Value and a bool. The Value is the return
+     *         Value, if found. The bool is true if a Value is found, 
+     *         else false if none is found
+     **/
+    template<typename Key,typename Value> 
+            std::pair<std::pair<Key,Value>,bool> TSMap<Key,Value>::findInfimum_key(Key k) const
+    {
+        atl::shared_lock lock(m_mutex);
+        auto it = m_map.lower_bound(k);
+
+        // If the iterator has the same key, return its value
+        if( it != m_map.end() && it->first == k ){
+            return std::make_pair(std::make_pair(it->first,it->second), true);
+        } 
+        // Else if the iterator is the first element, then either the map 
+        // is empty or the first element is greater than the search key
+        else if( it == m_map.begin() ){
+            return std::make_pair(std::make_pair(Key{},Value{}), false);
+        } else{ // else, we decrement the iterator and return its value
+            it--;
+            return std::make_pair(std::make_pair(it->first,it->second), true);
+        }
+    }
+
     /*
      * \brief returns the number of entries in the map
      */
@@ -179,7 +237,7 @@ namespace atl
     template<typename Key, typename Value> bool TSMap<Key, Value>::
             emplace(Key k, Value v, bool force)
     {
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
 
         if (!force && m_map.find(k) != m_map.end()) {
             return false;
@@ -200,7 +258,7 @@ namespace atl
     template<typename... Args> bool TSMap<Key,Value>::
         createInPlace(Key k, Args... args)
     {
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
         auto ret = m_map.emplace(std::piecewise_construct,
                                   std::forward_as_tuple(k),
                                   std::forward_as_tuple(args...));
@@ -222,7 +280,7 @@ namespace atl
     template<typename Key, typename Value> std::pair<Value,bool> TSMap<Key, Value>::
             replace(Key k, Value v, bool force)
     {
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
         Value newVal = v;
         auto it = m_map.emplace(k, newVal);
 
@@ -246,7 +304,7 @@ namespace atl
     template<typename Key, typename Value> bool TSMap<Key, Value>::
             erase(Key k, std::function<bool(Key,Value&)> f)
     {
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
         auto it = m_map.find(k);
 
         if (it == m_map.end()){
@@ -270,7 +328,7 @@ namespace atl
     template<typename Key, typename Value> std::pair<Value, bool> TSMap<Key, Value>::
             remove(Key k)
     {
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
         auto it = m_map.find(k);
 
         if (it != m_map.end()) {
@@ -292,7 +350,7 @@ namespace atl
     template<typename Key, typename Value> bool TSMap<Key, Value>::
     perform(Key k, std::function<bool(Key,Value&)> f)
     {
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
         auto it = m_map.find(k);
 
         if (it == m_map.end() || !f) {
@@ -328,7 +386,7 @@ namespace atl
     template<typename Key, typename Value> void TSMap<Key, Value>::
             clear()
     {
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
         m_map.clear();
     }
 
@@ -369,7 +427,7 @@ namespace atl
             for_each(std::function<bool(Key k, Value& v)> f)
     {
         size_t numSuccess = 0;
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
 
         for (auto it = m_map.begin(); it != m_map.end(); it++) {
             if (f(it->first, it->second)){
@@ -391,7 +449,7 @@ namespace atl
             delete_if(std::function<bool(Key k, Value& v)> f)
     {
         size_t numErased = 0;
-        std::unique_lock<atl::shared_mutex> lock(m_mutex);
+        std::lock_guard<atl::shared_mutex> lock(m_mutex);
 
         for (auto it = m_map.begin(); it != m_map.end(); ) {
             if (f(it->first, it->second)) {

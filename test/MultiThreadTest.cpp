@@ -25,22 +25,12 @@ JsonBox::Value testMultiThread(bool printFlag)
     mThread.Start();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mThread.Stop();
-    mThread.Join();
-
-    if (printFlag) {
-        std::cout << "Test running flag" << std::endl;
-    }
-
-    static bool running = true;
-    mThread.Start(&running);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    if (printFlag) {
-        std::cout << "Running being set to false!" << std::endl;
-    }
-
-    running = false;
     rc = mThread.Join();
+
+    mThread.Start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    mThread.Stop();
+    rc = mThread.Join() && rc;
 
     if (!rc) {
         if (printFlag) {
@@ -59,7 +49,6 @@ JsonBox::Value testMultiThread(bool printFlag)
 
     //Vector tests (timed)
     size_t threadCount = 50;
-    running = true;
     std::vector<Thread> threadVect(threadCount);
 
     if (resultString["pass"] == false) {

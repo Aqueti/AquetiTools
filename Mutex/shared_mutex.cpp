@@ -4,24 +4,30 @@
 
 #include "shared_mutex.h"
 
+#ifdef USE_HELGRIND
+#include "helgrind.h"
+#endif //USE_HELGRIND
+
 namespace atl
 {
 
-    //shared_mutex::~shared_mutex()
-    //{
-        //writer = false;
-        //readers = 0;
-        //m_cv.notify_all();
-        //m_read.unlock();
-        //m_mutex.unlock();
-    //}
+    shared_mutex::~shared_mutex()
+    {
+#ifdef USE_HELGRIND
+        // Use Readers as unique ID so it's not a mutex
+        ANNOTATE_RWLOCK_DESTROY(this);
+#endif //USE_HELGRIND
+    }
 
     /**
      * Constructor
      */
-    shared_mutex::shared_mutex()
+    shared_mutex::shared_mutex(): readers(0)
     {
-      readers = 0;
+#ifdef USE_HELGRIND
+        // Due to virtual destructor, this should be a VTable pointer
+        ANNOTATE_RWLOCK_CREATE(this);
+#endif //USE_HELGRIND
     }
 
     /**
@@ -30,10 +36,9 @@ namespace atl
     void shared_mutex::lock()
     {
         m_mutex.lock();
-
-        //std::unique_lock<std::mutex> lock( m_mutex );
-        //m_cv.wait( lock, [&]{ return !writer && !readers; } );
-        //writer = true;
+#ifdef USE_HELGRIND
+        ANNOTATE_RWLOCK_ACQUIRED(this, 1);
+#endif //USE_HELGRIND
     }
 
     /**
@@ -43,7 +48,13 @@ namespace atl
      */
     bool shared_mutex::try_lock()
     {
-        return m_mutex.try_lock();
+        bool locked = m_mutex.try_lock();
+#ifdef USE_HELGRIND
+        if(locked) {
+            ANNOTATE_RWLOCK_ACQUIRED(this, 1);
+        }
+#endif //USE_HELGRIND
+        return locked;
     }
 
     /**
@@ -51,26 +62,24 @@ namespace atl
      */
     void shared_mutex::unlock()
     {
+#ifdef USE_HELGRIND
+        ANNOTATE_RWLOCK_RELEASED(this, 1);
+#endif //USE_HELGRIND
         m_mutex.unlock();
-
-        //std::unique_lock<std::mutex> lock( m_mutex );
-        //writer = false;
-        //m_cv.notify_all();
     }
 
     /**
      * Checks if a lock is in place
-     */
+        */
     void shared_mutex::lock_shared()
     {
         m_read.lock();
         readers++;
         if( readers == 1 ) m_mutex.lock();
         m_read.unlock();
-
-        //std::unique_lock<std::mutex> lock( m_mutex );
-        //m_cv.wait( lock, [&]{ return !writer; } );
-        //readers++;
+#ifdef USE_HELGRIND
+        ANNOTATE_RWLOCK_ACQUIRED(this, 0);
+#endif //USE_HELGRIND
     }
 
     /**
@@ -90,6 +99,11 @@ namespace atl
             }
         }
         m_read.unlock();
+#ifdef USE_HELGRIND
+        if(rc) {
+            ANNOTATE_RWLOCK_ACQUIRED(this, 0);
+        }
+#endif //USE_HELGRIND
         return rc;
     }
 
@@ -98,14 +112,13 @@ namespace atl
      */
     void shared_mutex::unlock_shared()
     {
+#ifdef USE_HELGRIND
+        ANNOTATE_RWLOCK_RELEASED(this, 0);
+#endif //USE_HELGRIND
         m_read.lock();
         readers--;
         if( !readers ) m_mutex.unlock();
         m_read.unlock();
-
-        //std::unique_lock<std::mutex> lock( m_mutex );
-        //readers--;
-        //m_cv.notify_all();
     }
 
 

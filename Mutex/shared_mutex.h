@@ -4,7 +4,6 @@
 
 #pragma once
 
-//#include <condition_variable>
 #include <mutex>
 #include <atomic>
 
@@ -24,6 +23,7 @@ namespace atl
 
         public:
             shared_mutex();
+            virtual ~shared_mutex();
             shared_mutex( const shared_mutex& other ) = delete;
             shared_mutex& operator=( const shared_mutex& ) = delete;
             void lock(); 
