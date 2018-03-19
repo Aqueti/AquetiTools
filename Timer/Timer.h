@@ -76,7 +76,7 @@ class Timer
 {
 private:
     double  m_startTime = 0;                 //!< reference time point
-//        double  m_stopTime = 0;                  //!< preallocated current time
+    double  m_stopTime = 0;                  //!< preallocated current time
     int64_t m_timeCodeOffset = 0;            //!< offset from system time to global timecode
     double  m_fps=30;                        //!< Number of frames per second a
 
@@ -90,6 +90,8 @@ public:
     double      getFPS(void);
 
     void        start();
+    void        stop();
+    void        reset();
     double      elapsed();
 };
 
