@@ -17,6 +17,7 @@
 #include <fstream>
 #include <string.h>
 #include <TSQueue.tcc>
+#include <FileIO.h>
 #include "ThreadPool.h"
 #include "TaskManager.tcc"
 #include <assert.h>
@@ -43,7 +44,7 @@ JsonBox::Value testAquetiTools( bool testSubmodules = true
                               , bool assertFlag = false
                               , bool valgrind = false
                               , std::vector<std::string> unitList = {"Timer", "Thread", "MultiThread", "ThreadPool", 
-	"LruCache", "TSMap", "TSQueue", "TaskManager", "StringTools"});
+	"LruCache", "TSMap", "TSQueue", "TaskManager", "StringTools", "FileIO"});
 
 /**
  * Runs the tests for Timer
@@ -127,4 +128,5 @@ JsonBox::Value testTaskManager(int threads = 1000, bool printFlag = true, bool a
  */
 JsonBox::Value testStringTools(bool printFlag = false, bool assertFlag = false ); 
 
+JsonBox::Value testFileIO( bool printFlag = false, bool assertFlag = false ); 
 }

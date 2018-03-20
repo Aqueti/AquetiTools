@@ -177,6 +177,19 @@ JsonBox::Value testAquetiTools(bool testSubmodules, bool printFlag, bool assertF
                 std::cout << "StringTools failed to pass!" << std::endl;
                 pass = pass && false;
             }
+        } else if( !it->compare("FileIO")) {
+            std::cout << "Testing FileIO..." <<std::endl;
+            jsonValue = atl::testFileIO();
+            jsonUnits["FileIO"] = jsonValue;
+            jsonReturn["units"] = jsonUnits;
+            
+            if (jsonValue["pass"].getBoolean()) {
+                std::cout << "FileIO passed successfully!" << std::endl;
+                pass = pass && true;
+            } else {
+                std::cout << "FileIO failed to pass!" << std::endl;
+                pass = pass && false;
+            }
         } 
     }
 
@@ -184,5 +197,4 @@ JsonBox::Value testAquetiTools(bool testSubmodules, bool printFlag, bool assertF
     jsonReturn["pass"] = pass;
     return jsonReturn;
 }
-
 }

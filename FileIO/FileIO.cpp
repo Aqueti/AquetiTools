@@ -12,9 +12,10 @@
 #include <iostream>
 #include <string>
 
-#pragma once
 
-namespace atl::filesystem
+namespace atl
+{
+namespace filesystem
 {
   /**
    * \brief Creates a directory with the specified path
@@ -23,7 +24,7 @@ namespace atl::filesystem
    **/
    bool     create_directory( std::string dirname )
    {
-      int irc =  mkdir( p,  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+      int irc =  mkdir( dirname.c_str(),  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
       switch( irc )   
       {
@@ -84,8 +85,12 @@ namespace atl::filesystem
 
       //Open all the directories and recursively call this function
       if(( dir = opendir(name.c_str())) != NULL ) {
-         while((ent  readdir(dir)) != NULL ) {
-            count += remove_all( ent->dname);
+         while((ent=readdir(dir)) != NULL ) {
+            std::string name = ent->d_name;
+            if((( name.compare("."))&&(name.compare(".."))))
+            {
+               count += remove_all( ent->d_name);
+            }
          }
       }
 
@@ -103,6 +108,10 @@ namespace atl::filesystem
    **/
    std::string currentPath()
    {
-      return getcwd();
+      char name[PATH_MAX];
+      char * result = getcwd(name, PATH_MAX);
+
+      return std::string( result );
    }
+}
 }

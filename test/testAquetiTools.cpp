@@ -4,7 +4,7 @@
 
 #include "AquetiToolsTest.h"
 
-std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager", "StringTools"}; //!< List of units that tests must be run on 
+std::vector<std::string> unitList{"Timer", "CRC", "Thread", "MultiThread", "ThreadPool", "LruCache", "TSMap", "TSQueue", "TaskManager", "StringTools", "FileIO"}; //!< List of units that tests must be run on 
 
 /**
  * \brief prints out help to user

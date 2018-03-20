@@ -209,6 +209,13 @@ list( APPEND ATOOL_HEADERS
     IDGenerator/IDGenerator.hpp
 )
 
+include_directories( FileIO )
+set( FileIO_SRC
+   FileIO/FileIO.cpp
+)
+list( APPEND ATOOL_HEADERS
+   FileIO/FileIO.h
+)
 
 add_library( AquetiTools STATIC  
    ${Timer_SRC}
@@ -217,6 +224,7 @@ add_library( AquetiTools STATIC
    ${DataTypes_SRC}
    ${Tools_SRC}
    ${IDGenerator_SRC}
+   ${FileIO_SRC}
 )
 
 target_link_libraries( AquetiTools
@@ -239,6 +247,7 @@ if(BUILD_TESTS)
       test/TSMapTest.cpp
       test/TaskManagerTest.cpp
       test/StringToolsTest.cpp
+      test/FileIOTest.cpp
    )
    target_link_libraries( AquetiTools_test
       AquetiTools
