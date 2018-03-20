@@ -8,9 +8,10 @@
 #include <stdio.h>
 
 #include <dirent.h>
-
 #include <iostream>
 #include <string>
+
+#include "FileIO.h"
 
 
 namespace atl
@@ -60,10 +61,18 @@ namespace filesystem
    **/
    bool remove( std::string name)
    {
-      int irc = rmdir( name.c_str());
-      if( irc ) {
-         std::cerr << "Failed to remove file or directory: "<<name<<std::endl;
-         return false;
+      if( is_directory( name )) {
+         int irc = rmdir( name.c_str());
+         if( irc ) {
+            std::cerr << "Failed to directory: "<<name<<std::endl;
+            return false;
+         }
+      }
+      else {
+         if( remove( name.c_str())) {
+            std::cerr << "Failed to remove file: "<<name<<std::endl;
+            return false;
+         }
       }
 
       return true;
@@ -82,23 +91,34 @@ namespace filesystem
       uint64_t count = 0;
       DIR * dir;
       struct dirent * ent = NULL;
+     
+      std::cout << "Remove_all: "<<name<<std::endl;
 
-      //Open all the directories and recursively call this function
+
+      //Recursively call this function on all directories except the current
+      //and it's parent
       if(( dir = opendir(name.c_str())) != NULL ) {
          while((ent=readdir(dir)) != NULL ) {
-            std::string name = ent->d_name;
-            if((( name.compare("."))&&(name.compare(".."))))
+            std::string item= ent->d_name;
+            if((( item.compare("."))&&(item.compare(".."))))
             {
-               count += remove_all( ent->d_name);
+               std::string itemName = name;
+               itemName.append("/");
+               itemName.append(item);
+
+               if( is_directory( itemName.c_str())) {
+                  count += remove_all( itemName.c_str());
+               } 
+               else {  
+                  ::remove( itemName.c_str());
+               }
             }
          }
       }
 
       closedir( dir ) ;
 
-      std::cout << "Removing: "<<name <<std::endl;
-      count++;
-//      count += remove( name );
+      count += remove( name );
       return count;
    }
 
@@ -106,12 +126,48 @@ namespace filesystem
    * \brief determine current path
    * \return Current working path
    **/
-   std::string currentPath()
+   std::string current_path()
    {
       char name[PATH_MAX];
       char * result = getcwd(name, PATH_MAX);
 
       return std::string( result );
+   }
+
+  /**
+   * \brief Changes the current working path
+   * \return true on success, false on failure
+   **/
+   bool current_path( std::string newPath)
+   {
+      bool rc = true;
+
+      int irc = chdir( newPath.c_str());
+      if( irc != 0 ) 
+      {
+         std::cout << "Unable to change directory to "<<newPath<<" with code: "<<irc<<std::endl;
+         rc = false;
+      }
+
+      return rc;
+   }
+
+  /**
+   * \brief Checks if a file is a directorys
+   * \param [in] name name of file to check
+   * \return true if the the file is a directory, false otherwise
+   **/
+   bool is_directory( std::string name )
+   {
+      struct stat s;
+
+      if( stat( name.c_str(), &s) == 0 ) {
+         if( s.st_mode & S_IFDIR ) {
+            return true;
+         }
+      }
+
+      return false;
    }
 }
 }
