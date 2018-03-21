@@ -1,4 +1,6 @@
 #include "StringTools.h"
+#include <sstream>
+#include <iomanip>
 
 namespace atl
 {
@@ -23,4 +25,17 @@ namespace atl
 
       return resultVector;
    }
+
+
+ /**
+  * \brief Function that converts an integer to a string of given precision
+  **/
+  std::string intToString( uint64_t value, int width = 16 ) 
+  {
+     std::stringstream ss;
+     ss << std::setfill('0') << std::setw(width) << value;
+
+     return ss.str();
+  }
+
 }

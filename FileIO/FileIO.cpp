@@ -10,6 +10,8 @@
 #include <dirent.h>
 #include <iostream>
 #include <string>
+#include <vector>
+#include <StringTools.h>
 
 #include "FileIO.h"
 
@@ -61,16 +63,32 @@ namespace filesystem
    **/
    bool remove( std::string name)
    {
-      if( is_directory( name )) {
-         int irc = rmdir( name.c_str());
-         if( irc ) {
-            std::cerr << "Failed to directory: "<<name<<std::endl;
+      //Break name into a array
+      std::vector<std::string> pathVect = atl::stringParser(name, "/");
+      
+      std::string newPath = "";
+      for( uint64_t i = 0; i < pathVect.size(); i++ ) {
+         newPath.append( pathVect[i]);
+         if( !exists(newPath)) {
+            std::cout << newPath <<" does not exist. Unable to remove "<<name<<std::endl;
             return false;
          }
+         if( is_directory(newPath)) {
+            newPath.append("/");
+         }
       }
+
+      if( is_directory( newPath )) {
+         int irc = rmdir( name.c_str());
+         if( irc ) {
+            std::cerr << "Failed to remove directory: "<<newPath<<std::endl;
+            return false;
+         }
+      } 
       else {
-         if( remove( name.c_str())) {
-            std::cerr << "Failed to remove file: "<<name<<std::endl;
+         std::cout << "Removing file: "<<newPath<<std::endl;
+         if( ::remove( newPath.c_str())) {
+            std::cerr << "Failed to remove file: "<<newPath<<std::endl;
             return false;
          }
       }
