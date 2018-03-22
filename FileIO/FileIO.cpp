@@ -92,9 +92,6 @@ namespace filesystem
       DIR * dir;
       struct dirent * ent = NULL;
      
-      std::cout << "Remove_all: "<<name<<std::endl;
-
-
       //Recursively call this function on all directories except the current
       //and it's parent
       if(( dir = opendir(name.c_str())) != NULL ) {
