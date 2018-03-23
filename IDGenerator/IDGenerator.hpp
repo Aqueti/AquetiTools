@@ -19,7 +19,7 @@ namespace atl {
 class IDGenerator
 {
     public:
-        static std::string genAlphanumericString(int len=8);
+        static std::string genAlphanumericString(unsigned int len=8);
 };
 
 }//end namespace atl

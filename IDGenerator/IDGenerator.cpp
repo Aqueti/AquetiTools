@@ -15,7 +15,7 @@
 
 namespace atl {
 
-std::string IDGenerator::genAlphanumericString(int len)
+std::string IDGenerator::genAlphanumericString(unsigned int len)
 {
     std::string alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     std::uniform_int_distribution<int> d(0, alphabet.size() - 1);
