@@ -86,7 +86,6 @@ namespace filesystem
          }
       } 
       else {
-         std::cout << "Removing file: "<<newPath<<std::endl;
          if( ::remove( newPath.c_str())) {
             std::cerr << "Failed to remove file: "<<newPath<<std::endl;
             return false;
