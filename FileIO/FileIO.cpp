@@ -5,6 +5,7 @@
 //Unix specific includes
 #include <unistd.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <stdio.h>
 
 #include <dirent.h>
@@ -182,6 +183,25 @@ namespace filesystem
       }
 
       return false;
+   }
+
+  /**
+   * \brief gets disk information for the current directory
+   * \param [in] path directory to check
+   **/
+   space_info space( std::string path )
+   {
+      struct statvfs stat;
+
+      space_info si;
+
+      int rc =  statvfs( path.c_str(), &stat );
+      if( rc  == 0 ) {
+         si.capacity  = stat.f_bsize * stat.f_blocks;
+         si.free      = stat.f_bsize * stat.f_bfree;
+         si.available = si.capacity - si.free;
+      }
+      return si;
    }
 }
 }

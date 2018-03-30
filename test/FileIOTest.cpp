@@ -90,7 +90,10 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
       rc = false;
    }
 
- 
+   //check drive space
+   atl::filesystem::space_info si = atl::filesystem::space("test");
+   std::cout << "SI:"<<dir1<<" capacity:"<<si.capacity<<", free: "<<si.free<<", avail:"<<si.available<<std::endl;
+
    //Only remove directories if all is good. Otherwise, could delete valuable things
    if( rc) 
    {
@@ -107,6 +110,9 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
         rc = false;
      }
    }
+
+   std::cout << "SI:"<<dir1<<" capacity:"<<si.capacity<<", free: "<<si.free<<", avail:"<<si.available<<std::endl;
+
 
    JsonBox::Value result;
    result["pass"].setBoolean(rc);
