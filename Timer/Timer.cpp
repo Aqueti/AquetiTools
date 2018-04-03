@@ -145,7 +145,7 @@ void Timer::reset()
 /**
  * \brief Function to determine the time elapsed since the timer was started
  *
- * @return The stop time minus the start time
+ * @return The stop time minus the start time (units are seconds as a double)
  */
 double Timer::elapsed()
 {
@@ -303,7 +303,7 @@ int64_t convertDoubleToTimeCode(double dTime, double fps)
 /**
  * Gets the current time as a double
  *
- * @return The double time
+ * @return The double time in seconds since the epoch
  */
 double getTime()
 {
