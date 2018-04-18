@@ -99,6 +99,8 @@ public:
 double      getTime();
 uint64_t    getUsecTime();
 uint64_t    getTimestamp();
+timeval     convertUsecTimeToTimeval(uint64_t t);
+uint64_t    convertTimevalToUsecTime(timeval tv);
 double      convertTimeValToDouble(timeval tv);
 SMPTETime   convertTimeValToSMPTE(timeval tv, double fps);
 timeval     convertDoubleToTimeVal(double dTime);
