@@ -34,7 +34,7 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
       std::cout << "Unexpected dir listing. Received "<<fileList.size()<<" items, not 1"<<std::endl;
       rc = false;
    }
-   else if( dir1.compare(fileList[0]))  {
+   else if( dir2.compare(fileList[0]))  {
       std::cout << "Expected test, Received:"<<std::endl;
       for(auto it : fileList ) {
          std::cout <<it<<std::endl; 
