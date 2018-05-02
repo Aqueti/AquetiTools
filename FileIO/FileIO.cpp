@@ -203,5 +203,49 @@ namespace filesystem
       }
       return si;
    }
+
+  /**
+   * \brief Returns a vector of items in a directory
+   * \param [in] name directory to get a file listing for
+   * \return vector of filenames
+   **/
+   std::vector<std::string> dir( std::string name, bool recurse ) 
+   {
+      std::vector<std::string> result;
+
+      //If the path is not a directory, nothing will be found
+      if( is_directory(name)) {
+
+         //Recurse through items in directory
+         DIR * dptr;
+         struct dirent * ent = NULL;
+   
+         if(( dptr = opendir(name.c_str())) != NULL ) {
+            while((ent=readdir(dptr)) != NULL ) {
+               std::string item= ent->d_name;
+               if( item.compare(".") && item.compare("..")) {
+
+                  std::string value = name;
+                  value.append("/");
+                  value.append(item);
+                  result.push_back(value);
+
+                  if( is_directory(value)) {
+
+                      if( recurse ) {
+                         std::vector<std::string> tempList = dir(value);
+                         result.insert(result.end(),tempList.begin(), tempList.end());
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      return result;
+   }
 }
+
+
+
 }

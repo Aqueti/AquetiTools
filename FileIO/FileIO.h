@@ -26,6 +26,8 @@ namespace filesystem
    bool     is_directory( std::string name );
    bool     current_path(std::string path);                //Set the current path
    std::string current_path();                             //Get the current path
+   std::vector<std::string>  dir( std::string path
+                                , bool recurse = false);   //Lists all files in the path
    space_info space( std::string path );
  
 }

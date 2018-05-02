@@ -16,7 +16,7 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
    std::string file1 = "test/test2/file1.txt";
    std::string rootPath = atl::filesystem::current_path();
 
-   std::cout << "Creating test directorys:\n\t -"<<dir1<<"\n\t -"<<dir2<<std::endl;
+   std::cout << "Creating test directories:\n\t "<<dir1<<"\n\t "<<dir2<<std::endl;
    atl::filesystem::create_directory(dir1);
    atl::filesystem::create_directory(dir2);
 
@@ -27,6 +27,27 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
    myfile.close();
 
    std::cout << "RootPath: "<<rootPath<<std::endl;
+
+   //List everything in dir1
+   std::vector<std::string> fileList = atl::filesystem::dir(dir1);
+   if( fileList.size() != 1 ) {
+      std::cout << "Unexpected dir listing. Received "<<fileList.size()<<" items, not 1"<<std::endl;
+      rc = false;
+   }
+   else if( dir1.compare(fileList[0]))  {
+      std::cout << "Expected test, Received:"<<std::endl;
+      for(auto it : fileList ) {
+         std::cout <<it<<std::endl; 
+      }
+      rc = false;
+   }
+
+
+   fileList = atl::filesystem::dir(dir1, true);
+   for( auto it : fileList ) {
+      std::cout << it <<std::endl;
+   }
+   
 
    //Got into subdir 1
    if( !atl::filesystem::current_path(dir1)) {
@@ -112,6 +133,9 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
    }
 
    std::cout << "SI:"<<dir1<<" capacity:"<<si.capacity<<", free: "<<si.free<<", avail:"<<si.available<<std::endl;
+
+
+
 
 
    JsonBox::Value result;
