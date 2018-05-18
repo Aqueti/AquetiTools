@@ -203,5 +203,26 @@ namespace filesystem
       }
       return si;
    }
+
+  /**
+   * \brief lists all files and directories in the given path
+   **/
+   std::vector<std::string>getFileList( std::string path )
+   {
+      std::vector<std::string> fileList;
+      DIR *dir;
+      struct dirent *ent;
+      if(( dir = opendir( path.c_str() != NULL ) {
+         while(( ent = readdir( dir)) != NULL ) {
+            fileList.push_back( ent->d_name );
+         }
+         closedir(dir);
+      }
+      else {
+         perror("");
+      }
+
+      return fileList;
+   }
 }
 }
