@@ -35,8 +35,8 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
 
    //Check for file1 before it's created
    int64_t sz = atl::filesystem::file_size( file1 );
-   if( sz != 19 ) {
-      std::cout << "FileIO::file_size failure. Size of "<<sz<<" not 19 " << std::endl;
+   if( sz != 21 ) {
+      std::cout << "FileIO::file_size failure. Size of "<<sz<<" not 21" << std::endl;
       rc = false;
    }
 

@@ -242,9 +242,10 @@ namespace filesystem
    std::vector<std::string>getFileList( std::string path )
    {
       std::vector<std::string> fileList;
-      DIR *dir;
+      DIR *dir = NULL;
       struct dirent *ent;
-      if(( dir = opendir( path.c_str() != NULL ) {
+      dir = opendir( path.c_str());
+      if( dir != NULL ) {
          while(( ent = readdir( dir)) != NULL ) {
             fileList.push_back( ent->d_name );
          }
