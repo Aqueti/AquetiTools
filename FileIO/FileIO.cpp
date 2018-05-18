@@ -256,5 +256,23 @@ namespace filesystem
 
       return fileList;
    }
+
+  /**
+   * \brief gets the size of the specified file
+   * \return returns the file size in bytes, -1 on error
+   **/
+   int64_t file_size( std::string filename )
+   {
+      //Check if the file exists
+      if( !exists(filename)) {
+         return -1;
+      }
+
+      struct stat stat_buf;
+      int rc = stat(filename.c_str(), &stat_buf );
+      return rc == 0 ? stat_buf.st_size : -1;
+      
+      
+   }
 }
 }

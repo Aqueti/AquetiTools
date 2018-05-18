@@ -24,6 +24,7 @@ namespace filesystem
    bool     exists( std::string name);
    bool     remove( std::string name);
    uint64_t remove_all( std::string name);
+   uint64_t file_size( std::string name );
    bool     is_directory( std::string name );
    bool     current_path(std::string path);
    std::vector<std::string>ls( std::string path );        
