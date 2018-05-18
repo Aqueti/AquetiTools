@@ -158,6 +158,29 @@ double Timer::elapsed()
    
 }
 
+
+/**
+ * \brief Converts microseconds since the epoch to a timeval struct
+ **/
+timeval convertUsecTimeToTimeval(uint64_t t)
+{
+    timeval tv;
+    tv.tv_sec = t / 1e6;
+    tv.tv_usec = t - tv.tv_sec*1e6;
+    return tv;
+}
+
+
+/**
+ * \brief Converts a timeval struct to microseconds since the epoch
+ **/
+uint64_t convertTimevalToUsecTime(timeval tv)
+{
+    uint64_t t = tv.tv_sec * 1e6;
+    t += tv.tv_usec;
+    return t;
+}
+
 /**
  * Function to convert a timeval struct to double
  *

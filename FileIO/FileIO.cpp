@@ -3,12 +3,17 @@
  **/
 
 //Unix specific includes
+#ifdef _WIN32
+#include <Windows.h>
+#include <direct.h>
+#else
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
-#include <stdio.h>
-
 #include <dirent.h>
+#endif
+
+#include <stdio.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -28,7 +33,11 @@ namespace filesystem
    **/
    bool     create_directory( std::string dirname )
    {
-      int irc =  mkdir( dirname.c_str(),  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#ifdef _WIN32
+     int irc = _mkdir(dirname.c_str());
+#else
+     int irc =  mkdir( dirname.c_str(),  S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+#endif
 
       switch( irc )   
       {
@@ -71,7 +80,7 @@ namespace filesystem
       for( uint64_t i = 0; i < pathVect.size(); i++ ) {
          newPath.append( pathVect[i]);
          if( !exists(newPath)) {
-            std::cout << newPath <<" does not exist. Unable to remove "<<name<<std::endl;
+            std::cerr << newPath <<" does not exist. Unable to remove "<<name<<std::endl;
             return false;
          }
          if( is_directory(newPath)) {
@@ -106,7 +115,10 @@ namespace filesystem
    **/
    uint64_t remove_all( std::string name) 
    {
-      uint64_t count = 0;
+     uint64_t count = 0;
+#ifdef _WIN32
+     std::cerr << "remove_all() not yet implemented on Windows" << std::endl;
+#else
       DIR * dir;
       struct dirent * ent = NULL;
      
@@ -134,6 +146,7 @@ namespace filesystem
       closedir( dir ) ;
 
       count += remove( name );
+#endif
       return count;
    }
 
@@ -143,10 +156,21 @@ namespace filesystem
    **/
    std::string current_path()
    {
+#ifdef _WIN32
+     // Get the length of the string, then allocate and read it.
+     DWORD len = GetCurrentDirectory(0, nullptr);
+     std::vector<char> result(len);
+     if (len != GetCurrentDirectory(len, result.data())) {
+       std::cerr << "Unable to get current directory" << std::endl;
+       return "";
+     }
+     return result.data();
+#else
       char name[PATH_MAX];
       char * result = getcwd(name, PATH_MAX);
 
       return std::string( result );
+#endif
    }
 
   /**
@@ -160,7 +184,7 @@ namespace filesystem
       int irc = chdir( newPath.c_str());
       if( irc != 0 ) 
       {
-         std::cout << "Unable to change directory to "<<newPath<<" with code: "<<irc<<std::endl;
+         std::cerr << "Unable to change directory to "<<newPath<<" with code: "<<irc<<std::endl;
          rc = false;
       }
 
@@ -191,9 +215,16 @@ namespace filesystem
    **/
    space_info space( std::string path )
    {
+     space_info si;
+#ifdef _WIN32
+     ULARGE_INTEGER available, capacity, free;
+     if (GetDiskFreeSpaceEx(path.c_str(), &available, &capacity, &free)) {
+       si.capacity = capacity.QuadPart;
+       si.free = free.QuadPart;
+       si.available = available.QuadPart;
+     };
+#else
       struct statvfs stat;
-
-      space_info si;
 
       int rc =  statvfs( path.c_str(), &stat );
       if( rc  == 0 ) {
@@ -201,6 +232,7 @@ namespace filesystem
          si.free      = stat.f_bsize * stat.f_bfree;
          si.available = si.capacity - si.free;
       }
+#endif
       return si;
    }
 
