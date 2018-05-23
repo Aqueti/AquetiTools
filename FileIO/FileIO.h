@@ -10,7 +10,7 @@ namespace atl
 namespace filesystem
 {
    #define MAX_PATH_LEN 2048                               //!<Maximum length for a file path
-   #define CREATE_DIRECTORY_TIMEOUT 0.5                    //!<Timeout for directory creation
+   const uint64_t CREATE_DIRECTORY_TIMEOUT=0.5;            //!<Timeout for directory creation
 
    //Structure that indicates available space
    struct space_info {
@@ -27,7 +27,7 @@ namespace filesystem
    int64_t  file_size( std::string name );
    bool     is_directory( std::string name );
    bool     current_path(std::string path);
-   std::vector<std::string>ls( std::string path );        
+   std::vector<std::string>getFileList( std::string path );        
    std::string current_path();                             
    space_info  space( std::string path );                 
 
