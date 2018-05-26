@@ -78,7 +78,11 @@ namespace filesystem
       
       std::string newPath = "";
       for( uint64_t i = 0; i < pathVect.size(); i++ ) {
-         newPath.append( pathVect[i]);
+         if( pathVect[i]=="" )  {
+            newPath.append("/");
+         } else {
+            newPath.append( pathVect[i]);
+         }
          if( !exists(newPath)) {
             std::cerr << newPath <<" does not exist. Unable to remove "<<name<<std::endl;
             return false;
