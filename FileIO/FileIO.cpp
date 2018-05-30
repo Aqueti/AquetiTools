@@ -279,5 +279,21 @@ namespace filesystem
       
       
    }
+
+  /**
+   * \brief Shows disk utilization for specified drive
+   **/
+   double getUtilization( std::string path )
+   {
+      double util = 0;
+      //Calculate the max utilization for each drive
+      filesystem::space_info si = filesystem::space( path );
+      if( si.capacity != 0 ) {
+         util = 1.0-(double)si.free / (double)si.capacity;
+      }
+
+      return util;
+
+   }
 }
 }
