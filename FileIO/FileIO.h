@@ -30,7 +30,7 @@ namespace filesystem
    std::vector<std::string>getFileList( std::string path );        
    std::string current_path();                             
    space_info  space( std::string path );                 
-
+   double      getUtilization( std::string path );
  
 }
 }
