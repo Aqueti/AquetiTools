@@ -442,7 +442,7 @@ namespace atl
      *        meets some condition
      * \param [in] f Function that takes Key, Value pair and returns 
      *        a boolean, applied to each element; If the function 
-     *        returns false on an element, the element is deleted
+     *        returns true on an element, the element is deleted
      * \return the number of entries deleted
      */
     template<typename Key, typename Value> size_t TSMap<Key, Value>::
