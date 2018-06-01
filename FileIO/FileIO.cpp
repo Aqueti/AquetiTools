@@ -78,7 +78,11 @@ namespace filesystem
       
       std::string newPath = "";
       for( uint64_t i = 0; i < pathVect.size(); i++ ) {
-         newPath.append( pathVect[i]);
+         if( pathVect[i]=="" )  {
+            newPath.append("/");
+         } else {
+            newPath.append( pathVect[i]);
+         }
          if( !exists(newPath)) {
             std::cerr << newPath <<" does not exist. Unable to remove "<<name<<std::endl;
             return false;
@@ -234,6 +238,62 @@ namespace filesystem
       }
 #endif
       return si;
+   }
+
+  /**
+   * \brief lists all files and directories in the given path
+   **/
+   std::vector<std::string>getFileList( std::string path )
+   {
+      std::vector<std::string> fileList;
+      DIR *dir = NULL;
+      struct dirent *ent;
+      dir = opendir( path.c_str());
+      if( dir != NULL ) {
+         while(( ent = readdir( dir)) != NULL ) {
+            fileList.push_back( ent->d_name );
+         }
+         closedir(dir);
+      }
+      else {
+         perror("");
+      }
+
+      return fileList;
+   }
+
+  /**
+   * \brief gets the size of the specified file
+   * \return returns the file size in bytes, -1 on error
+   **/
+   int64_t file_size( std::string filename )
+   {
+      //Check if the file exists
+      if( !exists(filename)) {
+         return -1;
+      }
+
+      struct stat stat_buf;
+      int rc = stat(filename.c_str(), &stat_buf );
+      return rc == 0 ? stat_buf.st_size : -1;
+      
+      
+   }
+
+  /**
+   * \brief Shows disk utilization for specified drive
+   **/
+   double getUtilization( std::string path )
+   {
+      double util = 0;
+      //Calculate the max utilization for each drive
+      filesystem::space_info si = filesystem::space( path );
+      if( si.capacity != 0 ) {
+         util = 1.0-(double)si.free / (double)si.capacity;
+      }
+
+      return util;
+
    }
 }
 }

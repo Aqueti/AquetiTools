@@ -20,11 +20,26 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
    atl::filesystem::create_directory(dir1);
    atl::filesystem::create_directory(dir2);
 
+   //Check for file1 before it's created
+   if( atl::filesystem::file_size( file1 ) >= 0 ) {
+      std::cout << "FileIO::file_size failure. Return of non-existent file >= 0" << std::endl;
+      rc = false;
+   }
+
+
    //Create a file to test deletion
    std::ofstream myfile;
    myfile.open(file1.c_str());
    myfile << file1 <<std::endl;
    myfile.close();
+
+   //Check for file1 before it's created
+   int64_t sz = atl::filesystem::file_size( file1 );
+   if( sz != 21 ) {
+      std::cout << "FileIO::file_size failure. Size of "<<sz<<" not 21" << std::endl;
+      rc = false;
+   }
+
 
    std::cout << "RootPath: "<<rootPath<<std::endl;
 

@@ -9,13 +9,14 @@ namespace atl
 {
 namespace filesystem
 {
-   #define MAX_PATH_LEN 2048
+   #define MAX_PATH_LEN 2048                               //!<Maximum length for a file path
+   const uint64_t CREATE_DIRECTORY_TIMEOUT=0.5;            //!<Timeout for directory creation
 
    //Structure that indicates available space
    struct space_info {
-      uint64_t capacity  = 0;
-      uint64_t free      = 0;
-      uint64_t available = 0;
+      uint64_t capacity  = 0;                              //Total capacity
+      uint64_t free      = 0;                              //Free space
+      uint64_t available = 0;                              //available space
    };
 
    //File system functions
@@ -23,10 +24,13 @@ namespace filesystem
    bool     exists( std::string name);
    bool     remove( std::string name);
    uint64_t remove_all( std::string name);
+   int64_t  file_size( std::string name );
    bool     is_directory( std::string name );
-   bool     current_path(std::string path);                //Set the current path
-   std::string current_path();                             //Get the current path
-   space_info space( std::string path );
+   bool     current_path(std::string path);
+   std::vector<std::string>getFileList( std::string path );        
+   std::string current_path();                             
+   space_info  space( std::string path );                 
+   double      getUtilization( std::string path );
  
 }
 }
