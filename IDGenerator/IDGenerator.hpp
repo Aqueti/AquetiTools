@@ -12,7 +12,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <random>
+#include <string>
+#include "Timer.h"
 
 namespace atl {
 

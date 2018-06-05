@@ -18,13 +18,16 @@ namespace atl {
 std::string IDGenerator::genAlphanumericString(unsigned int len)
 {
     std::string alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    std::uniform_int_distribution<int> d(0, alphabet.size() - 1);
-    std::random_device rd;
+    //std::uniform_int_distribution<int> d(0, alphabet.size() - 1);
+    //std::random_device rd;
+    std::srand(atl::getUsecTime()); //use current time as seed for RNG
 
     std::string str;
     int pos;
     while (str.size() <= len) {
-        pos = d(rd);
+        //pos = d(rd);
+        int randomInt = std::rand();
+        pos = randomInt % alphabet.length();
         str += alphabet.substr(pos,1);
     }
 
