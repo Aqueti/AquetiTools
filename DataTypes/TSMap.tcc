@@ -248,13 +248,6 @@ namespace atl
     {
         std::lock_guard<atl::shared_mutex> lock(m_mutex);
 
-        auto existingKey = m_map.find(k);
-        if (existingKey != m_map.end()) {
-            std::cout << "TSMap::emplace: found item in map when trying to emplace" << std::endl;
-            std::cout << "TSMap::emplace: found key < new key = " << (existingKey->first < k) << std::endl;
-            std::cout << "TSMap::emplace: new key < found key = " << (k < existingKey->first) << std::endl;
-        }
-
         if (!force && m_map.find(k) != m_map.end()) {
             return false;
         }
