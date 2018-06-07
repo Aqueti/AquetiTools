@@ -31,12 +31,14 @@ namespace atl
     template<typename Key, typename Value> class TSMap
     {
         protected:
-            std::map<Key, Value> m_map;     //!< Map of objects
+            std::map<Key, Value, std::function<bool(Key,Key)>> m_map;     //!< Map of objects
             mutable shared_mutex m_mutex;
     
         public:
-            // read functions
+            TSMap();
             ~TSMap();
+
+            // read functions
             std::pair<Value, bool>  find(Key k) const;
             std::pair<Value, bool>  lower_bound(Key k) const;
             std::pair<std::pair<Key,Value>, bool> lower_bound_key(Key k) const;
@@ -63,6 +65,13 @@ namespace atl
             size_t for_each(std::function<bool(Key k, Value& v)> f);
             size_t delete_if(std::function<bool(Key k, Value& v)> f);
     };
+
+    /**
+     * @brief Constructor. Explicitly defines the comparison operator for use by the map.
+     **/
+    template<typename Key, typename Value> TSMap<Key, Value>::TSMap()
+        : m_map([](Key k1, Key k2)->bool { return k1 < k2; })
+    { }
 
     /**
      * @brief Destructor. Clears the map
@@ -238,6 +247,13 @@ namespace atl
             emplace(Key k, Value v, bool force)
     {
         std::lock_guard<atl::shared_mutex> lock(m_mutex);
+
+        auto existingKey = m_map.find(k);
+        if (existingKey != m_map.end()) {
+            std::cout << "TSMap::emplace: found item in map when trying to emplace" << std::endl;
+            std::cout << "TSMap::emplace: found key < new key = " << (existingKey->first < k) << std::endl;
+            std::cout << "TSMap::emplace: new key < found key = " << (k < existingKey->first) << std::endl;
+        }
 
         if (!force && m_map.find(k) != m_map.end()) {
             return false;
