@@ -233,7 +233,7 @@ namespace filesystem
       int rc =  statvfs( path.c_str(), &stat );
       if( rc  == 0 ) {
          si.capacity  = stat.f_frsize * stat.f_blocks;
-         si.free      = stat.f_bsize * stat.f_bfree;
+         si.free      = stat.f_bsize * stat.f_bavail;
          si.available = si.capacity - si.free;
       }
 #endif
