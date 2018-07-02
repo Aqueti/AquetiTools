@@ -45,12 +45,15 @@ namespace filesystem
             return true;
          case EACCES:
             std::cerr << "Failed to create directory "<<dirname<<". Permission denied"<<std::endl;
+         case EEXIST:
+            std::cerr << "Failed to create directory "<<dirname<<". Pathname already exists" << std::endl;
          case ENOENT:
             std::cerr << "Failed to create directory "<<dirname<<". Invalid path"<<std::endl;
          case EROFS:
             std::cerr << "Failed to create directory "<<dirname<<". Read-only file system"<<std::endl;
          default:
-            std::cerr << "Failed to create directory "<<dirname<<". Read-only file system"<<std::endl;
+            std::cerr << "Failed to create directory "<<dirname<<". " <<std::endl;
+            perror("Error info: ");
       }
       return false;
    }
