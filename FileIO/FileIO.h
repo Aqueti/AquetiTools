@@ -5,6 +5,7 @@
 
 #include <sys/stat.h>
 #include <string>
+#include <vector>
 namespace atl
 {
 namespace filesystem
@@ -27,7 +28,7 @@ namespace filesystem
    int64_t  file_size( std::string name );
    bool     is_directory( std::string name );
    bool     current_path(std::string path);
-   std::vector<std::string>getFileList( std::string path );        
+   std::vector<std::string> getFileList( std::string path );        
    std::string current_path();                             
    space_info  space( std::string path );                 
    double      getUtilization( std::string path );
