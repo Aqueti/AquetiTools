@@ -77,34 +77,34 @@ namespace filesystem
    bool remove( std::string name)
    {
       //Break name into a array
-      std::vector<std::string> pathVect = atl::stringParser(name, "/");
-      
-      std::string newPath = "";
-      for( uint64_t i = 0; i < pathVect.size(); i++ ) {
-         if( pathVect[i]=="" )  {
-            newPath.append("/");
-         } else {
-            newPath.append( pathVect[i]);
-         }
-         if( !exists(newPath)) {
-            std::cerr << newPath <<" does not exist. Unable to remove "<<name<<std::endl;
-            return false;
-         }
-         if( is_directory(newPath)) {
-            newPath.append("/");
-         }
-      }
+      //std::vector<std::string> pathVect = atl::stringParser(name, "/");
+      //
+      //std::string newPath = "";
+      //for( uint64_t i = 0; i < pathVect.size(); i++ ) {
+      //   if( pathVect[i]=="" )  {
+      //      newPath.append("/");
+      //   } else {
+      //      newPath.append( pathVect[i]);
+      //   }
+      //   if( !exists(newPath)) {
+      //      std::cerr << newPath <<" does not exist. Unable to remove "<<name<<std::endl;
+      //      return false;
+      //   }
+      //   if( is_directory(newPath)) {
+      //      newPath.append("/");
+      //   }
+      //}
 
-      if( is_directory( newPath )) {
+      if( is_directory( name )) {
          int irc = rmdir( name.c_str());
          if( irc ) {
-            std::cerr << "Failed to remove directory: "<<newPath<<std::endl;
+            //std::cerr << "Failed to remove directory: "<<name<<std::endl;
             return false;
          }
       } 
       else {
-         if( ::remove( newPath.c_str())) {
-            std::cerr << "Failed to remove file: "<<newPath<<std::endl;
+         if( ::remove(name.c_str()) != 0) {
+            //std::cerr << "Failed to remove file: "<<name<<std::endl;
             return false;
          }
       }
