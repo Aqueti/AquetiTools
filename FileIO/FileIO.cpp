@@ -248,7 +248,10 @@ namespace filesystem
    **/
    std::vector<std::string>getFileList( std::string path )
    {
-      std::vector<std::string> fileList;
+     std::vector<std::string> fileList;
+#ifdef _WIN32
+     std::cerr << "getFileList() not yet implemented on Windows" << std::endl;
+#else
       DIR *dir = NULL;
       struct dirent *ent;
       dir = opendir( path.c_str());
@@ -261,7 +264,7 @@ namespace filesystem
       else {
          perror("");
       }
-
+#endif
       return fileList;
    }
 
