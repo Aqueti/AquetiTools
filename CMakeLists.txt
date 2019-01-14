@@ -122,7 +122,7 @@ endif()
 #############################################
 #Determine Compiler options
 if (NOT WIN32)
-   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-parameter -std=c++11 -fPIC") #Compile faster on debug, with warnings
+   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -std=c++11 -fPIC") #Compile faster on debug, with warnings
    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11 -fPIC") #Optimize compilation, no warnings
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -fPIC") #Else slightly optimize, with warnings
 
