@@ -15,13 +15,12 @@
 #define H264_HIGH_BANDWIDTH  300/19               //!< per microcamera bandwidth for hi-res H264
 #define DEFAULT_BLOCK_SIZE  4*MEGABYTE
 #define DEFAULT_BLOCKS_PER_CONTAINER 64           //!< Number of blocks per contains
-#define DEFAULT_FRAME_RATE 30
-//sdf #define DEFAULT_INPUT_STREAMS 19
+#define DEFAULT_FRAME_RATE 5
 #define DEFAULT_INPUT_STREAMS 2
 #define DEFAULT_OUTPUT_STREAMS 1
 #define DEFAULT_MCAMS_PER_OUTPUT_STREAM
 #define DEFAULT_MCAMS_PER_DIR 1
-#define DEFAULT_OUTPUT_LATENCY 10
+#define DEFAULT_OUTPUT_LATENCY 100
 
 std::mutex g_writeCountMutex;
 uint64_t   g_writeCount = 0;
@@ -61,7 +60,7 @@ void statusFunction(double interval, bool *running )
 	 double   writeRate = (double)myWriteBytes*8.0/interval/(double)MEGABYTE;
 	 uint64_t myReadCount = g_readCount - prevReadCount;
 	 uint64_t myReadBytes = g_readBytes - prevReadBytes;
-	 double readRate = (double)myReadBytes*8.0/interval/(double)MEGABYTE;
+	 double   readRate = (double)myReadBytes*8.0/interval/(double)MEGABYTE;
 
 
 
@@ -69,7 +68,7 @@ void statusFunction(double interval, bool *running )
 		   <<" writes: "<<myWriteCount<<" files/"<<myWriteBytes<<" bytes/"<<writeRate<<" Mbps,"
 		   <<" reads: "<<myReadCount<<" files/"<<myReadBytes<<" bytes/"<<readRate<<" Mbps,"
 		   <<" total writes: "<<g_writeCount<<" files/"<<g_writeBytes<<" bytes,"
-		   <<" total reads: "<<g_readCount<<" files/"<<g_readBytes<<"bytes" 
+		   <<" total reads: "<<g_readCount<<" files/"<<g_readBytes/(double)MEGABYTE<<" MB" 
 		   <<std::endl;
 
         prevWriteCount = g_writeCount;
@@ -215,7 +214,7 @@ void writeFunction( std::string name, double rate, bool * running )
       std::string filename = generateFilename( name, myCount);
 
       //Check timer. Wait until it's time to insert, then add
-      while( timer.elapsed() < previousTime+myFreq) {
+      while( timer.elapsed() < myFreq) {
         std::this_thread::sleep_for( std::chrono::milliseconds(1));
       }
 
@@ -226,22 +225,23 @@ void writeFunction( std::string name, double rate, bool * running )
       fptr = fopen( filename.c_str(), "wb" );
       if( fptr == NULL ) {
          std::cout << "Failed to open file "<<filename<<std::endl;
-         continue;
       }
+      else {
 
-      //Write data and close the file
-      fwrite( data, 1, g_fileSize, fptr );
-      fclose(fptr);
-      fptr = NULL;
+        //Write data and close the file
+        fwrite( data, 1, g_fileSize, fptr );
+        fclose(fptr);
+        fptr = NULL;
 
-      //Update global tracking
-      incrementWrite( g_fileSize );
-      myCount++;
+        //Update global tracking
+        incrementWrite( g_fileSize );
+        myCount++;
 
-      //Update max value in maxMap.
-      {
-         std::lock_guard<std::mutex> maxLock (g_maxMapMutex);
-         g_maxStreamMap[name] = myCount;
+        //Update max value in maxMap.
+        {
+           std::lock_guard<std::mutex> maxLock (g_maxMapMutex);
+           g_maxStreamMap[name] = myCount;
+        }
       }
    }
 
@@ -278,10 +278,10 @@ void readFunction( uint64_t startOffset
 
       for( auto it : g_names ) {
          //get filename
-         std::cout<<"Generating filename for "<<it<<","<<std::to_string(index)<<std::endl;
+         std::cout<<"Generating read filename for "<<it<<","<<std::to_string(index)<<std::endl;
          std::string filename = generateFilename( it, index);
 	
-         while( timer.elapsed() < previousTime+myFreq) {
+         while( timer.elapsed() < myFreq) {
             atl::sleep(.001);
 
 	    if( ! *running ) {
@@ -420,9 +420,12 @@ int main( int argc, char * argv[] )
 			 
 
     //Create status thread. This prints the output
-    std::thread statusThread = std::thread(statusFunction, 1.0, &running);
+    std::thread statusThread = std::thread(statusFunction, 10.0, &running);
 
-    atl::sleep(100.0);
+    //Wait until we're at 95%
+    while( atl::filesystem::getUtilization(g_basePath) < .95 ) {
+       atl::sleep(1.0);
+    }
 
     std::cout <<"Setting running to false!"<<std::endl;
     running = false;
