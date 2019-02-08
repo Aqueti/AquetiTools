@@ -5,8 +5,10 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+
 #include <Timer.h>
 #include <FileIO.h>
+#include <StringTools.h>
 
 #define MEGABYTE (1024*1024)
 
@@ -18,24 +20,28 @@
 #define DEFAULT_INPUT_STREAMS 2
 #define DEFAULT_OUTPUT_STREAMS 1
 #define DEFAULT_MCAMS_PER_OUTPUT_STREAM
-#define DEFAULT_STORAGE_PATH "./test"
-#define DEFAULT_FILES_PER_DIR 1000
 #define DEFAULT_MCAMS_PER_DIR 1
-#define DEFAULT_OUTPUT_LATENCY 1000
+#define DEFAULT_OUTPUT_LATENCY 10
 
 std::mutex g_writeCountMutex;
 uint64_t   g_writeCount = 0;
 uint64_t   g_writeBytes = 0;
+uint64_t   g_inputStreams = 1;
 
 std::mutex g_readCountMutex;
 uint64_t   g_readCount  = 0;
 uint64_t   g_readBytes = 0;
 
-std::mutex g_maxMapMutex;
-std::mutex g_minMapMutex;
+std::string g_basePath = "./test";
+uint64_t    g_filesPerDir = 1000;
+uint64_t    g_fileSize = 4*MEGABYTE;
+
+std::mutex  g_maxMapMutex;
+std::mutex  g_minMapMutex;
 std::map<std::string, uint64_t> g_maxStreamMap;
 std::map<std::string, uint64_t> g_minStreamMap;
 
+std::vector<std::string> g_names;
 
 void statusFunction(double interval, bool *running )	
 { 
@@ -79,6 +85,37 @@ void statusFunction(double interval, bool *running )
    }
 }
 
+/**
+ * \brief get the max index all uCams have
+ **/
+uint64_t getMaxIndex()
+{
+   uint64_t minVal = UINT64_MAX;
+
+   for( auto it:g_names ) {
+      if( g_maxStreamMap[it] < minVal ) {
+         minVal = g_maxStreamMap[it];
+      }
+   }
+
+   return minVal;
+}
+
+/**
+ * \brief get the min index all uCams have
+ **/
+uint64_t getMinIndex()
+{
+   uint64_t maxVal = 0;
+
+   for( auto it:g_names ) {
+      if( g_minStreamMap[it] > maxVal ) {
+         maxVal = g_minStreamMap[it];
+      }
+   }
+
+   return maxVal;
+}
 
 /**
  * \brief function for statistics on writtend data
@@ -110,13 +147,32 @@ void incrementRead(uint64_t bytes)
    g_readCount++;
 }
 
+/**
+ * \brief Generates a filename given a camera name and file count
+ * \param [in] name microcamera name
+ * \param [in] count frame number for the specificed microcamera
+ * \return returns the fully defined path and filename for the file
+ **/
+std::string generateFilename( std::string name, uint64_t count ) 
+{
+   uint64_t dirIndex = count / g_filesPerDir;
 
+   //Create my path
+   std::string filename = g_basePath;
+   filename.append("/");
+   filename.append(name);
+   filename.append("/");
+   filename.append(std::to_string(dirIndex));
+   filename.append("/");
+   filename.append(std::to_string(count));
 
+   return filename;
+}
 
 /**
  * \brief Storage Function
  **/
-void writeFunction( std::string name, uint64_t fileSize, double rate, std::string basePath, uint64_t filesPerDir, bool * running )
+void writeFunction( std::string name, double rate, bool * running )
 {
    //Add ourselves to teh global map
    {
@@ -131,64 +187,41 @@ void writeFunction( std::string name, uint64_t fileSize, double rate, std::strin
 
    uint64_t previousTime = 0;
    uint64_t myCount = 0;
-   uint64_t dirCount = 0;
    std::string myPath;
    double myFreq = 1.0/rate;
 
    //Create my file
-   char * data = new char[fileSize];
+   char * data = new char[g_fileSize];
 
-   //Create my path
-   std::string myBasePath = basePath;
-   myBasePath.append("/");
-   myBasePath.append(name);
+   std::string filename = generateFilename( name, myCount );
+   std::vector<std::string> pathVect = atl::stringParser( filename, "/" );
 
-   bool result = true;
-   if( !atl::filesystem::is_directory(myBasePath)) { 
-      result = atl::filesystem::create_directory(myBasePath);
+   std::string path;
+
+   //Delete all subthreads
+   for( auto it = begin(pathVect); it+1 != end( pathVect); ++it ) {
+      path.append(*it);
+      std::cout << "adding "<<path<<std::endl;
+      if( !atl::filesystem::is_directory( *it )) {
+         atl::filesystem::create_directory( path );
+      }
+      path.append("/");
+       
    }
-
-   if( !result ) {
-      std::cout << "Storage Thread "<<name<<" unable to create path: "<<myBasePath<<". Exiting"<<std::endl;
-      return;
-   }
-
 
    //Main loop
    while( *running )
    {
-      //Check If we are at the directory limit (or first directory)
-      if(!( myCount % filesPerDir )) {
-	 std::cout << "Mod for "<<std::to_string(myCount)<<": "<<std::to_string(myCount % filesPerDir )<<std::endl;
-         myPath = myBasePath;
-         myPath.append("/");
-         myPath.append(std::to_string(dirCount));
+      std::string filename = generateFilename( name, myCount);
 
-         //create directory
-         if( atl::filesystem::create_directory( myPath )) {
-            std::cout << "Creating directory "<<myPath<<std::endl;
-            dirCount ++;
-         }
-         else {
-            std::cout << "Error creating directory "<<myPath<<"!"<<std::endl;
-            continue;
-         }
-      }
-      
-
-      //Create the file we are going to write to
-      std::string filename = myPath;
-      filename.append("/");
-      filename.append(std::to_string(myCount));
-
-      //Check timer. Wait until it's time
+      //Check timer. Wait until it's time to insert, then add
       while( timer.elapsed() < previousTime+myFreq) {
         std::this_thread::sleep_for( std::chrono::milliseconds(1));
       }
 
       timer.start();
 
-      //Write the file
+      //Open the file
       FILE * fptr = NULL;
       fptr = fopen( filename.c_str(), "wb" );
       if( fptr == NULL ) {
@@ -196,22 +229,20 @@ void writeFunction( std::string name, uint64_t fileSize, double rate, std::strin
          continue;
       }
 
-      //Write data
-      fwrite( data, 1, fileSize, fptr );
+      //Write data and close the file
+      fwrite( data, 1, g_fileSize, fptr );
       fclose(fptr);
       fptr = NULL;
 
       //Update global tracking
-      incrementWrite( fileSize );
+      incrementWrite( g_fileSize );
       myCount++;
 
-      //Update max value in map
+      //Update max value in maxMap.
       {
          std::lock_guard<std::mutex> maxLock (g_maxMapMutex);
          g_maxStreamMap[name] = myCount;
       }
-
-      
    }
 
    std::cout << "Closing write thread "<<name<<std::endl;
@@ -222,79 +253,65 @@ void writeFunction( std::string name, uint64_t fileSize, double rate, std::strin
 
 
 
-void readFunction( std::string name
-      , uint64_t fileSize
+void readFunction( uint64_t startOffset
       , double rate
-      , std::string basePath
-      , uint64_t filesPerDir
       , bool * running 
-		, uint64_t myCount = 0
       )
 {
    atl::Timer timer;
+   uint64_t index = 0;
    uint64_t previousTime = 0;
-   uint64_t dirCount = 0;
-   std::string myPath;
    double myFreq = 1.0/rate;
 
    //Create my file for reading
-   char * data = new char[fileSize];
-
-   //Create my path
-   std::string myBasePath = basePath;
-   myBasePath.append("/");
-   myBasePath.append(name);
-
-   if( !atl::filesystem::is_directory(myBasePath)) { 
-      std::cout << "Base path "<<myBasePath<<" does not exist!"<<std::endl;
-      return;
-	}
-
+   char * data = new char[g_fileSize];
 
    //Main loop
    while( *running )
    {
-      //Check If we are at the directory limit (or first directory)
-      if(!( myCount % filesPerDir )) {
-         myPath = myBasePath;
-         myPath.append("/");
-         myPath.append(std::to_string(dirCount));
-			dirCount++;
-      }
+      uint64_t maxIndex = getMaxIndex();
 
-      if( !atl::filesystem::is_directory( myPath)) {
-            std::cout << "Directory does not exist: "<<myPath<<"!"<<std::endl;
-            continue;
-      }
-      
-      //Name the file we are going to read
-      std::string filename = myPath;
-      myPath.append("/");
-      myPath.append(std::to_string(myCount));
-
-      //Check timer. Wait until it's time
-      while( timer.elapsed() < previousTime+myFreq) {
-         std::this_thread::sleep_for( std::chrono::milliseconds(1));
-      }
-
-      timer.start();
-
-      //Write the file
-      FILE * fptr = NULL;
-      fptr = fopen( filename.c_str(), "rb" );
-      if( fptr == NULL ) {
-         std::cout << "Failed to open file for reading "<<filename<<std::endl;
+      if( maxIndex < startOffset ) {
          continue;
       }
 
-      //Write data
-      fread( data, 1, fileSize, fptr );
-      fclose(fptr);
-      fptr = NULL;
 
-      //Update global tracking
-      incrementRead( fileSize );
-      myCount++;
+      for( auto it : g_names ) {
+         //get filename
+         std::cout<<"Generating filename for "<<it<<","<<std::to_string(index)<<std::endl;
+         std::string filename = generateFilename( it, index);
+	
+         while( timer.elapsed() < previousTime+myFreq) {
+            atl::sleep(.001);
+
+	    if( ! *running ) {
+	       break;
+	    }
+	 }
+         //Write the file
+         FILE * fptr = NULL;
+         fptr = fopen( filename.c_str(), "rb" );
+         if( fptr == NULL ) {
+            std::cout << "Failed to open file for reading "<<filename<<std::endl;
+            continue;
+         }
+
+         //Read data
+         uint64_t bytes = fread( data, 1, g_fileSize, fptr );
+         fclose(fptr);
+         fptr = NULL;
+
+         timer.start();
+
+	 if( bytes != g_fileSize )  {
+            std::cout <<"ERROR: read "<<bytes<<"/"<<g_fileSize<<" bytes from "<<filename<<std::endl;
+         }
+
+         //Update global tracking
+         incrementRead( g_fileSize );
+      }
+
+      index++;
       
    }
 
@@ -312,19 +329,18 @@ int main( int argc, char * argv[] )
     uint64_t streamRate         = H264_HIGH_BANDWIDTH *1024*1024/8;
 
     //Input params
-    double inputFrameRate       = DEFAULT_FRAME_RATE;
-    uint64_t inputStreams       = DEFAULT_INPUT_STREAMS;
+    double   inputFrameRate       = DEFAULT_FRAME_RATE;
 
     //Storage params
     uint64_t blocksPerContainer = DEFAULT_BLOCKS_PER_CONTAINER;
     uint64_t blockSize          = DEFAULT_BLOCK_SIZE;
     uint64_t uCamsPerDirectory  = DEFAULT_MCAMS_PER_DIR;
-    uint64_t filesPerDirectory  = DEFAULT_FILES_PER_DIR;
-
 
     //Playback params
     uint64_t outputStreams = DEFAULT_OUTPUT_STREAMS;
-    uint64_t streamsPerOutputStream = inputStreams;
+    uint64_t streamsPerOutputStream = g_inputStreams;
+    uint64_t readOffset = DEFAULT_OUTPUT_LATENCY;                    //!< How far behind write to start
+    double   outputFrameRate     = DEFAULT_FRAME_RATE;
 
     /////////////////////////////////////////////
     //Read in command line options
@@ -332,72 +348,81 @@ int main( int argc, char * argv[] )
 
 
     //Calculate values
-    uint64_t totalWriteBandwith = streamRate*inputStreams;
+    uint64_t totalWriteBandwith = streamRate*g_inputStreams;
     uint64_t readBandwidthPerOutputStream = streamsPerOutputStream*streamRate;
     uint64_t totalReadBandwidth = readBandwidthPerOutputStream * outputStreams;
 
-    std::string baseStoragePath   = DEFAULT_STORAGE_PATH;
-    uint64_t fileSize        = blocksPerContainer * blockSize;
-    double   filesPerSecPerStream = fileSize/streamRate;
-    double   totalFilesPerSec     = inputStreams * filesPerSecPerStream; 
+    g_fileSize             = blocksPerContainer * blockSize;
+    double   filesPerSecPerStream = g_fileSize/streamRate;
+    double   totalFilesPerSec     = g_inputStreams * filesPerSecPerStream; 
 
     //Print assumptions
     std::cout <<"Aqueti Storage Validation Tool"<<std::endl;
     std::cout <<"Input:"<<std::endl;
-    std::cout <<"\tstreams:    "<<inputStreams<<std::endl;
+    std::cout <<"\tstreams:    "<<g_inputStreams<<std::endl;
     std::cout <<"\tframe rate: "<<inputFrameRate<<std::endl;
     std::cout <<"\tStream bandwidth: "<<(double)streamRate/(double)MEGABYTE<<" Mbps"<<std::endl;
     std::cout <<"\tTotal write bandwidth: "<<totalWriteBandwith<<" Mbps"<<std::endl;
+    std::cout <<"\tFiles per directory: "<<g_filesPerDir<<std::endl;
 
     std::cout <<"Output:"<<std::endl;
     std::cout <<"\tstreams: "<<outputStreams<<std::endl;
     std::cout <<"\tinput streams required: "<<streamsPerOutputStream<<std::endl;
     std::cout <<"\tread bandwidth per stream:"<< readBandwidthPerOutputStream<<std::endl;
     std::cout <<"\ttotal read bandwidth per stream:"<<totalReadBandwidth<<std::endl;
+    std::cout <<"\tframes behind live to start: "<<readOffset<<std::endl;
     
     std::cout <<"File system info"<<std::endl;
-    std::cout <<"\tStorage Path:"<< baseStoragePath<<std::endl;
-    std::cout <<"\tFile Size:"<<fileSize<<std::endl;
+    std::cout <<"\tStorage Path:"<< g_basePath<<std::endl;
+    std::cout <<"\tFile Size:"<<g_fileSize<<std::endl;
     std::cout <<"\tFiles per second per stream: "<<filesPerSecPerStream<<std::endl;
     std::cout <<"\tTotal files per second: "<<totalFilesPerSec<<std::endl;
     std::cout <<"\tuCams per directory: "<<uCamsPerDirectory<<std::endl;
-    std::cout <<"\tFiles per directory: "<<filesPerDirectory<<std::endl;
 
     bool running = true;
-    std::vector<std::string> names;
     std::vector<std::thread> writeVect;
     std::vector<std::thread> readVect;
 
     bool result = true;
-    if( !atl::filesystem::is_directory(baseStoragePath)) { 
-      result = atl::filesystem::create_directory(baseStoragePath);
+    if( !atl::filesystem::is_directory(g_basePath)) { 
+      result = atl::filesystem::create_directory(g_basePath);
     }
 
     if( !result ) {
-	    std::cout << "Storage directory "<<baseStoragePath<<" does not exist and unable to create"<<std::endl;
+       std::cout << "Base Storage directory "<<g_basePath<<" does not exist and unable to create"<<std::endl;
     }
 
-    //Create write threads
-    for( uint64_t i=0; i < inputStreams; i++ ) {
+    //Create write threads - one per input stream
+    for( uint64_t i=0; i < g_inputStreams; i++ ) {
        std::string name = "uCam_";
        name.append( std::to_string(i));
     
        writeVect.push_back( std::thread( writeFunction
                        , name
-		       , fileSize
 		       , inputFrameRate
-		       , baseStoragePath
-		       , filesPerDirectory
 		       , &running
 		       ));
+       g_names.push_back(name);
     }
 
-    //Create read threads
-    
+
+    //Create read threads - one for each output stream
+    for( uint64_t i = 0; i < outputStreams; i++ ) {
+       std::string name = "render_";
+       name.append( std::to_string(i));
+
+       readVect.push_back( std::thread( readFunction 
+			 , readOffset
+			 , outputFrameRate
+			 , &running
+			 ));
+    }
+			 
+
     //Create status thread. This prints the output
     std::thread statusThread = std::thread(statusFunction, 1.0, &running);
 
-    atl::sleep(10.0);
+    atl::sleep(100.0);
 
     std::cout <<"Setting running to false!"<<std::endl;
     running = false;
@@ -406,6 +431,11 @@ int main( int argc, char * argv[] )
 
     //Delete all subthreads
     for( auto it = begin(writeVect); it != end( writeVect); ++it ) {
+       it->join();
+    }
+
+    //Delete all subthreads
+    for( auto it = begin(readVect); it != end( readVect); ++it ) {
        it->join();
     }
  
