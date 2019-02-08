@@ -181,6 +181,37 @@ std::string generateFilename( std::string name, uint64_t count )
 }
 
 /**
+ * \brief Delete oldest data for continuous operation
+ **/
+void reaperFunction( bool * running ) {
+   while( *running ) {
+      //Wait until we're at 95%
+      if( atl::filesystem::getUtilization(g_basePath) > g_maxUtil ) {
+         uint64_t minVal = UINT64_MAX;
+         std::string name;
+
+         //get the older index of any frame
+         for( auto it:g_names ) {
+            if( g_minStreamMap[it] < minVal ) {
+               minVal = g_maxStreamMap[it];
+               name = it;
+            }
+         }   
+         std::string fname = generateFilename( name, minVal );
+
+         std::cout << "Removing "<<fname<<std::endl;
+         bool result = atl::filesystem::remove(fname);
+         if( !result) {
+         std::cout << "Unable to remove "<<fname<<std::endl;
+         }   
+      }
+      else {
+         atl::sleep(1.0);
+      }
+   }
+}
+
+/**
  * \brief Storage Function
  **/
 void writeFunction( std::string name, double rate, bool * running )
@@ -553,7 +584,7 @@ int main( int argc, char * argv[] )
    // Processing loop
    /////////////////////////////////////////////
    //Wait until we're at 95%
-   while( atl::filesystem::getUtilization(g_basePath) < g_maxUtil ) {
+   while( true ) {
       atl::sleep(1.0);
    }
 
