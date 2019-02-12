@@ -42,6 +42,8 @@ uint64_t    g_filesPerDir = 1000;
 uint64_t    g_fileSize = 4*MEGABYTE;
 double      g_maxUtil    = 95;
 
+uint64_t    g_removeCount = 0;
+
 std::mutex  g_maxMapMutex;
 std::mutex  g_minMapMutex;
 std::map<std::string, uint64_t> g_maxStreamMap;
@@ -57,30 +59,31 @@ std::vector<std::string> g_names;
 void statusFunction(double interval, bool *running )   
 { 
    uint64_t count = 0;
-   uint64_t prevWriteCount = g_writeCount;
-   uint64_t prevWriteBytes = g_writeBytes;
-   uint64_t prevReadCount  = g_readCount;
-   uint64_t prevReadBytes  = g_readBytes;
+   uint64_t prevWriteCount  = g_writeCount;
+   uint64_t prevWriteBytes  = g_writeBytes;
+   uint64_t prevReadCount   = g_readCount;
+   uint64_t prevReadBytes   = g_readBytes;
+   uint64_t prevRemoveCount = g_removeCount;
 
    atl::Timer timer; 
    while(*running) {
       if( timer.elapsed() > interval ) {
-    double interval = timer.elapsed();
+         double interval = timer.elapsed();
          timer.start();
-    uint64_t myWriteCount = g_writeCount - prevWriteCount;
-    uint64_t myWriteBytes = g_writeBytes - prevWriteBytes;
-    double   writeRate = (double)myWriteBytes*8.0/interval/(double)MEGABYTE;
-    uint64_t myReadCount = g_readCount - prevReadCount;
-    uint64_t myReadBytes = g_readBytes - prevReadBytes;
-    double   readRate = (double)myReadBytes*8.0/interval/(double)MEGABYTE;
-
-
+         uint64_t myWriteCount = g_writeCount - prevWriteCount;
+         uint64_t myWriteBytes = g_writeBytes - prevWriteBytes;
+         double   writeRate = (double)myWriteBytes*8.0/interval/(double)MEGABYTE;
+         uint64_t myReadCount = g_readCount - prevReadCount;
+         uint64_t myReadBytes = g_readBytes - prevReadBytes;
+         double   readRate = (double)myReadBytes*8.0/interval/(double)MEGABYTE;
+         uint64_t myRemoveCount = g_removeCount - prevRemoveCount;
 
          std::cout << count <<" "<< atl::getDateAsString()
          <<" writes: "<<myWriteCount<<" files/"<<myWriteBytes<<" bytes/"<<writeRate<<" Mbps,"
          <<" reads: "<<myReadCount<<" files/"<<myReadBytes<<" bytes/"<<readRate<<" Mbps,"
          <<" total writes: "<<g_writeCount<<" files/"<<g_writeBytes<<" bytes,"
          <<" total reads: "<<g_readCount<<" files/"<<g_readBytes/(double)MEGABYTE<<" MB," 
+         <<" removeCount: "<<myRemoveCount<<" total removed: "<<g_removeCount
          <<" util: "<<atl::filesystem::getUtilization(g_basePath)*100.0
          <<std::endl;
 
@@ -206,6 +209,7 @@ void reaperFunction( bool * running ) {
          } 
          else {
             g_minStreamMap[name] = minVal + 1;
+            g_removeCount++;
          }  
       }
       else {
@@ -297,7 +301,9 @@ void writeFunction( std::string name, double rate, bool * running )
 }
 
 
-
+/**
+ * \brief Fucntions for reading files
+ **/
 void readFunction( uint64_t startOffset
       , double rate
       , bool * running 
@@ -315,48 +321,60 @@ void readFunction( uint64_t startOffset
    {
       uint64_t maxIndex = getMaxIndex();
 
-      if( maxIndex < startOffset ) {
-         continue;
-      }
-
-
-      for( auto it : g_names ) {
-         //get filename
-         std::cout<<"Generating read filename for "<<it<<","<<std::to_string(index)<<std::endl;
-         std::string filename = generateFilename( it, index);
-   
-         while( timer.elapsed() < myFreq) {
-            atl::sleep(.001);
-
-       if( ! *running ) {
-          break;
-       }
-    }
-         //Write the file
-         FILE * fptr = NULL;
-         fptr = fopen( filename.c_str(), "rb" );
-         if( fptr == NULL ) {
-            std::cout << "Failed to open file for reading "<<filename<<std::endl;
-            continue;
-         }
-
-         //Read data
-         uint64_t bytes = fread( data, 1, g_fileSize, fptr );
-         fclose(fptr);
-         fptr = NULL;
-
-         timer.start();
-
-    if( bytes != g_fileSize )  {
-            std::cout <<"ERROR: read "<<bytes<<"/"<<g_fileSize<<" bytes from "<<filename<<std::endl;
-         }
-
-         //Update global tracking
-         incrementRead( g_fileSize );
-      }
-
-      index++;
+      //If our max index is greater than the start offset, begin reading
+      if(( maxIndex > startOffset )&&(index < maxIndex -5 )) {
+         for( auto it : g_names ) {
+            //get filename
+            std::string filename = generateFilename( it, index);
       
+            while( timer.elapsed() < myFreq) {
+               atl::sleep(.001);
+
+               if( ! *running ) {
+                  break;
+               }
+            }
+
+            //Write the file
+            FILE * fptr = NULL;
+            fptr = fopen( filename.c_str(), "rb" );
+            if( fptr == NULL ) {
+               std::cout << "Failed to open file for reading "<<filename<<std::endl;
+               continue;
+            }
+
+            //Read data
+            uint64_t bytes = fread( data, 1, g_fileSize, fptr );
+            fclose(fptr);
+            fptr = NULL;
+
+
+            if( bytes != g_fileSize )  {
+               std::cout <<"ERROR: read "<<bytes<<"/"<<g_fileSize<<" bytes from "<<filename<<std::endl;
+            }
+
+            //Update global tracking
+            incrementRead( g_fileSize );
+         }
+
+         while(timer.elapsed() < 1.0/g_ofps) {
+            atl::sleep( 1.0/g_ofps - timer.elapsed());
+         }
+
+         index++;
+      }
+      else {
+         if(index > maxIndex-5 )  {
+            print("Within 5 frames of live. Reading paused");
+         }
+      }
+
+      while(( timer.elapsed() < 1.0/g_ofps )&&(*running )) {
+         atl::sleep( 1.0/g_ofps - timer.elapsed() );
+      }
+ 
+      //Restart the the timer
+      timer.start();
    }
 
    //Delete data
