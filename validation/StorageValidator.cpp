@@ -40,7 +40,7 @@ uint64_t   g_readOffset    = 1100;
 std::string g_basePath = "./test";
 uint64_t    g_filesPerDir = 1000;
 uint64_t    g_fileSize = 4*MEGABYTE;
-double      g_maxUtil    = .95;
+double      g_maxUtil    = 95;
 
 std::mutex  g_maxMapMutex;
 std::mutex  g_minMapMutex;
@@ -80,7 +80,8 @@ void statusFunction(double interval, bool *running )
          <<" writes: "<<myWriteCount<<" files/"<<myWriteBytes<<" bytes/"<<writeRate<<" Mbps,"
          <<" reads: "<<myReadCount<<" files/"<<myReadBytes<<" bytes/"<<readRate<<" Mbps,"
          <<" total writes: "<<g_writeCount<<" files/"<<g_writeBytes<<" bytes,"
-         <<" total reads: "<<g_readCount<<" files/"<<g_readBytes/(double)MEGABYTE<<" MB" 
+         <<" total reads: "<<g_readCount<<" files/"<<g_readBytes/(double)MEGABYTE<<" MB," 
+         <<" util: "<<atl::filesystem::getUtilization(g_basePath)*100.0
          <<std::endl;
 
         prevWriteCount = g_writeCount;
@@ -186,24 +187,26 @@ std::string generateFilename( std::string name, uint64_t count )
 void reaperFunction( bool * running ) {
    while( *running ) {
       //Wait until we're at 95%
-      if( atl::filesystem::getUtilization(g_basePath) > g_maxUtil ) {
+      if( 100.0*atl::filesystem::getUtilization(g_basePath) > g_maxUtil ) {
          uint64_t minVal = UINT64_MAX;
          std::string name;
 
          //get the older index of any frame
          for( auto it:g_names ) {
             if( g_minStreamMap[it] < minVal ) {
-               minVal = g_maxStreamMap[it];
+               minVal = g_minStreamMap[it];
                name = it;
             }
          }   
          std::string fname = generateFilename( name, minVal );
 
-         std::cout << "Removing "<<fname<<std::endl;
          bool result = atl::filesystem::remove(fname);
          if( !result) {
-         std::cout << "Unable to remove "<<fname<<std::endl;
-         }   
+            std::cout << "Unable to remove "<<fname<<std::endl;
+         } 
+         else {
+            g_minStreamMap[name] = minVal + 1;
+         }  
       }
       else {
          atl::sleep(1.0);
@@ -580,6 +583,9 @@ int main( int argc, char * argv[] )
    //Create status thread. This prints the output
    std::thread statusThread = std::thread(statusFunction, 10.0, &running);
 
+   //Create a garbage collection thread
+   std::thread reaperThread = std::thread(reaperFunction, &running );
+
    /////////////////////////////////////////////
    // Processing loop
    /////////////////////////////////////////////
@@ -602,6 +608,8 @@ int main( int argc, char * argv[] )
    for( auto it = begin(readVect); it != end( readVect); ++it ) {
       it->join();
    }
+
+   reaperThread.join();
 
 
   
