@@ -239,7 +239,7 @@ void reaperFunction( bool * running ) {
  **/
 void writeFunction( std::string name, double rate, bool * running )
 {
-   //Add ourselves to teh global map
+   //Add ourselves to the global map
    {
       std::lock_guard<std::mutex> minLock (g_minMapMutex);
       std::lock_guard<std::mutex> maxLock (g_maxMapMutex);
@@ -546,9 +546,9 @@ int main( int argc, char * argv[] )
 
 
    //Calculate values
-   uint64_t totalWriteBandwith = g_streamRate*g_inputStreams/MEGABYTE;
+   uint64_t totalWriteBandwith = g_streamRate*g_inputStreams;
    uint64_t readBandwidthPerOutputStream = streamsPerOutputStream*g_streamRate;
-   uint64_t totalReadBandwidth = readBandwidthPerOutputStream * g_outputStreams;
+   uint64_t totalReadBandwidth = (double)readBandwidthPerOutputStream * g_outputStreams;
 
    g_fileSize              = blocksPerContainer * blockSize;
    std::cout << "streamRate: "<<g_streamRate<<", fileSize: "<<g_fileSize<<std::endl;
@@ -562,8 +562,8 @@ int main( int argc, char * argv[] )
    std::cout <<"Input:"<<std::endl;
    std::cout <<"\tstreams:    "<<g_inputStreams<<std::endl;
    std::cout <<"\tframe rate: "<<g_ifps<<std::endl;
-   std::cout <<"\tStream bandwidth: "<<(double)g_streamRate/(double)MEGABYTE<<" Mbps"<<std::endl;
-   std::cout <<"\tTotal write bandwidth: "<<totalWriteBandwith<<" Mbps"<<std::endl;
+   std::cout <<"\tStream bandwidth: "<<g_streamRate<<" Mbps"<<std::endl;
+   std::cout <<"\tTotal write bandwidth: "<<totalWriteBandwith/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\tFiles per directory: "<<g_filesPerDir<<std::endl;
 
    std::cout <<"Output:"<<std::endl;
@@ -581,6 +581,8 @@ int main( int argc, char * argv[] )
    std::cout <<"\tTotal write files per second: "<<g_totalWriteFilesPerSec<<std::endl;
    std::cout <<"\tuCams per directory: "<<g_filesPerDir<<std::endl;
    std::cout <<"\tMax Utilization: "<<g_maxUtil<<std::endl;
+
+   std::cout << "Write Rate: "<< (double)g_fileSize/(double)g_streamRate<<std::endl;
 
 
    /////////////////////////////////////////////
@@ -611,7 +613,7 @@ int main( int argc, char * argv[] )
    
       writeVect.push_back( std::thread( writeFunction
             , name
-            , g_ifps
+            , g_fileSize/g_streamRate
             , &running
             ));
       g_names.push_back(name);
@@ -625,7 +627,8 @@ int main( int argc, char * argv[] )
 
       readVect.push_back( std::thread( readFunction 
          , g_readOffset
-         , g_ofps
+//         , g_ofps
+         , g_fileSize/g_streamRate
          , &running
          ));
    }
