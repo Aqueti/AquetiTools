@@ -13,7 +13,7 @@
 
 #define MEGABYTE (1024*1024)
 
-#define H264_HIGH_BANDWIDTH (300.0/19.0)*MEGABYTE/8               //!< per microcamera bandwidth for hi-res H264
+#define H264_HIGH_BANDWIDTH (300.0*MEGABYTE/19.0)          //!< per microcamera bandwidth for hi-res H264
 #define DEFAULT_BLOCK_SIZE  4*MEGABYTE
 #define DEFAULT_BLOCKS_PER_CONTAINER 64           //!< Number of blocks per contains
 #define DEFAULT_INPUT_STREAMS 2
@@ -27,12 +27,13 @@ std::mutex g_writeCountMutex;
 uint64_t   g_writeCount   = 0;
 uint64_t   g_writeBytes   = 0;
 uint64_t   g_inputStreams = 1;
-uint64_t   g_streamRate   = H264_HIGH_BANDWIDTH;
+double     g_streamRate   = H264_HIGH_BANDWIDTH;
 double     g_ifps         = 30;
 double     g_filesPerSecPerStream  = 0;
 double     g_totalWriteFilesPerSec = 0;
 double     g_totalReadFilesPerSec  = 0;
 double     g_totalRmFilesPerSec    = 0;
+double     g_streamSecPerFile ;
 
 std::mutex g_readCountMutex;
 uint64_t   g_readCount     = 0;
@@ -44,8 +45,8 @@ uint64_t   g_readOffset    = 1100;
 std::string g_basePath = "./test";
 bool        g_rmdir       = true;
 uint64_t    g_filesPerDir = 1000;
-uint64_t    g_fileSize = 4*MEGABYTE;
-double      g_maxUtil    = 95;
+uint64_t    g_fileSize    = 4*MEGABYTE;
+double      g_maxUtil     = 95;
 
 uint64_t    g_removeCount = 0;
 
@@ -93,13 +94,13 @@ void statusFunction(double interval, bool *running )
          <<" util: "<<atl::filesystem::getUtilization(g_basePath)*100.0
          <<std::endl;
 
-         if( myWriteCount != interval *g_ifps ) {
-            std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< interval*g_totalWriteFilesPerSec << "files"<<std::endl;
+         if( myWriteCount != (uint64_t)(interval/g_streamSecPerFile )) {
+            std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< interval/g_streamSecPerFile<< "files"<<std::endl;
          }
-         if( myReadCount != interval *g_ifps ) {
+         if((myReadCount > 0)&&( myReadCount != interval *g_ifps )) {
             std::cout << "ERROR: Read "<<myReadCount<<" of "<< interval*g_totalReadFilesPerSec<< "files"<<std::endl;
          }
-         if( myRemoveCount != interval *g_ifps ) {
+         if((myRemoveCount > 0)&&( myRemoveCount != interval *g_ifps )) {
             std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< interval*g_totalRmFilesPerSec<< "files"<<std::endl;
          }
 
@@ -252,7 +253,7 @@ void writeFunction( std::string name, double rate, bool * running )
 
    uint64_t myCount = 0;
    std::string myPath;
-   double myFreq = 1.0/rate;
+   double myFreq = rate;
 
    //Create my file
    char * data = new char[g_fileSize];
@@ -546,37 +547,40 @@ int main( int argc, char * argv[] )
 
 
    //Calculate values
-   uint64_t totalWriteBandwith = g_streamRate*g_inputStreams;
-   uint64_t readBandwidthPerOutputStream = streamsPerOutputStream*g_streamRate;
-   uint64_t totalReadBandwidth = (double)readBandwidthPerOutputStream * g_outputStreams;
+   double   totalWriteBandwith = g_streamRate*(double)g_inputStreams;
+   double   readBandwidthPerOutputStream = streamsPerOutputStream*g_streamRate;
+   double   totalReadBandwidth = (double)readBandwidthPerOutputStream * g_outputStreams;
 
-   g_fileSize              = blocksPerContainer * blockSize;
+//   g_fileSize              = blocksPerContainer * blockSize;
    std::cout << "streamRate: "<<g_streamRate<<", fileSize: "<<g_fileSize<<std::endl;
    g_filesPerSecPerStream  = (double)g_streamRate*g_inputStreams/(double)g_fileSize;
    g_totalWriteFilesPerSec = (double)g_inputStreams * g_filesPerSecPerStream; 
-   g_totalReadFilesPerSec  = (double)g_outputStreams * g_filesPerSecPerStream * g_inputStreams; 
+   g_totalReadFilesPerSec  = (double)g_outputStreams *(double) g_filesPerSecPerStream * (double)g_inputStreams; 
    g_totalRmFilesPerSec    = (double)g_inputStreams * g_filesPerSecPerStream; 
+   g_streamSecPerFile = 8*g_fileSize/g_streamRate;
+  
 
    //Print assumptions
    std::cout <<"Aqueti Storage Validation Tool"<<std::endl;
    std::cout <<"Input:"<<std::endl;
    std::cout <<"\tstreams:    "<<g_inputStreams<<std::endl;
    std::cout <<"\tframe rate: "<<g_ifps<<std::endl;
-   std::cout <<"\tStream bandwidth: "<<g_streamRate<<" Mbps"<<std::endl;
+   std::cout <<"\tStream bandwidth: "<<g_streamRate/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\tTotal write bandwidth: "<<totalWriteBandwith/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\tFiles per directory: "<<g_filesPerDir<<std::endl;
+   std::cout <<"\tFile interval: "<<g_streamSecPerFile<<" seconds"<<std::endl;
 
    std::cout <<"Output:"<<std::endl;
    std::cout <<"\tstreams: "<<g_outputStreams<<std::endl;
    std::cout <<"\tinput streams required: "<<streamsPerOutputStream<<std::endl;
    std::cout <<"\tframe rate: "<<g_ofps<<std::endl;
-   std::cout <<"\tread bandwidth per stream:"<< readBandwidthPerOutputStream<<std::endl;
-   std::cout <<"\ttotal read bandwidth per stream:"<<totalReadBandwidth<<std::endl;
+   std::cout <<"\tread bandwidth per stream:"<< readBandwidthPerOutputStream/MEGABYTE<<" Mbps"<<std::endl;
+   std::cout <<"\ttotal read bandwidth per stream:"<<totalReadBandwidth/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\tframes behind live to start: "<<g_readOffset<<std::endl;
    
    std::cout <<"File system info"<<std::endl;
    std::cout <<"\tStorage Path:"<< g_basePath<<std::endl;
-   std::cout <<"\tFile Size:"<<g_fileSize<<std::endl;
+   std::cout <<"\tFile Size:"<<g_fileSize<<" bytes"<<std::endl;
    std::cout <<"\tFiles per second per stream: "<<g_filesPerSecPerStream<<std::endl;
    std::cout <<"\tTotal write files per second: "<<g_totalWriteFilesPerSec<<std::endl;
    std::cout <<"\tuCams per directory: "<<g_filesPerDir<<std::endl;
@@ -613,7 +617,8 @@ int main( int argc, char * argv[] )
    
       writeVect.push_back( std::thread( writeFunction
             , name
-            , g_fileSize/g_streamRate
+            , g_streamSecPerFile
+//            , g_fileSize/g_streamRate
             , &running
             ));
       g_names.push_back(name);
