@@ -38,6 +38,7 @@ double     g_ofps          = 30;
 uint64_t   g_readOffset    = 1100; 
 
 std::string g_basePath = "./test";
+bool        g_rmdir       = true;
 uint64_t    g_filesPerDir = 1000;
 uint64_t    g_fileSize = 4*MEGABYTE;
 double      g_maxUtil    = 95;
@@ -365,7 +366,7 @@ void readFunction( uint64_t startOffset
       }
       else {
          if(index > maxIndex-5 )  {
-            print("Within 5 frames of live. Reading paused");
+            std::cout << "Within 5 frames of live. Reading paused"<<std::endl;
          }
       }
 
@@ -411,9 +412,12 @@ void printHelp()
    std::cout << std::endl;
 
    std::cout << "Options:"<<std::endl;
+   std::cout << "   Setup Parameters"<<std::endl;
+   std::cout << "\t-basePath <value>    directory to write data to"<<std::endl;
+   std::cout << "\t-irmdir              remove output directory if it exists"<<std::endl;
    std::cout << "   Input Parameters"<<std::endl;
    std::cout << "\t-istreams <value>    number of input streams (default = "<<g_inputStreams<<")"<<std::endl;
-   std::cout << "\t-ifps <value>         frame rate of input streams in fps (default = "<<g_ifps<<")"<<std::endl;
+   std::cout << "\t-ifps <value>        frame rate of input streams in fps (default = "<<g_ifps<<")"<<std::endl;
    std::cout << "\t-streamMbps <value>  average stream bitrate in Mbps (default = "<<(double)g_streamRate/(double)MEGABYTE<<")"<<std::endl;
    std::cout << "   Storage Parameters"<<std::endl;
    std::cout << "\t-fileSize <value>    size of the files written to disk in bytes (default = "<<g_fileSize<<")"<<std::endl;
@@ -513,6 +517,12 @@ int main( int argc, char * argv[] )
             exit(1);
          }
       }
+      else if(!std::strcmp(argv[i], "-rmdir")) {
+         g_rmdir = true;
+      }
+      else if(!std::strcmp(argv[i], "-baseDir")) {
+         g_basePath = argv[++i];
+      }
       else {
          std::cout << "Invalid input parameter \""<<std::string(argv[i])<<"\". Re-run with -h to see options"<<std::endl;
          exit(1);
@@ -561,6 +571,11 @@ int main( int argc, char * argv[] )
    bool running = true;
    std::vector<std::thread> writeVect;
    std::vector<std::thread> readVect;
+
+   //Check if we should remove the directory
+   if( g_rmdir ) {
+      atl::filesystem::remove_all( g_basePath );
+   } 
 
    bool result = true;
    if( !atl::filesystem::is_directory(g_basePath)) { 
