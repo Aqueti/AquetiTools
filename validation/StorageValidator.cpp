@@ -99,10 +99,10 @@ void statusFunction(double interval, bool *running )
          {
             std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
          }
-         if((myReadCount > 0)&&( myReadCount != interval *g_ifps )) {
+         if((myReadCount > 0)&&( myReadCount != interval *g_totalReadFilesPerSec )) {
             std::cout << "ERROR: Read "<<myReadCount<<" of "<< interval*g_totalReadFilesPerSec<< "files"<<std::endl;
          }
-         if((myRemoveCount > 0)&&( myRemoveCount != interval *g_ifps )) {
+         if((myRemoveCount > 0)&&( myRemoveCount != interval * g_totalRmFilesPerSec)) {
             std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< interval*g_totalRmFilesPerSec<< "files"<<std::endl;
          }
 
