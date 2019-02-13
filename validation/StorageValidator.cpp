@@ -94,8 +94,8 @@ void statusFunction(double interval, bool *running )
          <<" util: "<<atl::filesystem::getUtilization(g_basePath)*100.0
          <<std::endl;
 
-         if(( myWriteCount < (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )-1)||
-           ( myWriteCount < (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )-1))
+         if(( myWriteCount < (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )-g_inputStreams)||
+           ( myWriteCount < (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )-g_inputStreams))
          {
             std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
          }
@@ -292,7 +292,6 @@ void writeFunction( std::string name, double rate, bool * running )
             dirname.append("/");
          }
 
-         std::cout << "creating directory "<<dirname<<std::endl;
          atl::filesystem::create_directory( dirname );
 
       }
@@ -313,7 +312,10 @@ void writeFunction( std::string name, double rate, bool * running )
       else {
 
         //Write data and close the file
-        fwrite( data, 1, g_fileSize, fptr );
+        size_t bytes = fwrite( data, 1, g_fileSize, fptr );
+        if( bytes < g_fileSize ) {
+           std::cout << "ERROR: wrote "<<bytes<<" of "<<g_fileSize<<"bytes to "<<filename<<std::endl;
+        }
         fclose(fptr);
         fptr = NULL;
 
