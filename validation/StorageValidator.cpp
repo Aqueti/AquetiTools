@@ -94,7 +94,9 @@ void statusFunction(double interval, bool *running )
          <<" util: "<<atl::filesystem::getUtilization(g_basePath)*100.0
          <<std::endl;
 
-         if( myWriteCount != (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )) {
+         if(( myWriteCount < (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )-1)||
+           ( myWriteCount < (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )-1))
+         {
             std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
          }
          if((myReadCount > 0)&&( myReadCount != interval *g_ifps )) {
@@ -277,7 +279,23 @@ void writeFunction( std::string name, double rate, bool * running )
    //Main loop
    while( *running )
    {
+
       std::string filename = generateFilename( name, myCount);
+
+      //If its time for a new directory, create the directory
+      if( !(myCount % g_filesPerDir )) {
+         std::vector<std::string> path = atl::stringParser( filename, "/");
+      
+         std::string dirname;   
+         for( uint64_t i = 0; i < path.size()-1; i++ ) {
+            dirname.append(path[i]);
+            dirname.append("/");
+         }
+
+         std::cout << "creating directory "<<dirname<<std::endl;
+         atl::filesystem::create_directory( dirname );
+
+      }
 
       //Check timer. Wait until it's time to insert, then add
       while( timer.elapsed() < myFreq) {
