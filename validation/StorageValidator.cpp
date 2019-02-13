@@ -94,8 +94,8 @@ void statusFunction(double interval, bool *running )
          <<" util: "<<atl::filesystem::getUtilization(g_basePath)*100.0
          <<std::endl;
 
-         if( myWriteCount != (uint64_t)(interval/g_streamSecPerFile )) {
-            std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< interval/g_streamSecPerFile<< "files"<<std::endl;
+         if( myWriteCount != (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )) {
+            std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
          }
          if((myReadCount > 0)&&( myReadCount != interval *g_ifps )) {
             std::cout << "ERROR: Read "<<myReadCount<<" of "<< interval*g_totalReadFilesPerSec<< "files"<<std::endl;
