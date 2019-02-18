@@ -21,6 +21,7 @@ class IDGenerator
 {
     public:
         static std::string genAlphanumericString(unsigned int len=8);
+        static std::string genNumericString(unsigned int len=8);
 };
 
 }//end namespace atl
