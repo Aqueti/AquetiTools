@@ -34,4 +34,23 @@ std::string IDGenerator::genAlphanumericString(unsigned int len)
     return str;
 }
 
+std::string IDGenerator::genNumericString(unsigned int len)
+{
+    std::string alphabet = "0123456789";
+    //std::uniform_int_distribution<int> d(0, alphabet.size() - 1);
+    //std::random_device rd;
+    std::srand(atl::getUsecTime()); //use current time as seed for RNG
+
+    std::string str;
+    int pos;
+    while (str.size() <= len) {
+        //pos = d(rd);
+        int randomInt = std::rand();
+        pos = randomInt % alphabet.length();
+        str += alphabet.substr(pos,1);
+    }
+
+    return str;
+}
+
 }//end namespace atl
