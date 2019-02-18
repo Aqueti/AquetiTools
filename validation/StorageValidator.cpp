@@ -108,7 +108,7 @@ void statusFunction(double interval, bool *running )
             std::cout << "ERROR: Read "<<myReadCount<<" of "<< interval*g_totalReadFilesPerSec<< "files"<<std::endl;
          }
          if((myRemoveCount > 0)&&( myRemoveCount != interval * g_totalRmFilesPerSec)) {
-            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< interval*g_totalRmFilesPerSec<< "files"<<std::endl;
+            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
          }
 
         prevWriteCount = g_writeCount;
@@ -230,8 +230,7 @@ void reaperFunction( bool * running ) {
                std::cout << "Unable to remove "<<fname<<std::endl;
             } 
             else {
-               std::cout << "Removed "<<fname<<std::endl;
-               g_minStreamMap[name] = minVal + 1;
+               g_minStreamMap[name] = g_minStreamMap[name] + 1;
                g_removeCount++;
             }
          }  
