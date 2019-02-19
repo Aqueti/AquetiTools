@@ -105,11 +105,12 @@ void statusFunction(double interval, bool *running )
            (( myReadCount < (int64_t)(g_outputStreams*interval/g_streamSecPerFile )-g_outputStreams)||
             ( myReadCount > (int64_t)(g_outputStreams*interval/g_streamSecPerFile )+g_outputStreams)
            )) {
-            std::cout << "ERROR: Read "<<myReadCount<<" of "<< interval*g_totalReadFilesPerSec<< "files"<<std::endl;
+            std::cout << "ERROR: Read "<<myReadCount<<" of "<< (int64_t)(g_outputStreams*interval)/g_streamSecPerFile<< "files"<<std::endl;
          }
-         if((myRemoveCount > 0)&&( myRemoveCount != interval * g_totalRmFilesPerSec)) {
-            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
-         }
+//         if((myRemoveCount > 0)&&( myRemoveCount != interval * g_totalRmFilesPerSec)) {
+//            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< interval * g_totalRmFilesPerSec << "files"<<std::endl;
+//            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
+//         }
 
         prevWriteCount = g_writeCount;
         prevWriteBytes = g_writeBytes;
@@ -234,6 +235,7 @@ void reaperFunction( bool * running ) {
                g_removeCount++;
             }
          }  
+         atl::sleep(.1);
       }
       else {
          atl::sleep(1.0);
@@ -355,7 +357,7 @@ void readFunction( uint64_t startOffset
 {
    atl::Timer timer;
    uint64_t index = 0;
-   double myFreq = rate;
+   double myFreq = 1/rate;
 
    //Create my file for reading
    char * data = new char[g_fileSize];
@@ -413,7 +415,7 @@ void readFunction( uint64_t startOffset
          }
       }
       else {
-         std::cout  <<" ERROR: Read behind by "<<timer.elapsed()<<" seconds"<<std::endl;
+         std::cout  <<" ERROR: Read behind by "<<timer.elapsed()-myFreq<<" seconds ("<<timer.elapsed()<<"-"<<myFreq<<std::endl;
       }
  
       //Restart the the timer
@@ -677,7 +679,7 @@ int main( int argc, char * argv[] )
 
       readVect.push_back( std::thread( readFunction 
          , g_readOffset
-         , g_streamSecPerFile
+         , g_ofps
          , &running
          ));
    }
