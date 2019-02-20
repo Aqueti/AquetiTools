@@ -405,16 +405,11 @@ void readFunction( uint64_t startOffset
       }
 
       //Wait until it's time for the next read
-      if( timer.elapsed() < myFreq ) {
-         while( timer.elapsed() < myFreq ) {
+      while(( timer.elapsed() < myFreq )&&(*running)) {
             atl::sleep(.001);
-
-            if( ! *running ) {
-               break;
-            }
-         }
       }
-      else {
+
+      if( timer.elapsed() > myFreq *1.1 ) {
          std::cout  <<" ERROR: Read behind by "<<timer.elapsed()-myFreq<<" seconds ("<<timer.elapsed()<<"-"<<myFreq<<std::endl;
       }
  
