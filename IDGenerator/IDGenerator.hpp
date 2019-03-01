@@ -12,6 +12,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <random>
 #include <string>
 #include "Timer.h"
 
@@ -22,6 +23,7 @@ class IDGenerator
     public:
         static std::string genAlphanumericString(unsigned int len=8);
         static std::string genNumericString(unsigned int len=8);
+        static uint64_t genUint64();
 };
 
 }//end namespace atl

@@ -53,4 +53,12 @@ std::string IDGenerator::genNumericString(unsigned int len)
     return str;
 }
 
+uint64_t IDGenerator::genUint64()
+{
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_int_distribution<uint64_t> distribution(0, UINT64_MAX);
+    return distribution(generator);
+}
+
 }//end namespace atl
