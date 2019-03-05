@@ -166,10 +166,12 @@ set(Thread_SRC
    Thread/Thread.cpp
    Thread/Thread.cpp
    Thread/Thread.cpp
+   Thread/ThreadWorker.cpp
 )
 
 list( APPEND ATOOL_HEADERS
    Thread/Thread.h
+   Thread/ThreadWorker.h
    Thread/MultiThread.h
    Thread/ThreadPool.h
    Thread/TaskManager.tcc
