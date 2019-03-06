@@ -366,6 +366,7 @@ void readFunction( uint64_t startOffset
    {
       bool delayed =  false;
       uint64_t maxIndex = getMaxIndex();
+      uint64_t bytesRead = 0;
 
       //If our max index is greater than the start offset, begin reading
       if(( maxIndex > startOffset )&&(index < (int64_t)(maxIndex - g_readGap))) {
@@ -390,10 +391,11 @@ void readFunction( uint64_t startOffset
             if( bytes != g_fileSize )  {
                std::cout <<"ERROR: read "<<bytes<<"/"<<g_fileSize<<" bytes from "<<filename<<std::endl;
             }
+            bytesRead += bytes;
 
          }
          //Update global tracking
-         incrementRead( g_fileSize );
+         incrementRead( bytesRead );
          index++;
 
 
@@ -412,7 +414,7 @@ void readFunction( uint64_t startOffset
 
       //Wait until it's time for the next read
       while(( timer.elapsed() < myFreq )&&(*running)) {
-            atl::sleep(.001);
+            atl::sleep(.01);
       }
 
       if(!delayed && ( timer.elapsed() > myFreq *1.1 )) {
