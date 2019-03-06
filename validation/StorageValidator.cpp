@@ -41,7 +41,7 @@ uint64_t   g_readBytes     = 0;
 uint64_t   g_outputStreams = DEFAULT_OUTPUT_STREAMS;
 double     g_ofps          = 30;
 uint64_t   g_readOffset    = 1100;          //!< How many files behind when reads start
-uint64_t   g_readGap       = 100;           //!< How close to live we can get
+uint64_t   g_readGap       = 10;           //!< How close to live we can get
 double     g_pauseDur      = 60;            //!< Default pause duration
 
 std::string g_basePath = "./test";
@@ -92,7 +92,7 @@ void statusFunction(double interval, bool *running )
          std::cout << count <<" "<< atl::getDateAsString()
          <<" writes: "<<myWriteCount<<" files/"<<myWriteBytes<<" bytes/"<<writeRate<<" Mbps,"
          <<" reads: "<<myReadCount<<" files/"<<myReadBytes<<" bytes/"<<readRate<<" Mbps,"
-         <<" total writes: "<<g_writeCount<<" files/"<<g_writeBytes<<" bytes,"
+         <<" total writes: "<<g_writeCount<<" files/"<<g_writeBytes/(double)MEGABYTE<<" bytes,"
          <<" total reads: "<<g_readCount<<" files/"<<g_readBytes/(double)MEGABYTE<<" MB," 
          <<" removeCount: "<<myRemoveCount<<" total removed: "<<g_removeCount
          <<" util: "<<atl::filesystem::getUtilization(g_basePath)*100.0
@@ -107,7 +107,7 @@ void statusFunction(double interval, bool *running )
            (( myReadCount < (int64_t)(g_outputStreams*g_inputStreams*interval/g_streamSecPerFile )-g_outputStreams)||
             ( myReadCount > (int64_t)(g_outputStreams*g_inputStreams*interval/g_streamSecPerFile )+g_outputStreams)
            )) {
-            std::cout << "ERROR: Read "<<myReadCount<<" of "<< (int64_t)(g_outputStreams*interval/g_streamSecPerFile)-g_outputStreams<< " files"<<std::endl;
+            std::cout << "ERROR: Read "<<myReadCount<<" of "<< g_inputStreams*(int64_t)(g_outputStreams*interval/g_streamSecPerFile)-g_outputStreams<< " files"<<std::endl;
          }
 
         prevWriteCount = g_writeCount;
@@ -270,16 +270,16 @@ void writeFunction( std::string name, double rate, bool * running )
    std::string path;
 
    //Delete all subthreads
-   for( auto it = begin(pathVect); it+1 != end( pathVect); ++it ) {
+   for( auto it = begin(pathVect); it+2 != end( pathVect); ++it ) {
       path.append(*it);
       //If path doesn't exist, add it
       if( !atl::filesystem::exists(path)) {
-         std::cout << "adding "<<path<<std::endl;
          if( !atl::filesystem::is_directory( *it )) {
             atl::filesystem::create_directory( path );
          }
       }
       path.append("/");
+      atl::sleep(.1);
        
    }
 
@@ -299,6 +299,7 @@ void writeFunction( std::string name, double rate, bool * running )
             dirname.append("/");
          }
 
+         std::cout << "Creating directory: "<<dirname<<std::endl;
          atl::filesystem::create_directory( dirname );
 
       }
@@ -363,6 +364,7 @@ void readFunction( uint64_t startOffset
    //Main loop
    while( *running )
    {
+      bool delayed = false;
       uint64_t maxIndex = getMaxIndex();
 
       //If our max index is greater than the start offset, begin reading
@@ -397,7 +399,9 @@ void readFunction( uint64_t startOffset
 
       }
       else {
-         std::cout << "Within "<<g_readGap<<" frames of live. Reading paused for "<<g_pauseDur<<" seconds"<<std::endl;
+         if( maxIndex > startOffset ) {
+            std::cout << "Within "<<g_readGap<<" frames of live. Reading paused for "<<g_pauseDur<<" seconds"<<std::endl;
+         }
          atl::sleep(g_pauseDur);
       }
 
@@ -406,7 +410,7 @@ void readFunction( uint64_t startOffset
             atl::sleep(.001);
       }
 
-      if( timer.elapsed() > myFreq *1.1 ) {
+      if(!delayed && ( timer.elapsed() > myFreq *1.1 )) {
          std::cout  <<" ERROR: Read behind by "<<timer.elapsed()-myFreq<<" seconds ("<<timer.elapsed()<<">"<<myFreq<<std::endl;
       }
  
