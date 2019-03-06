@@ -40,10 +40,12 @@ uint64_t   g_readCount     = 0;
 uint64_t   g_readBytes     = 0;
 uint64_t   g_outputStreams = DEFAULT_OUTPUT_STREAMS;
 double     g_ofps          = 30;
-uint64_t   g_readOffset    = 1100; 
+uint64_t   g_readOffset    = 1100;          //!< How many files behind when reads start
+uint64_t   g_readGap       = 100;           //!< How close to live we can get
+double     g_pauseDur      = 60;            //!< Default pause duration
 
 std::string g_basePath = "./test";
-bool        g_rmdir       = true;
+bool        g_rmdir       = false;
 uint64_t    g_filesPerDir = 1000;
 uint64_t    g_fileSize    = 4*MEGABYTE;
 double      g_maxUtil     = 95;
@@ -107,10 +109,6 @@ void statusFunction(double interval, bool *running )
            )) {
             std::cout << "ERROR: Read "<<myReadCount<<" of "<< (int64_t)(g_outputStreams*interval/g_streamSecPerFile)-g_outputStreams<< " files"<<std::endl;
          }
-//         if((myRemoveCount > 0)&&( myRemoveCount != interval * g_totalRmFilesPerSec)) {
-//            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< interval * g_totalRmFilesPerSec << "files"<<std::endl;
-//            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
-//         }
 
         prevWriteCount = g_writeCount;
         prevWriteBytes = g_writeBytes;
@@ -218,7 +216,7 @@ void reaperFunction( bool * running ) {
       //Wait until we're at 95%
       double util = atl::filesystem::getUtilization( g_basePath )*100.0;
       if( util > g_maxUtil ) {
-         uint64_t minVal = UINT64_MAX;
+//         uint64_t minVal = UINT64_MAX;
 
          for( auto it : g_minStreamMap ) {
             std::string name = it.first;
@@ -356,7 +354,7 @@ void readFunction( uint64_t startOffset
       )
 {
    atl::Timer timer;
-   uint64_t index = 0;
+   int64_t index = 0;
    double myFreq = 1/rate;
 
    //Create my file for reading
@@ -368,7 +366,7 @@ void readFunction( uint64_t startOffset
       uint64_t maxIndex = getMaxIndex();
 
       //If our max index is greater than the start offset, begin reading
-      if(( maxIndex > startOffset )&&(index < maxIndex -100 )) {
+      if(( maxIndex > startOffset )&&(index < (int64_t)(maxIndex - g_readGap))) {
          for( auto it : g_names ) {
             //get filename
             std::string filename = generateFilename( it, index);
@@ -399,9 +397,8 @@ void readFunction( uint64_t startOffset
 
       }
       else {
-         if(index > maxIndex-5 )  {
-            std::cout << "Within 5 frames of live. Reading paused"<<std::endl;
-         }
+         std::cout << "Within "<<g_readGap<<" frames of live. Reading paused for "<<g_pauseDur<<" seconds"<<std::endl;
+         atl::sleep(g_pauseDur);
       }
 
       //Wait until it's time for the next read
@@ -410,7 +407,7 @@ void readFunction( uint64_t startOffset
       }
 
       if( timer.elapsed() > myFreq *1.1 ) {
-         std::cout  <<" ERROR: Read behind by "<<timer.elapsed()-myFreq<<" seconds ("<<timer.elapsed()<<"-"<<myFreq<<std::endl;
+         std::cout  <<" ERROR: Read behind by "<<timer.elapsed()-myFreq<<" seconds ("<<timer.elapsed()<<">"<<myFreq<<std::endl;
       }
  
       //Restart the the timer
@@ -440,12 +437,12 @@ void printHelp()
    std::cout << std::endl;
    std::cout << "   Per stream bandwidth for standard video modes"<<std::endl;
    std::cout << "\tMode       Quality    fps    Bandwidth"<<std::endl;
-   std::cout << "\tH264       High       30     300 Mbps"<<std::endl;
-   std::cout << "\tH264       Medium     30     300 Mbps"<<std::endl;
-   std::cout << "\tH264       Low        30     300 Mbps"<<std::endl;
+   std::cout << "\tH264       High       30     600 Mbps"<<std::endl;
+   std::cout << "\tH264       Medium     30     400 Mbps"<<std::endl;
+   std::cout << "\tH264       Low        30     200 Mbps"<<std::endl;
    std::cout << "\tH265       High       30     300 Mbps"<<std::endl;
-   std::cout << "\tH265       Medium     30     300 Mbps"<<std::endl;
-   std::cout << "\tH265       Low        30     300 Mbps"<<std::endl;
+   std::cout << "\tH265       Medium     30     200 Mbps"<<std::endl;
+   std::cout << "\tH265       Low        30     100 Mbps"<<std::endl;
    std::cout << std::endl;
    std::cout << "The fps field is used to scale output bandwidth based on input frame rate"<<std::endl;
    std::cout << std::endl;
@@ -465,7 +462,8 @@ void printHelp()
    std::cout << "   Output Parameters"<<std::endl;
    std::cout << "\t-ostreams <value >   number of output streams (default = "<<g_outputStreams<<")"<<std::endl;
    std::cout << "\t-ofps <value>        frame rate of output streams in fps (default = "<<g_ifps<<")"<<std::endl;
-   std::cout << "\t-readOffset <value>  how many frames behind input do we start reading (default = "<<g_readOffset<<")"<<std::endl;
+   std::cout << "\t-readOffset <value>  how many files behind input do we start reading (default = "<<g_readOffset<<")"<<std::endl;
+   std::cout << "\t-minReadGap <value>  how far behind live do we stop reading data (defalt = "<<g_readGap<<")"<<std::endl;
    std::cout << "\t-interval <value>    how often statistics are written (default = "<<g_statusInterval<<")"<<std::endl;
 
    return;
@@ -480,8 +478,8 @@ int main( int argc, char * argv[] )
 
    //Input params
    //Storage params
-   uint64_t blocksPerContainer = DEFAULT_BLOCKS_PER_CONTAINER;
-   uint64_t blockSize          = DEFAULT_BLOCK_SIZE;
+//   uint64_t blocksPerContainer = DEFAULT_BLOCKS_PER_CONTAINER;
+//   uint64_t blockSize          = DEFAULT_BLOCK_SIZE;
 
    //Playback params
    uint64_t streamsPerOutputStream = g_inputStreams;
@@ -557,10 +555,17 @@ int main( int argc, char * argv[] )
             exit(1);
          }
       }
+      else if(!std::strcmp(argv[i], "-readGap")) {
+         g_readGap = std::atoi(argv[++i]);
+         if( g_readOffset == 0 ) {
+            std::cout << "Invalid readOffset value: "<<argv[i]<<std::endl;
+            exit(1);
+         }
+      }
       else if(!std::strcmp(argv[i], "-rmdir")) {
          g_rmdir = true;
       }
-      else if(!std::strcmp(argv[i], "-baseDir")) {
+      else if(!std::strcmp(argv[i], "-basePath")) {
          g_basePath = argv[++i];
       }
       else if(!std::strcmp(argv[i], "-interval")) {
@@ -623,6 +628,10 @@ int main( int argc, char * argv[] )
 
    std::cout << "Write Rate: "<< (double)g_fileSize/(double)g_streamRate<<std::endl;
 
+   if( g_readOffset < g_readGap ) {
+      std::cout << "ERROR: Read offset must be at least "<<g_readGap<<std::endl;
+      exit(1);
+   }
 
    /////////////////////////////////////////////
    // Setup
@@ -633,7 +642,16 @@ int main( int argc, char * argv[] )
 
    //Check if we should remove the directory
    if( g_rmdir ) {
-      std::cout << "Removing test directory: "<<g_basePath<<std::endl;
+      std::string input;
+      std::cout << "Are you sure you want to remove the "<<g_basePath<<" directory (y/n)?"<<std::endl;
+      std::cin >> input;
+
+      if( input.compare("y")) {
+         std::cout << "Aborting"<<std::endl;
+         exit(1);
+       }
+     
+  
       atl::filesystem::remove_all( g_basePath );
 
       while( atl::filesystem::exists( g_basePath )) {
