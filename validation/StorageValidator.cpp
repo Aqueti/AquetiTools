@@ -26,7 +26,7 @@
 std::mutex g_writeCountMutex;
 uint64_t   g_writeCount   = 0;
 uint64_t   g_writeBytes   = 0;
-uint64_t   g_inputStreams = 1;
+int64_t    g_inputStreams = 1;
 double     g_streamRate   = H264_HIGH_BANDWIDTH;
 double     g_ifps         = 30;
 double     g_filesPerSecPerStream  = 0;
@@ -47,8 +47,10 @@ bool        g_rmdir       = true;
 uint64_t    g_filesPerDir = 1000;
 uint64_t    g_fileSize    = 4*MEGABYTE;
 double      g_maxUtil     = 95;
+double      g_targetUtil  = 90;
 
 uint64_t    g_removeCount = 0;
+uint64_t    g_statusInterval = 10;
 
 std::mutex  g_maxMapMutex;
 std::mutex  g_minMapMutex;
@@ -76,7 +78,7 @@ void statusFunction(double interval, bool *running )
       if( timer.elapsed() > interval ) {
          double interval = timer.elapsed();
          timer.start();
-         uint64_t myWriteCount = g_writeCount - prevWriteCount;
+         int64_t myWriteCount = g_writeCount - prevWriteCount;
          uint64_t myWriteBytes = g_writeBytes - prevWriteBytes;
          double   writeRate = (double)myWriteBytes*8.0/interval/(double)MEGABYTE;
          uint64_t myReadCount = g_readCount - prevReadCount;
@@ -94,22 +96,27 @@ void statusFunction(double interval, bool *running )
          <<" util: "<<atl::filesystem::getUtilization(g_basePath)*100.0
          <<std::endl;
 
-         if(( myWriteCount < (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )-g_inputStreams)||
-           ( myWriteCount < (uint64_t)(g_inputStreams*interval/g_streamSecPerFile )-g_inputStreams))
+         if(( myWriteCount < (int64_t)(g_inputStreams*interval/g_streamSecPerFile )-g_inputStreams)||
+            ( myWriteCount > (int64_t)(g_inputStreams*interval/g_streamSecPerFile )+g_inputStreams))
          {
             std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
          }
-         if((myReadCount > 0)&&( myReadCount != interval *g_ifps )) {
-            std::cout << "ERROR: Read "<<myReadCount<<" of "<< interval*g_totalReadFilesPerSec<< "files"<<std::endl;
+         if(( myReadCount > 0 ) &&
+           (( myReadCount < (int64_t)(g_outputStreams*g_inputStreams*interval/g_streamSecPerFile )-g_outputStreams)||
+            ( myReadCount > (int64_t)(g_outputStreams*g_inputStreams*interval/g_streamSecPerFile )+g_outputStreams)
+           )) {
+            std::cout << "ERROR: Read "<<myReadCount<<" of "<< (int64_t)(g_outputStreams*interval/g_streamSecPerFile)-g_outputStreams<< " files"<<std::endl;
          }
-         if((myRemoveCount > 0)&&( myRemoveCount != interval *g_ifps )) {
-            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< interval*g_totalRmFilesPerSec<< "files"<<std::endl;
-         }
+//         if((myRemoveCount > 0)&&( myRemoveCount != interval * g_totalRmFilesPerSec)) {
+//            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< interval * g_totalRmFilesPerSec << "files"<<std::endl;
+//            std::cout << "ERROR: Removed "<<myRemoveCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
+//         }
 
         prevWriteCount = g_writeCount;
         prevWriteBytes = g_writeBytes;
         prevReadCount  = g_readCount;
         prevReadBytes  = g_readBytes;
+        prevRemoveCount = g_removeCount;
 
          count++;
       }
@@ -209,27 +216,26 @@ std::string generateFilename( std::string name, uint64_t count )
 void reaperFunction( bool * running ) {
    while( *running ) {
       //Wait until we're at 95%
-      if( 100.0*atl::filesystem::getUtilization(g_basePath) > g_maxUtil ) {
+      double util = atl::filesystem::getUtilization( g_basePath )*100.0;
+      if( util > g_maxUtil ) {
          uint64_t minVal = UINT64_MAX;
-         std::string name;
 
-         //get the older index of any frame
-         for( auto it:g_names ) {
-            if( g_minStreamMap[it] < minVal ) {
-               minVal = g_minStreamMap[it];
-               name = it;
+         for( auto it : g_minStreamMap ) {
+            std::string name = it.first;
+
+
+            std::string fname = generateFilename( name, g_minStreamMap[name]);
+
+            bool result = atl::filesystem::remove(fname);
+            if( !result) {
+               std::cout << "Unable to remove "<<fname<<std::endl;
+            } 
+            else {
+               g_minStreamMap[name] = g_minStreamMap[name] + 1;
+               g_removeCount++;
             }
-         }   
-         std::string fname = generateFilename( name, minVal );
-
-         bool result = atl::filesystem::remove(fname);
-         if( !result) {
-            std::cout << "Unable to remove "<<fname<<std::endl;
-         } 
-         else {
-            g_minStreamMap[name] = minVal + 1;
-            g_removeCount++;
          }  
+         atl::sleep(.1);
       }
       else {
          atl::sleep(1.0);
@@ -268,9 +274,12 @@ void writeFunction( std::string name, double rate, bool * running )
    //Delete all subthreads
    for( auto it = begin(pathVect); it+1 != end( pathVect); ++it ) {
       path.append(*it);
-      std::cout << "adding "<<path<<std::endl;
-      if( !atl::filesystem::is_directory( *it )) {
-         atl::filesystem::create_directory( path );
+      //If path doesn't exist, add it
+      if( !atl::filesystem::exists(path)) {
+         std::cout << "adding "<<path<<std::endl;
+         if( !atl::filesystem::is_directory( *it )) {
+            atl::filesystem::create_directory( path );
+         }
       }
       path.append("/");
        
@@ -348,7 +357,7 @@ void readFunction( uint64_t startOffset
 {
    atl::Timer timer;
    uint64_t index = 0;
-   double myFreq = 1.0/rate;
+   double myFreq = 1/rate;
 
    //Create my file for reading
    char * data = new char[g_fileSize];
@@ -359,19 +368,11 @@ void readFunction( uint64_t startOffset
       uint64_t maxIndex = getMaxIndex();
 
       //If our max index is greater than the start offset, begin reading
-      if(( maxIndex > startOffset )&&(index < maxIndex -5 )) {
+      if(( maxIndex > startOffset )&&(index < maxIndex -100 )) {
          for( auto it : g_names ) {
             //get filename
             std::string filename = generateFilename( it, index);
-      
-            while( timer.elapsed() < myFreq) {
-               atl::sleep(.001);
-
-               if( ! *running ) {
-                  break;
-               }
-            }
-
+     
             //Write the file
             FILE * fptr = NULL;
             fptr = fopen( filename.c_str(), "rb" );
@@ -393,12 +394,9 @@ void readFunction( uint64_t startOffset
             //Update global tracking
             incrementRead( g_fileSize );
          }
-
-         while(timer.elapsed() < 1.0/g_ofps) {
-            atl::sleep( 1.0/g_ofps - timer.elapsed());
-         }
-
          index++;
+
+
       }
       else {
          if(index > maxIndex-5 )  {
@@ -406,8 +404,13 @@ void readFunction( uint64_t startOffset
          }
       }
 
-      while(( timer.elapsed() < 1.0/g_ofps )&&(*running )) {
-         atl::sleep( 1.0/g_ofps - timer.elapsed() );
+      //Wait until it's time for the next read
+      while(( timer.elapsed() < myFreq )&&(*running)) {
+            atl::sleep(.001);
+      }
+
+      if( timer.elapsed() > myFreq *1.1 ) {
+         std::cout  <<" ERROR: Read behind by "<<timer.elapsed()-myFreq<<" seconds ("<<timer.elapsed()<<"-"<<myFreq<<std::endl;
       }
  
       //Restart the the timer
@@ -450,7 +453,7 @@ void printHelp()
    std::cout << "Options:"<<std::endl;
    std::cout << "   Setup Parameters"<<std::endl;
    std::cout << "\t-basePath <value>    directory to write data to"<<std::endl;
-   std::cout << "\t-rmdir              remove output directory if it exists"<<std::endl;
+   std::cout << "\t-rmdir              remove output directory if it exists (default = true)"<<std::endl;
    std::cout << "   Input Parameters"<<std::endl;
    std::cout << "\t-istreams <value>    number of input streams (default = "<<g_inputStreams<<")"<<std::endl;
    std::cout << "\t-ifps <value>        frame rate of input streams in fps (default = "<<g_ifps<<")"<<std::endl;
@@ -463,6 +466,7 @@ void printHelp()
    std::cout << "\t-ostreams <value >   number of output streams (default = "<<g_outputStreams<<")"<<std::endl;
    std::cout << "\t-ofps <value>        frame rate of output streams in fps (default = "<<g_ifps<<")"<<std::endl;
    std::cout << "\t-readOffset <value>  how many frames behind input do we start reading (default = "<<g_readOffset<<")"<<std::endl;
+   std::cout << "\t-interval <value>    how often statistics are written (default = "<<g_statusInterval<<")"<<std::endl;
 
    return;
 }
@@ -559,6 +563,13 @@ int main( int argc, char * argv[] )
       else if(!std::strcmp(argv[i], "-baseDir")) {
          g_basePath = argv[++i];
       }
+      else if(!std::strcmp(argv[i], "-interval")) {
+         g_statusInterval = std::atoi(argv[++i]);
+         if( g_readOffset == 0 ) {
+            std::cout << "Invalid readOffset value: "<<argv[i]<<std::endl;
+            exit(1);
+         }
+      }
       else {
          std::cout << "Invalid input parameter \""<<std::string(argv[i])<<"\". Re-run with -h to see options"<<std::endl;
          exit(1);
@@ -573,7 +584,7 @@ int main( int argc, char * argv[] )
 
 //   g_fileSize              = blocksPerContainer * blockSize;
    std::cout << "streamRate: "<<g_streamRate<<", fileSize: "<<g_fileSize<<std::endl;
-   g_filesPerSecPerStream  = (double)g_streamRate*g_inputStreams/(double)g_fileSize;
+   g_filesPerSecPerStream  = (double)g_streamRate*g_inputStreams/(double)g_fileSize/8;
    g_totalWriteFilesPerSec = (double)g_inputStreams * g_filesPerSecPerStream; 
    g_totalReadFilesPerSec  = (double)g_outputStreams *(double) g_filesPerSecPerStream * (double)g_inputStreams; 
    g_totalRmFilesPerSec    = (double)g_inputStreams * g_filesPerSecPerStream; 
@@ -596,6 +607,7 @@ int main( int argc, char * argv[] )
    std::cout <<"\tframe rate: "<<g_ofps<<std::endl;
    std::cout <<"\tread bandwidth per stream:"<< readBandwidthPerOutputStream/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\ttotal read bandwidth per stream:"<<totalReadBandwidth/MEGABYTE<<" Mbps"<<std::endl;
+   std::cout <<"\ttotal read files per second:"<<g_totalReadFilesPerSec<<std::endl;
    std::cout <<"\tframes behind live to start: "<<g_readOffset<<std::endl;
    
    std::cout <<"File system info"<<std::endl;
@@ -605,6 +617,9 @@ int main( int argc, char * argv[] )
    std::cout <<"\tTotal write files per second: "<<g_totalWriteFilesPerSec<<std::endl;
    std::cout <<"\tuCams per directory: "<<g_filesPerDir<<std::endl;
    std::cout <<"\tMax Utilization: "<<g_maxUtil<<std::endl;
+   std::cout <<"\tTotal files removed per second: "<<g_totalRmFilesPerSec<<std::endl;
+   std::cout <<"\tStatus update interval: "<<g_statusInterval<<std::endl;
+
 
    std::cout << "Write Rate: "<< (double)g_fileSize/(double)g_streamRate<<std::endl;
 
@@ -618,7 +633,13 @@ int main( int argc, char * argv[] )
 
    //Check if we should remove the directory
    if( g_rmdir ) {
+      std::cout << "Removing test directory: "<<g_basePath<<std::endl;
       atl::filesystem::remove_all( g_basePath );
+
+      while( atl::filesystem::exists( g_basePath )) {
+         atl::sleep(.1);
+      }
+      
    } 
 
    bool result = true;
@@ -629,9 +650,10 @@ int main( int argc, char * argv[] )
    if( !result ) {
       std::cout << "Base Storage directory "<<g_basePath<<" does not exist and unable to create"<<std::endl;
    }
+   atl::sleep(1.0);
 
    //Create write threads - one per input stream
-   for( uint64_t i=0; i < g_inputStreams; i++ ) {
+   for( int64_t i=0; i < g_inputStreams; i++ ) {
       std::string name = "uCam_";
       name.append( std::to_string(i));
    
@@ -652,15 +674,14 @@ int main( int argc, char * argv[] )
 
       readVect.push_back( std::thread( readFunction 
          , g_readOffset
-//         , g_ofps
-         , g_fileSize/g_streamRate
+         , g_ofps
          , &running
          ));
    }
          
 
    //Create status thread. This prints the output
-   std::thread statusThread = std::thread(statusFunction, 10.0, &running);
+   std::thread statusThread = std::thread(statusFunction, g_statusInterval, &running);
 
    //Create a garbage collection thread
    std::thread reaperThread = std::thread(reaperFunction, &running );
