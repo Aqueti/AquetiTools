@@ -364,7 +364,7 @@ void readFunction( uint64_t startOffset
    //Main loop
    while( *running )
    {
-      bool delayed = false;
+      bool delayed =  false;
       uint64_t maxIndex = getMaxIndex();
 
       //If our max index is greater than the start offset, begin reading
@@ -391,18 +391,23 @@ void readFunction( uint64_t startOffset
                std::cout <<"ERROR: read "<<bytes<<"/"<<g_fileSize<<" bytes from "<<filename<<std::endl;
             }
 
-            //Update global tracking
-            incrementRead( g_fileSize );
          }
+         //Update global tracking
+         incrementRead( g_fileSize );
          index++;
 
 
       }
       else {
+         delayed = true;
          if( maxIndex > startOffset ) {
             std::cout << "Within "<<g_readGap<<" frames of live. Reading paused for "<<g_pauseDur<<" seconds"<<std::endl;
          }
-         atl::sleep(g_pauseDur);
+
+         atl::Timer timer;
+         while(( timer.elapsed() < g_pauseDur) && *running ) {
+            atl::sleep(0.1);
+         }
       }
 
       //Wait until it's time for the next read
