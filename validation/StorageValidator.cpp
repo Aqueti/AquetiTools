@@ -419,7 +419,7 @@ void readFunction( int64_t startOffset
 
       //Wait until it's time for the next read
       while(( timer.elapsed() < myFreq )&&(*running)) {
-            atl::sleep(.01);
+            atl::sleep(.001);
       }
 
       if(!delayed && ( timer.elapsed() > myFreq *1.1 )) {
