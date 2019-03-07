@@ -12,6 +12,8 @@
 #include <FileIO.h>
 #include <StringTools.h>
 
+#include <revision.h>
+
 #define MEGABYTE (1024*1024)
 
 #define H264_HIGH_BANDWIDTH (300.0*MEGABYTE/19.0)          //!< per microcamera bandwidth for hi-res H264
@@ -436,7 +438,8 @@ void readFunction( int64_t startOffset
    
 void printHelp()
 {
-   std::cout << "Aqueti Storage Validator\n"<<std::endl;
+   std::cout << "Aqueti Storage Validator"<<std::endl;
+   std::cout << "Version: "<<atl::VERSION<<", build: "<<atl::GIT_COMMIT_HASH<<"\n"<<std::endl;
    std::cout << "This application is used to verify that a storage solution is able to support a" <<std::endl;
    std::cout << "specific configuration without requiring a full software installation. It is "<<std::endl; 
    std::cout << "designed to work with both Windows and Linux systems."<<std::endl;
