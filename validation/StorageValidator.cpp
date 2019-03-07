@@ -6,6 +6,7 @@
 #include <thread>
 #include <mutex>
 #include <cstring>
+#include <cmath>
 
 #include <Timer.h>
 #include <FileIO.h>
@@ -40,8 +41,8 @@ uint64_t   g_readCount     = 0;
 uint64_t   g_readBytes     = 0;
 uint64_t   g_outputStreams = DEFAULT_OUTPUT_STREAMS;
 double     g_ofps          = 30;
-uint64_t   g_readOffset    = 1100;          //!< How many files behind when reads start
-uint64_t   g_readGap       = 10;           //!< How close to live we can get
+int64_t    g_readOffset    = 1100;          //!< How many files behind when reads start
+int64_t    g_readGap       = 10;           //!< How close to live we can get
 double     g_pauseDur      = 60;            //!< Default pause duration
 
 std::string g_basePath = "./test";
@@ -83,8 +84,8 @@ void statusFunction(double interval, bool *running )
          int64_t myWriteCount = g_writeCount - prevWriteCount;
          uint64_t myWriteBytes = g_writeBytes - prevWriteBytes;
          double   writeRate = (double)myWriteBytes*8.0/interval/(double)MEGABYTE;
-         uint64_t myReadCount = g_readCount - prevReadCount;
-         uint64_t myReadBytes = g_readBytes - prevReadBytes;
+         int64_t myReadCount = g_readCount - prevReadCount;
+         int64_t myReadBytes = g_readBytes - prevReadBytes;
          double   readRate = (double)myReadBytes*8.0/interval/(double)MEGABYTE;
          uint64_t myRemoveCount = g_removeCount - prevRemoveCount;
          
@@ -103,11 +104,12 @@ void statusFunction(double interval, bool *running )
          {
             std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
          }
+         int64_t target  = g_outputStreams*g_inputStreams*std::ceil(interval/g_streamSecPerFile);
          if(( myReadCount > 0 ) &&
-           (( myReadCount < (int64_t)(g_outputStreams*g_inputStreams*interval/g_streamSecPerFile )-g_outputStreams)||
-            ( myReadCount > (int64_t)(g_outputStreams*g_inputStreams*interval/g_streamSecPerFile )+g_outputStreams)
+           (( myReadCount < target - g_inputStreams) ||
+            ( myReadCount > target + g_inputStreams) 
            )) {
-            std::cout << "ERROR: Read "<<myReadCount<<" of "<< g_inputStreams*(int64_t)(g_outputStreams*interval/g_streamSecPerFile)-g_outputStreams<< " files"<<std::endl;
+            std::cout << "ERROR: Read "<<myReadCount<<" of "<< target << " files"<<std::endl;
          }
 
         prevWriteCount = g_writeCount;
@@ -349,14 +351,14 @@ void writeFunction( std::string name, double rate, bool * running )
 /**
  * \brief Fucntions for reading files
  **/
-void readFunction( uint64_t startOffset
+void readFunction( int64_t startOffset
       , double rate
       , bool * running 
       )
 {
    atl::Timer timer;
    int64_t index = 0;
-   double myFreq = 1/rate;
+   double myFreq = rate;
 
    //Create my file for reading
    char * data = new char[g_fileSize];
@@ -365,14 +367,14 @@ void readFunction( uint64_t startOffset
    while( *running )
    {
       bool delayed =  false;
-      uint64_t maxIndex = getMaxIndex();
-      uint64_t bytesRead = 0;
+      int64_t maxIndex = getMaxIndex();
 
       //If our max index is greater than the start offset, begin reading
-      if(( maxIndex > startOffset )&&(index < (int64_t)(maxIndex - g_readGap))) {
+      if(( maxIndex > startOffset )&&(index < (maxIndex - g_readGap))) {
          for( auto it : g_names ) {
             //get filename
             std::string filename = generateFilename( it, index);
+            std::cout << "reading: "<<filename<<std::endl;
      
             //Write the file
             FILE * fptr = NULL;
@@ -391,11 +393,10 @@ void readFunction( uint64_t startOffset
             if( bytes != g_fileSize )  {
                std::cout <<"ERROR: read "<<bytes<<"/"<<g_fileSize<<" bytes from "<<filename<<std::endl;
             }
-            bytesRead += bytes;
+            incrementRead( bytes );
 
          }
          //Update global tracking
-         incrementRead( bytesRead );
          index++;
 
 
@@ -604,7 +605,7 @@ int main( int argc, char * argv[] )
    g_totalWriteFilesPerSec = (double)g_inputStreams * g_filesPerSecPerStream; 
    g_totalReadFilesPerSec  = (double)g_outputStreams *(double) g_filesPerSecPerStream * (double)g_inputStreams; 
    g_totalRmFilesPerSec    = (double)g_inputStreams * g_filesPerSecPerStream; 
-   g_streamSecPerFile = 8*g_fileSize/g_streamRate;
+   g_streamSecPerFile      = 8*g_fileSize/g_streamRate;
   
 
    //Print assumptions
@@ -689,7 +690,6 @@ int main( int argc, char * argv[] )
       writeVect.push_back( std::thread( writeFunction
             , name
             , g_streamSecPerFile
-//            , g_fileSize/g_streamRate
             , &running
             ));
       g_names.push_back(name);
@@ -703,7 +703,7 @@ int main( int argc, char * argv[] )
 
       readVect.push_back( std::thread( readFunction 
          , g_readOffset
-         , g_ofps
+         , g_streamSecPerFile
          , &running
          ));
    }
