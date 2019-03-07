@@ -657,7 +657,7 @@ int main( int argc, char * argv[] )
    std::vector<std::thread> readVect;
 
    //Check if we should remove the directory
-   if( g_rmdir ) {
+   if(( g_rmdir )&&(atl::filesystem::exists(g_basePath))) {
       std::string input;
       std::cout << "Are you sure you want to remove the "<<g_basePath<<" directory (y/n)?"<<std::endl;
       std::cin >> input;
@@ -678,6 +678,7 @@ int main( int argc, char * argv[] )
 
    bool result = true;
    if( !atl::filesystem::is_directory(g_basePath)) { 
+     std::cout << "Creating basePath: "<<g_basePath<<std::endl;
      result = atl::filesystem::create_directory(g_basePath);
    }
 
