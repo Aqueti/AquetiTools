@@ -68,7 +68,8 @@ std::vector<std::string> g_names;
  * \param [in] running pointer to a boolean that terminal processing loop
  **/
 void statusFunction(double interval, bool *running )   
-{ 
+{
+   bool     started = false; 
    uint64_t count = 0;
    uint64_t prevWriteCount  = g_writeCount;
    uint64_t prevWriteBytes  = g_writeBytes;
@@ -105,11 +106,15 @@ void statusFunction(double interval, bool *running )
             std::cout << "ERROR: Wrote "<<myWriteCount<<" of "<< g_inputStreams*interval/g_streamSecPerFile<< "files"<<std::endl;
          }
          int64_t target  = g_outputStreams*g_inputStreams*std::ceil(interval/g_streamSecPerFile);
-         if(( myReadCount > 0 ) &&
+         if(( myReadCount > 0 ) && (started ) &&
            (( myReadCount < target - g_inputStreams) ||
             ( myReadCount > target + g_inputStreams) 
            )) {
             std::cout << "ERROR: Read "<<myReadCount<<" of "<< target << " files"<<std::endl;
+         }
+
+         if( myReadCount > 0 ) {
+            started = true;
          }
 
         prevWriteCount = g_writeCount;
@@ -374,7 +379,6 @@ void readFunction( int64_t startOffset
          for( auto it : g_names ) {
             //get filename
             std::string filename = generateFilename( it, index);
-            std::cout << "reading: "<<filename<<std::endl;
      
             //Write the file
             FILE * fptr = NULL;
