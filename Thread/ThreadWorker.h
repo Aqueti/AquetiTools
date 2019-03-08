@@ -9,6 +9,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <functional>
 #include <mutex>
 #include "Thread.h"
 
