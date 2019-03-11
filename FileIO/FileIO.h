@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <string>
 #include <vector>
+
 namespace atl
 {
 namespace filesystem
@@ -32,6 +33,21 @@ namespace filesystem
    std::string current_path();                             
    space_info  space( std::string path );                 
    double      getUtilization( std::string path );
+
+   /**
+   *  \brief update mod/access times
+   *  \param name file on which to operate
+   *  \param create whether or not to create if doesn't exist
+   *  \return errors from creating or updating time
+   **/
+   int touch(std::string name, bool create = true);
+
+   /**
+   *  \brief return file modification time
+   *  \param name filename
+   *  \return microsecond time of last modification
+   **/
+   uint64_t getLastModTime(std::string name);
  
 }
 }

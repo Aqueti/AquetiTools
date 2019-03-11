@@ -11,6 +11,8 @@
 #include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <dirent.h>
+#include <fcntl.h>
+#include <sys/types.h>
 #endif
 
 #include <stdio.h>
@@ -301,5 +303,60 @@ namespace filesystem
       return util;
 
    }
+
+int touch(std::string name, bool create)
+{
+#ifdef _WIN32
+     std::cerr << "touch not yet implemented on Windows" << std::endl;
+	 return -1;
+#else
+ 
+	// open
+
+	 int fd = open(name.c_str(), O_CREAT | O_WRONLY | O_NONBLOCK | O_NOCTTY, 0666);
+	 if(fd < 0) {
+		 int err = errno;
+		 std::cerr << __FUNCTION__ << " error opening file" << std::endl;
+		 // TODO: use api returns 
+		 return err;
+	 }
+
+	 struct timespec times[2];
+	 times[0].tv_nsec = UTIME_NOW;
+	 times[1].tv_nsec = UTIME_NOW;
+
+	 int rv = futimens(fd,times);
+	 if(rv < 0) {
+		 int err = errno;
+		 std::cerr << __FUNCTION__ << " error setting file access/mod time" << std::endl;
+		 // TODO: use api returns 
+		 return err;
+	 }
+
+	 close(fd);
+
+	 return 0;
+
+#endif
+}
+
+uint64_t getLastModTime(std::string name)
+{
+#ifdef _WIN32
+     std::cerr << "getLastModTime not yet implemented on Windows" << std::endl;
+	 return 0;
+#else
+ 
+	struct stat statBuf;
+	int rv = stat(name.c_str(), &statBuf);
+	if(rv < 0){ 
+		perror(0);
+		std::cerr << __FUNCTION__ << " stat failed" << std::endl;
+		return 0;
+	}
+	return statBuf.st_mtim.tv_sec * 1e6 + statBuf.st_mtim.tv_nsec / 1e3;
+#endif
+}
+
 }
 }

@@ -219,6 +219,7 @@ list( APPEND ATOOL_HEADERS
    FileIO/FileIO.h
 )
 
+
 add_library( AquetiTools STATIC  
    ${Timer_SRC}
    ${Thread_SRC}
@@ -227,6 +228,7 @@ add_library( AquetiTools STATIC
    ${Tools_SRC}
    ${IDGenerator_SRC}
    ${FileIO_SRC}
+   ${AqtError_SRC}
 )
 
 target_link_libraries( AquetiTools
