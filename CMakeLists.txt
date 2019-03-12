@@ -268,8 +268,20 @@ if(BUILD_TESTS)
    )
    list(APPEND TARGET_LIST testAquetiTools )
 
+   #Add validation tools
+   add_executable( storageValidator
+      validation/StorageValidator.cpp
+   )
+
+   target_link_libraries( storageValidator
+      AquetiTools
+   )
+   list(APPEND TARGET_LIST storageValidator)
+
    #Add AquetiTools test as an executavble
 endif()
+
+
 
 #############################################
 #install library files
