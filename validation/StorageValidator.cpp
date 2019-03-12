@@ -31,7 +31,6 @@ uint64_t   g_writeCount   = 0;
 uint64_t   g_writeBytes   = 0;
 int64_t    g_inputStreams = 1;
 double     g_streamRate   = H264_HIGH_BANDWIDTH;
-double     g_ifps         = 30;
 double     g_filesPerSecPerStream  = 0;
 double     g_totalWriteFilesPerSec = 0;
 double     g_totalReadFilesPerSec  = 0;
@@ -39,18 +38,18 @@ double     g_totalRmFilesPerSec    = 0;
 double     g_streamSecPerFile ;
 
 std::mutex g_readCountMutex;
-uint64_t   g_readCount     = 0;
-uint64_t   g_readBytes     = 0;
-uint64_t   g_outputStreams = DEFAULT_OUTPUT_STREAMS;
-double     g_ofps          = 30;
-int64_t    g_readOffset    = 1100;          //!< How many files behind when reads start
-int64_t    g_readGap       = 10;           //!< How close to live we can get
-double     g_pauseDur      = 60;            //!< Default pause duration
+uint64_t   g_readCount      = 0;
+uint64_t   g_readBytes      = 0;
+uint64_t   g_outputStreams  = DEFAULT_OUTPUT_STREAMS;
+int64_t    g_readOffset     = 100;           //!< How many files behind when reads start
+int64_t    g_readGap        = 10;           //!< How close to live we can get
+double     g_pauseDur       = 60;            //!< Default pause duration
+int64_t    g_streamsPerRead = 5;
 
 std::string g_basePath = "./test";
-bool        g_rmdir       = false;
+bool        g_rmdir       = true;
 uint64_t    g_filesPerDir = 1000;
-uint64_t    g_fileSize    = 4*MEGABYTE;
+uint64_t    g_fileSize    = 64*MEGABYTE;
 double      g_maxUtil     = 95;
 double      g_targetUtil  = 90;
 
@@ -263,6 +262,7 @@ void writeFunction( std::string name, double rate, bool * running )
       g_maxStreamMap.insert( std::make_pair(name,0));
       g_minStreamMap.insert( std::make_pair(name,0));
    }
+
    std::cout << "Starting write function "<<name<<std::endl;
    atl::Timer timer;
 
@@ -378,9 +378,12 @@ void readFunction( int64_t startOffset
 
       //If our max index is greater than the start offset, begin reading
       if(( maxIndex > startOffset )&&(index < (maxIndex - g_readGap))) {
-         for( auto it : g_names ) {
+         int streamsRead = 0;
+         for( auto it = g_names.begin(); it != g_names.end() && streamsRead < g_streamsPerRead; ++it ) {
+//         for( auto it : g_names ) {
+
             //get filename
-            std::string filename = generateFilename( it, index);
+            std::string filename = generateFilename( *it, index);
      
             //Write the file
             FILE * fptr = NULL;
@@ -468,22 +471,21 @@ void printHelp()
 
    std::cout << "Options:"<<std::endl;
    std::cout << "   Setup Parameters"<<std::endl;
-   std::cout << "\t-basePath <value>    directory to write data to"<<std::endl;
-   std::cout << "\t-rmdir              remove output directory if it exists (default = true)"<<std::endl;
+   std::cout << "\t-basePath <value>       directory to write data to"<<std::endl;
+   std::cout << "\t-keepData               do remove output directory on exit" <<std::endl;
    std::cout << "   Input Parameters"<<std::endl;
-   std::cout << "\t-istreams <value>    number of input streams (default = "<<g_inputStreams<<")"<<std::endl;
-   std::cout << "\t-ifps <value>        frame rate of input streams in fps (default = "<<g_ifps<<")"<<std::endl;
-   std::cout << "\t-streamMbps <value>  average stream bitrate in Mbps (default = "<<(double)g_streamRate/(double)MEGABYTE<<")"<<std::endl;
+   std::cout << "\t-istreams <value>       number of input streams (default = "<<g_inputStreams<<")"<<std::endl;
+   std::cout << "\t-streamMbps <value>     average stream bitrate in Mbps (default = "<<(double)g_streamRate/(double)MEGABYTE<<")"<<std::endl;
    std::cout << "   Storage Parameters"<<std::endl;
-   std::cout << "\t-fileSize <value>    size of the files written to disk in bytes (default = "<<g_fileSize<<")"<<std::endl;
-   std::cout << "\t-filesPerDir <value> number of files written into a single directory (default = "<<g_filesPerDir<<")"<<std::endl;
-   std::cout << "\t-maxUtil  <value>    percent of drive utilization to begin deleting files (default = "<<g_maxUtil<<")"<<std::endl;
+   std::cout << "\t-fileSize <value>       size of the files written to disk in bytes (default = "<<g_fileSize<<")"<<std::endl;
+   std::cout << "\t-filesPerDir <value>    number of files written into a single directory (default = "<<g_filesPerDir<<")"<<std::endl;
+   std::cout << "\t-maxUtil  <value>       percent of drive utilization to begin deleting files (default = "<<g_maxUtil<<")"<<std::endl;
    std::cout << "   Output Parameters"<<std::endl;
-   std::cout << "\t-ostreams <value >   number of output streams (default = "<<g_outputStreams<<")"<<std::endl;
-   std::cout << "\t-ofps <value>        frame rate of output streams in fps (default = "<<g_ifps<<")"<<std::endl;
-   std::cout << "\t-readOffset <value>  how many files behind input do we start reading (default = "<<g_readOffset<<")"<<std::endl;
-   std::cout << "\t-minReadGap <value>  how far behind live do we stop reading data (defalt = "<<g_readGap<<")"<<std::endl;
-   std::cout << "\t-interval <value>    how often statistics are written (default = "<<g_statusInterval<<")"<<std::endl;
+   std::cout << "\t-ostreams <value >      number of output streams (default = "<<g_outputStreams<<")"<<std::endl;
+   std::cout << "\t-readOffset <value>     how many files behind input do we start reading (default = "<<g_readOffset<<")"<<std::endl;
+   std::cout << "\t-minReadGap <value>     how far behind live do we stop reading data (defalt = "<<g_readGap<<")"<<std::endl;
+   std::cout << "\t-interval <value>       how often statistics are written (default = "<<g_statusInterval<<")"<<std::endl;
+   std::cout << "\t-streamsPerRead <value> number of streams for each read operation (default = "<<g_streamsPerRead<<")"<<std::endl;
 
    return;
 }
@@ -515,13 +517,6 @@ int main( int argc, char * argv[] )
          g_inputStreams = std::atoi(argv[++i]);
          if( g_inputStreams == 0 ) {
             std::cout << "Invalid istreams value: "<<argv[i]<<std::endl;
-            exit(1);
-         }
-      }
-      else if(!std::strcmp(argv[i], "-ifps")) {
-         g_ifps = std::atof(argv[++i]);
-         if( g_ifps == 0 ) {
-            std::cout << "Invalid ifps value: "<<argv[i]<<std::endl;
             exit(1);
          }
       }
@@ -560,13 +555,6 @@ int main( int argc, char * argv[] )
             exit(1);
          }
       }
-      else if(!std::strcmp(argv[i], "-ofps")) {
-         g_ofps = std::atof(argv[++i]);
-         if( g_ofps == 0 ) {
-            std::cout << "Invalid ofps value: "<<argv[i]<<std::endl;
-            exit(1);
-         }
-      }
       else if(!std::strcmp(argv[i], "-readOffset")) {
          g_readOffset = std::atoi(argv[++i]);
          if( g_readOffset == 0 ) {
@@ -581,8 +569,15 @@ int main( int argc, char * argv[] )
             exit(1);
          }
       }
-      else if(!std::strcmp(argv[i], "-rmdir")) {
-         g_rmdir = true;
+      else if(!std::strcmp(argv[i], "-keepData")) {
+         g_rmdir = false;
+      }
+      else if(!std::strcmp(argv[i], "-streamsPerRead")) {
+         g_streamsPerRead = std::atoi(argv[++i]);
+         if( g_streamsPerRead == 0 ) {
+            std::cout << "Invalid streamsPerRead value: "<<argv[i]<<std::endl;
+            exit(1);
+         }
       }
       else if(!std::strcmp(argv[i], "-basePath")) {
          g_basePath = argv[++i];
@@ -619,7 +614,6 @@ int main( int argc, char * argv[] )
    std::cout <<"Aqueti Storage Validation Tool"<<std::endl;
    std::cout <<"Input:"<<std::endl;
    std::cout <<"\tstreams:    "<<g_inputStreams<<std::endl;
-   std::cout <<"\tframe rate: "<<g_ifps<<std::endl;
    std::cout <<"\tStream bandwidth: "<<g_streamRate/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\tTotal write bandwidth: "<<totalWriteBandwith/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\tFiles per directory: "<<g_filesPerDir<<std::endl;
@@ -628,7 +622,6 @@ int main( int argc, char * argv[] )
    std::cout <<"Output:"<<std::endl;
    std::cout <<"\tstreams: "<<g_outputStreams<<std::endl;
    std::cout <<"\tinput streams required: "<<streamsPerOutputStream<<std::endl;
-   std::cout <<"\tframe rate: "<<g_ofps<<std::endl;
    std::cout <<"\tread bandwidth per stream:"<< readBandwidthPerOutputStream/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\ttotal read bandwidth per stream:"<<totalReadBandwidth/MEGABYTE<<" Mbps"<<std::endl;
    std::cout <<"\ttotal read files per second:"<<g_totalReadFilesPerSec<<std::endl;
@@ -659,24 +652,20 @@ int main( int argc, char * argv[] )
    std::vector<std::thread> writeVect;
    std::vector<std::thread> readVect;
 
-   //Check if we should remove the directory
-   if(( g_rmdir )&&(atl::filesystem::exists(g_basePath))) {
+   //Check if the basePath exists. Query user prior to removing. If it's not removed, then figure out a new starting point
+   if(atl::filesystem::exists(g_basePath)) {
       std::string input;
-      std::cout << "Are you sure you want to remove the "<<g_basePath<<" directory (y/n)?"<<std::endl;
+      std::cout << "Do you want to delete the data in "<<g_basePath<<"? If no, then new data will be added to the directory (y/n)?"<<std::endl;
       std::cin >> input;
 
-      if( input.compare("y")) {
-         std::cout << "Aborting"<<std::endl;
-         exit(1);
-       }
-     
-  
-      atl::filesystem::remove_all( g_basePath );
+      if( !input.compare("y")) {
+         std::cout << "deleting all data in "<<g_basePath<<std::endl;
+         atl::filesystem::remove_all( g_basePath );
 
-      while( atl::filesystem::exists( g_basePath )) {
-         atl::sleep(.1);
+         while( atl::filesystem::exists( g_basePath )) {
+            atl::sleep(.1);
+         }
       }
-      
    } 
 
    bool result = true;
@@ -691,16 +680,31 @@ int main( int argc, char * argv[] )
    atl::sleep(1.0);
 
    //Create write threads - one per input stream
-   for( int64_t i=0; i < g_inputStreams; i++ ) {
+   int inputs = 0;
+   for( int64_t i=0; inputs < g_inputStreams; i++ ) {
       std::string name = "uCam_";
       name.append( std::to_string(i));
-   
-      writeVect.push_back( std::thread( writeFunction
+
+
+      //Check if this name exists
+      std::string tempPath = g_basePath;
+      tempPath.append("/");
+      tempPath.append(name);
+
+      std::cout << "Checking for: "<<tempPath<<std::endl;
+
+      if( !atl::filesystem::exists( tempPath )) {
+         std::cout << "dne Creating: "<<tempPath<<std::endl;
+//         exit(1);
+         writeVect.push_back( std::thread( writeFunction
             , name
             , g_streamSecPerFile
             , &running
             ));
-      g_names.push_back(name);
+         g_names.push_back(name);
+         inputs++;
+
+      }
    }
 
 
