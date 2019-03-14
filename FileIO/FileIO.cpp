@@ -15,6 +15,7 @@
 #include <sys/types.h>
 #endif
 
+#include <errno.h>
 #include <stdio.h>
 #include <iostream>
 #include <string>
@@ -28,13 +29,64 @@ namespace atl
 {
 namespace filesystem
 {
+bool _create_directory( std::string dirname );
   /**
    * \brief Creates a directory with the specified path
    * \param [in] dirname name of the directory to create
    * \return true on success, false on failure
    **/
-   bool     create_directory( std::string dirname )
+   bool create_directory( std::string dirname, bool recursive)
    {
+	   if(!recursive) return _create_directory(dirname);
+
+#ifdef fleabug
+std::cout << "creating directory " << dirname << std::endl;
+#endif
+	   std::vector<std::string> pathTokens = stringParser(dirname, "/");
+	   std::string path;
+	   for(int i =0; i< pathTokens.size(); ++i){
+
+		   // handle repeated, leading, trailing delimiters
+		   if(pathTokens[i].empty()) { 
+			   continue;
+		   } else {
+			   if(i){
+				  path.append("/"); 
+			   }
+		   }
+
+		   path.append(pathTokens[i]);
+
+#ifdef fleabug
+std::cout << "token is: " << pathTokens[i] << std::endl;
+std::cout << "checking path " << path << std::endl;
+#endif
+		
+		   if(!exists(path)){
+#ifdef fleabug
+std::cout << path << " doesn't exist, creating directory" << std::endl;
+#endif
+			   bool rc = _create_directory(path);
+			   if(!rc){
+				   return false;
+			   }
+		   } else {
+			   if(!is_directory(path)){
+#ifdef fleabug
+std::cout << "path exists, but isn't directory" << std::endl;
+#endif
+					return false;
+				}
+			}
+	   }
+	   return true;
+   }
+
+
+
+bool _create_directory( std::string dirname )
+{
+
 #ifdef _WIN32
      int irc = _mkdir(dirname.c_str());
 #else
@@ -340,21 +392,26 @@ int touch(std::string name, bool create)
 #endif
 }
 
-uint64_t getLastModTime(std::string name)
+int getLastModTime(std::string name, uint64_t *time)
 {
 #ifdef _WIN32
      std::cerr << "getLastModTime not yet implemented on Windows" << std::endl;
-	 return 0;
+	 return -ENOSYS;
 #else
  
 	struct stat statBuf;
 	int rv = stat(name.c_str(), &statBuf);
 	if(rv < 0){ 
+		int err = errno;
 		perror(0);
-		std::cerr << __FUNCTION__ << " stat failed" << std::endl;
-		return 0;
+		return 0 - err;
 	}
-	return statBuf.st_mtim.tv_sec * 1e6 + statBuf.st_mtim.tv_nsec / 1e3;
+	if(time){
+		*time = statBuf.st_mtim.tv_sec * 1e6 + statBuf.st_mtim.tv_nsec / 1e3;
+	} else {
+		return -EINVAL;
+	}
+	return 0;
 #endif
 }
 

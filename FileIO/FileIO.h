@@ -22,7 +22,7 @@ namespace filesystem
    };
 
    //File system functions
-   bool     create_directory( std::string name );
+   bool     create_directory( std::string name, bool recursive = false);
    bool     exists( std::string name);
    bool     remove( std::string name);
    uint64_t remove_all( std::string name);
@@ -45,9 +45,11 @@ namespace filesystem
    /**
    *  \brief return file modification time
    *  \param name filename
-   *  \return microsecond time of last modification
+   *  \param [out] time pointer to uint64_t for return of usec time of mod
+   *  \return 0 on success
+   *  \return negative errno values on failure ( 0 - errno)
    **/
-   uint64_t getLastModTime(std::string name);
+   int getLastModTime(std::string name, uint64_t *time);
  
 }
 }
