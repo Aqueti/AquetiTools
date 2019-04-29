@@ -186,6 +186,13 @@ list( APPEND ATOOL_HEADERS
    DataTypes/TSQueue.tcc
 )
 
+include_directories( Math ) 
+list(APPEND ATOOL_HEADERS
+    Math/polyfit.tcc
+    Math/givensQR.hpp
+    Math/matrix.hpp
+    )
+
 include_directories( Tools ) 
 set( Tools_SRC
    Tools/StringTools.cpp
@@ -269,7 +276,11 @@ if(BUILD_TESTS)
    list(APPEND TARGET_LIST testAquetiTools )
 
    #Add AquetiTools test as an executavble
+   add_executable( testPolyfit
+       Math/testPolyfit.cpp
+       )
 endif()
+
 
 #############################################
 #install library files
