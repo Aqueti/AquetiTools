@@ -276,9 +276,9 @@ if(BUILD_TESTS)
    list(APPEND TARGET_LIST testAquetiTools )
 
    #Add AquetiTools test as an executavble
-   add_executable( testPolyfit
-       Math/testPolyfit.cpp
-       )
+   #   add_executable( testPolyfit
+   #       Math/testPolyfit.cpp
+   #       )
 endif()
 
 
