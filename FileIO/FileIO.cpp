@@ -11,8 +11,11 @@
 #include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <dirent.h>
+#include <fcntl.h>
+#include <sys/types.h>
 #endif
 
+#include <errno.h>
 #include <stdio.h>
 #include <iostream>
 #include <string>
@@ -26,13 +29,64 @@ namespace atl
 {
 namespace filesystem
 {
+bool _create_directory( std::string dirname );
   /**
    * \brief Creates a directory with the specified path
    * \param [in] dirname name of the directory to create
    * \return true on success, false on failure
    **/
-   bool     create_directory( std::string dirname )
+   bool create_directory( std::string dirname, bool recursive)
    {
+	   if(!recursive) return _create_directory(dirname);
+
+#ifdef fleabug
+std::cout << "creating directory " << dirname << std::endl;
+#endif
+	   std::vector<std::string> pathTokens = stringParser(dirname, "/");
+	   std::string path;
+	   for(int i =0; i< pathTokens.size(); ++i){
+
+		   // handle repeated, leading, trailing delimiters
+		   if(pathTokens[i].empty()) { 
+			   continue;
+		   } else {
+			   if(i){
+				  path.append("/"); 
+			   }
+		   }
+
+		   path.append(pathTokens[i]);
+
+#ifdef fleabug
+std::cout << "token is: " << pathTokens[i] << std::endl;
+std::cout << "checking path " << path << std::endl;
+#endif
+		
+		   if(!exists(path)){
+#ifdef fleabug
+std::cout << path << " doesn't exist, creating directory" << std::endl;
+#endif
+			   bool rc = _create_directory(path);
+			   if(!rc){
+				   return false;
+			   }
+		   } else {
+			   if(!is_directory(path)){
+#ifdef fleabug
+std::cout << "path exists, but isn't directory" << std::endl;
+#endif
+					return false;
+				}
+			}
+	   }
+	   return true;
+   }
+
+
+
+bool _create_directory( std::string dirname )
+{
+
 #ifdef _WIN32
      int irc = _mkdir(dirname.c_str());
 #else
@@ -301,5 +355,65 @@ namespace filesystem
       return util;
 
    }
+
+int touch(std::string name, bool create)
+{
+#ifdef _WIN32
+     std::cerr << "touch not yet implemented on Windows" << std::endl;
+	 return -1;
+#else
+ 
+	// open
+
+	 int fd = open(name.c_str(), O_CREAT | O_WRONLY | O_NONBLOCK | O_NOCTTY, 0666);
+	 if(fd < 0) {
+		 int err = errno;
+		 std::cerr << __FUNCTION__ << " error opening file" << std::endl;
+		 // TODO: use api returns 
+		 return err;
+	 }
+
+	 struct timespec times[2];
+	 times[0].tv_nsec = UTIME_NOW;
+	 times[1].tv_nsec = UTIME_NOW;
+
+	 int rv = futimens(fd,times);
+	 if(rv < 0) {
+		 int err = errno;
+		 std::cerr << __FUNCTION__ << " error setting file access/mod time" << std::endl;
+		 // TODO: use api returns 
+		 return err;
+	 }
+
+	 close(fd);
+
+	 return 0;
+
+#endif
+}
+
+int getLastModTime(std::string name, uint64_t *time)
+{
+#ifdef _WIN32
+     std::cerr << "getLastModTime not yet implemented on Windows" << std::endl;
+	 return -ENOSYS;
+#else
+ 
+	struct stat statBuf;
+	int rv = stat(name.c_str(), &statBuf);
+	if(rv < 0){ 
+		int err = errno;
+		perror(0);
+		return 0 - err;
+	}
+	if(time){
+		*time = statBuf.st_mtim.tv_sec * 1e6 + statBuf.st_mtim.tv_nsec / 1e3;
+	} else {
+		return -EINVAL;
+	}
+	return 0;
+#endif
+}
+
 }
 }

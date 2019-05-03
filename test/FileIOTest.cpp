@@ -129,6 +129,48 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
    std::cout << "SI:"<<dir1<<" capacity:"<<si.capacity<<", free: "<<si.free<<", avail:"<<si.available<<std::endl;
 
 
+
+   // testing touch
+   std::string testFile("touch_test" + std::to_string(atl::getUsecTime()));;
+   if(atl::filesystem::exists(testFile)){
+	   atl::filesystem::remove(testFile);
+   }
+
+   // file doesn't exist
+   int rv = atl::filesystem::touch(testFile);
+   if(rv){
+	   std::cerr << "error calling atl touch on nonexistant file. returned: " << rv << std::endl;
+	   rc = false;
+   }
+   if(!atl::filesystem::exists(testFile)){
+	   std::cerr << "touch failed to create file, but returned no error. " << std::endl;
+	   rc = false;
+   }
+   uint64_t modTime = atl::filesystem::getLastModTime(testFile);
+   std::this_thread::sleep_for(std::chrono::seconds(1));
+
+   uint64_t beforeTime = atl::getUsecTime();
+   std::this_thread::sleep_for(std::chrono::seconds(1));
+   rv = atl::filesystem::touch(testFile);
+   std::this_thread::sleep_for(std::chrono::seconds(1));
+   uint64_t afterTime = atl::getUsecTime();
+   if(rv){
+	   std::cerr << "error calling atl touch on nonexistant file. returned: " << rv << std::endl;
+	   rc = false;
+   }
+
+   uint64_t newModTime = atl::filesystem::getLastModTime(testFile);
+
+   if(modTime >= newModTime || newModTime < beforeTime || newModTime > afterTime){
+	   std::cerr << "atl touch failed to update file modification time" << std::endl;
+	   rc = false;
+   }
+
+   atl::filesystem::remove(testFile);
+   
+   
+
+
    JsonBox::Value result;
    result["pass"].setBoolean(rc);
    return result;
