@@ -146,7 +146,8 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
 	   std::cerr << "touch failed to create file, but returned no error. " << std::endl;
 	   rc = false;
    }
-   uint64_t modTime = atl::filesystem::getLastModTime(testFile);
+   uint64_t modTime;
+   int r = atl::filesystem::getLastModTime(testFile, &modTime);
    std::this_thread::sleep_for(std::chrono::seconds(1));
 
    uint64_t beforeTime = atl::getUsecTime();
@@ -159,7 +160,8 @@ JsonBox::Value testFileIO( bool printFlag, bool assertFlag  )
 	   rc = false;
    }
 
-   uint64_t newModTime = atl::filesystem::getLastModTime(testFile);
+   uint64_t newModTime;
+   rv = atl::filesystem::getLastModTime(testFile, &newModTime);
 
    if(modTime >= newModTime || newModTime < beforeTime || newModTime > afterTime){
 	   std::cerr << "atl touch failed to update file modification time" << std::endl;
