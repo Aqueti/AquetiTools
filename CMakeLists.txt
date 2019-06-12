@@ -242,6 +242,7 @@ add_library( AquetiTools STATIC
    ${Tools_SRC}
    ${IDGenerator_SRC}
    ${FileIO_SRC}
+   ${AqtError_SRC}
    ${Sockets_SRC}
 )
 
