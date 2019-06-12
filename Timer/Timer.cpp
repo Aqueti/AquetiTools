@@ -507,6 +507,31 @@ bool TimevalEqual(const timeval& tv1, const timeval& tv2)
     }
 }
 
+unsigned long TimevalDuration(struct timeval endT, struct timeval startT)
+{
+	return (endT.tv_usec - startT.tv_usec) +
+		1000000L * (endT.tv_sec - startT.tv_sec);
+}
+
+double TimevalDurationSeconds(struct timeval endT, struct timeval startT)
+{
+	return (endT.tv_usec - startT.tv_usec) / 1000000.0 +
+		(endT.tv_sec - startT.tv_sec);
+}
+
+double TimevalMsecs(const timeval& tv)
+{
+	return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
+}
+
+timeval MsecsTimeval(const double dMsecs)
+{
+	timeval tv;
+	tv.tv_sec = (long)floor(dMsecs / 1000.0);
+	tv.tv_usec = (long)((dMsecs / 1000.0 - tv.tv_sec) * 1e6);
+	return tv;
+}
+
 /**
  *\brief converts a double time to an ObjectId time. The m_id field is set to 0
  *\param [in] value time value to set to the object
