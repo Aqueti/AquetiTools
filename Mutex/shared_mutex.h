@@ -6,6 +6,7 @@
 
 #include <mutex>
 #include <atomic>
+#include "AtlMutexWrap.h"
 
 namespace atl
 {
@@ -17,8 +18,10 @@ namespace atl
     class shared_mutex
     {
         private:
-            std::mutex m_read; //!< Brief readers
-            std::mutex m_mutex;  //!< Brief member fields for mutext
+            //std::mutex m_read; //!< Brief readers
+			AtlMutex m_read;
+       //     std::mutex m_mutex;  //!< Brief member fields for mutext
+			AtlMutex m_mutex;
             std::atomic_int readers; //!< Brief the number of readers
 
         public:
