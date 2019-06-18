@@ -17,42 +17,65 @@
 
 using namespace atl;
 
-int main(int arg, char **argv)
+int test()
 {
 
+	std::cout << "testing std::mutex wrap" << std::endl;
 	AtlMutex m;
 	m.lock();
-
 	m.unlock();
+	std::cout << std::endl << std::endl;
 
+	std::cout << "testing aqueti shared mutex wrap" << std::endl;
+	std::cout << "only does anything if built with -DDEBUG_CACHE" << std::endl;
 	shared_mutex s;
 	s.lock();
-
 	s.unlock();
+	std::cout << std::endl << std::endl;
 
 
+	std::cout << "testing recursive mutex wrap" << std::endl;
 	AtlRecursiveMutex r;
-
-
 	r.lock();
-
 	r.unlock();
+	std::cout << std::endl << std::endl;
 
 
 	{
+		std::cout << "testing lock guard on std::mutex wrap" << std::endl;
 		std::lock_guard<AtlMutex> g(m);
-		std::cout << "lock guard mutex" << std::endl;
+		std::cout << std::endl << std::endl;
 	}
 	{
+		std::cout << "testing lock guard on recursiv mutex wrap" << std::endl;
 		std::lock_guard<AtlRecursiveMutex> g(r);
 		std::cout << "lock guard recursive" << std::endl;
+		std::cout << std::endl << std::endl;
 	}
 
 	{ 
+		std::cout << "testing aqueti shared lock on shared mutex wrap" << std::endl;
+		std::cout << "only does anything if built with -DDEBUG_CACHE" << std::endl;
 		shared_lock sl(s);
-		std::cout << "shared lock" << std::endl;
 		sl.unlock();
 		sl.lock();
+		std::cout << std::endl << std::endl;
 	}
+
+	return 0;
+
+}
+
+int test1()
+{
+	test();
+	return 0;
+}
+
+int main(int arg, char **argv)
+{
+	std::cout << "testing mutex wrap" << std::endl;
+
+	test1();
 
 }
