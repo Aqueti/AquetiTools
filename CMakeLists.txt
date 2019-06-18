@@ -207,6 +207,7 @@ set( Mutex_SRC
 )
 list(APPEND ATOOL_HEADERS
    Mutex/shared_mutex.h
+   Mutex/AtlMutexWrap.h
 )
 
 
@@ -225,6 +226,7 @@ set( FileIO_SRC
 list( APPEND ATOOL_HEADERS
    FileIO/FileIO.h
 )
+
 
 
 add_library( AquetiTools STATIC  
