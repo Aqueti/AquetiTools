@@ -15,11 +15,13 @@
 #include <thread>
 #include <iostream>
 #include <mutex>
+#include <execinfo.h>
 
 
 #pragma once
 
 namespace atl {
+
 
 
 
@@ -42,6 +44,7 @@ public:
 	{
 		std::thread::id tid = std::this_thread::get_id();
 		std::cout << "thread " << tid << " attempting to acquire mutex " << (int64_t)this << std::endl;
+		printTrace();
 		T::lock();
 		std::cout << "thread " << tid << " acquired mutex " << (int64_t)this << std::endl;
 	}
@@ -63,6 +66,7 @@ public:
 	{
 		std::thread::id tid = std::this_thread::get_id();
 		std::cout << "thread " << tid << " trying mutex " << (int64_t)this << std::endl;
+		printTrace();
 		bool rv = T::try_lock();
 		if(rv){
 			std::cout << "thread " << tid << " acquired mutex " << (int64_t)this << std::endl;
@@ -78,6 +82,20 @@ public:
 
 	~MutexWrap(){
 		std::cout << "destroying atl mutex wrap " << (uint64_t)this << std::endl;
+	}
+
+	void printTrace()
+	{
+#ifdef __GNUC__
+		void *buf[12];
+		int depth = backtrace(buf, 12);
+		char **strings = backtrace_symbols(buf, depth);
+		std::cout << "trizzace: " << std::endl;
+		for(int i = 2; i < depth - 2; ++i){ // ignore this function, our wrap, and pre-main calls
+			std::cout << strings[i] << std::endl;
+		}
+		free(strings);
+#endif
 	}
 
 #endif
