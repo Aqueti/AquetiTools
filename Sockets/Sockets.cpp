@@ -1087,25 +1087,23 @@ bool atl::Sockets::connect_tcp_to(const char* addr, int port,
 		}
 	}
 
-#ifndef USE_WINSOCK_SOCKETS
+#ifndef AQT_USE_WINSOCK_SOCKETS
 	client.sin_port = htons(port);
 #else
 	client.sin_port = htons((u_short)port);
 #endif
 
 	if (connect(*s, (struct sockaddr*) & client, sizeof(client)) < 0) {
-#ifdef USE_WINSOCK_SOCKETS
-		if (!d_tcp_only) {
-			fprintf(stderr, "connect_tcp_to: Could not connect "
-				"to machine %d.%d.%d.%d port %d\n",
-				(int)(client.sin_addr.S_un.S_un_b.s_b1),
-				(int)(client.sin_addr.S_un.S_un_b.s_b2),
-				(int)(client.sin_addr.S_un.S_un_b.s_b3),
-				(int)(client.sin_addr.S_un.S_un_b.s_b4),
-				(int)(ntohs(client.sin_port)));
-			int error = WSAGetLastError();
-			fprintf(stderr, "Winsock error: %d\n", error);
-		}
+#ifdef AQT_USE_WINSOCK_SOCKETS
+		fprintf(stderr, "connect_tcp_to: Could not connect "
+			"to machine %d.%d.%d.%d port %d\n",
+			(int)(client.sin_addr.S_un.S_un_b.s_b1),
+			(int)(client.sin_addr.S_un.S_un_b.s_b2),
+			(int)(client.sin_addr.S_un.S_un_b.s_b3),
+			(int)(client.sin_addr.S_un.S_un_b.s_b4),
+			(int)(ntohs(client.sin_port)));
+		int error = WSAGetLastError();
+		fprintf(stderr, "Winsock error: %d\n", error);
 #else
 		fprintf(stderr, "connect_tcp_to: Could not connect to "
 			"machine %d.%d.%d.%d port %d\n",
