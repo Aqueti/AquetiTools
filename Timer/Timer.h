@@ -119,6 +119,14 @@ timeval TimevalScale(const timeval& tv, double scale);
 timeval TimevalDiff(const timeval& tv1, const timeval& tv2);
 timeval TimevalNormalize(const timeval& in_tv);
 
+/// @brief Return number of microseconds between startT and endT.
+extern unsigned long TimevalDuration(struct timeval endT, struct timeval startT);
+
+/// @brief Return the number of seconds between startT and endT as a
+/// floating-point value.
+extern double TimevalDurationSeconds(struct timeval endT, struct timeval startT);
+extern double TimevalMsecs(const struct timeval& tv1);
+extern struct timeval MsecsTimeval(const double dMsecs);
 
 void        sleep(double time);
 double      convertObjectIdTimeToDouble(ObjectId id);

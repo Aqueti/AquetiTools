@@ -158,6 +158,14 @@ set(Timer_SRC
    Timer/Timer.cpp
 )
 
+include_directories( Sockets )
+set(Sockets_SRC
+   Sockets/Sockets.cpp
+)
+list( APPEND ATOOL_HEADERS
+   Sockets/Sockets.hpp
+)
+
 include_directories( Thread )
 set(Thread_SRC
    Thread/Thread.cpp
@@ -238,6 +246,7 @@ add_library( AquetiTools STATIC
    ${IDGenerator_SRC}
    ${FileIO_SRC}
    ${AqtError_SRC}
+   ${Sockets_SRC}
 )
 
 target_link_libraries( AquetiTools
