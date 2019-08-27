@@ -299,8 +299,10 @@ bool _create_directory( std::string dirname )
 
   /**
    * \brief lists all files and directories in the given path
+   * \param[in] path the target directory
+   * \param[in] all if true, adds . and .. to the return list
    **/
-   std::vector<std::string>getFileList( std::string path )
+   std::vector<std::string>getFileList(std::string path, bool all)
    {
      std::vector<std::string> fileList;
 #ifdef _WIN32
@@ -311,7 +313,10 @@ bool _create_directory( std::string dirname )
       dir = opendir( path.c_str());
       if( dir != NULL ) {
          while(( ent = readdir( dir)) != NULL ) {
-            fileList.push_back( ent->d_name );
+             std::string fname(ent->d_name);
+             if (all || fname.find(".") == std::string::npos) {
+                fileList.push_back( ent->d_name );
+             }
          }
          closedir(dir);
       }
