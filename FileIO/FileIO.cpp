@@ -314,7 +314,7 @@ bool _create_directory( std::string dirname )
       if( dir != NULL ) {
          while(( ent = readdir( dir)) != NULL ) {
              std::string fname(ent->d_name);
-             if (all || fname.find(".") == std::string::npos) {
+             if ( all || ((fname != ".") && (fname != "..")) ) {
                 fileList.push_back( ent->d_name );
              }
          }
