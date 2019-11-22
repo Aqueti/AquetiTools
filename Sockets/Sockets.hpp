@@ -1,6 +1,9 @@
 #pragma once
 #include <cstdint>
 
+//=======================================================================
+// Figure out whether we're using Windows sockets or not.
+
 // let's start with a clean slate
 #undef AQT_USE_WINSOCK_SOCKETS
 
@@ -8,27 +11,23 @@
 // compiling the library if you want it to use WINSOCK sockets.
 //#define CYGWIN_USES_WINSOCK_SOCKETS
 
-#if defined(_WIN32) &&                                                         \
-    (!defined(__CYGWIN__) || defined(CYGWIN_USES_WINSOCK_SOCKETS))
-#define AQT_USE_WINSOCK_SOCKETS
+#if defined(_WIN32) && (!defined(__CYGWIN__) || defined(CYGWIN_USES_WINSOCK_SOCKETS))
+  #define AQT_USE_WINSOCK_SOCKETS
 #endif
+
+//=======================================================================
+// Architecture-dependent include files and definitions.
 
 #ifndef AQT_USE_WINSOCK_SOCKETS
-#define SOCKET int
-// On Win32, this constant is defined as ~0 (sockets are unsigned ints)
-static const int INVALID_SOCKET = -1;
-#endif
-
-#if !(defined(_WIN32) && defined(AQT_USE_WINSOCK_SOCKETS))
-#include <sys/select.h> // for select
-#include <netinet/in.h> // for htonl, htons
-#endif
-
-//--------------------------------------------------------------
-// Timeval defines.
-
-#if (!defined(AQT_USE_WINSOCK_SOCKETS))
 	#include <sys/time.h> // for timeval, timezone, gettimeofday
+  #include <sys/select.h> // for fd_set
+  #include <netinet/in.h> // for htonl, htons
+
+  // On Winsock, we have to use SOCKET, so we're going to have to use it
+  // everywhere.
+  #define SOCKET int
+  // On Winsock, this constant is defined as ~0 (sockets are unsigned ints)
+  static const int INVALID_SOCKET = -1;
 #else // winsock sockets
 	// These are a pair of horrible hacks that instruct Windows include
 	// files to (1) not define min() and max() in a way that messes up
@@ -46,11 +45,10 @@ static const int INVALID_SOCKET = -1;
 	#include <winsock2.h> // struct timeval is defined here
 #endif
 
-namespace atl {	namespace Sockets {
+//=======================================================================
+// All externally visible symbols should be defined in the name space.
 
-#if !(defined(_WIN32) && defined(AQT_USE_WINSOCK_SOCKETS))
-#include <sys/select.h> // for fd_set
-#endif
+namespace atl {	namespace Sockets {
 
 /**
  *      This routine will write a block to a file descriptor.  It acts just
