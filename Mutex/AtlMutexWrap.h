@@ -11,20 +11,13 @@
 *  3333 Durham Chapel Hill Blvd Suite D100, Durham, North Carolina 27704 
 **/  
 
+#pragma once
 
 #include <thread>
 #include <iostream>
 #include <mutex>
-#include <execinfo.h>
-
-
-#pragma once
 
 namespace atl {
-
-
-
-
 
 /**
 *  \brief mutex wrapper to print when acquired and released
