@@ -15,6 +15,8 @@
   #define AQT_USE_WINSOCK_SOCKETS
 #endif
 
+namespace atl { namespace Sockets {
+
 //=======================================================================
 // Architecture-dependent include files and definitions.
 
@@ -25,7 +27,7 @@
 
   // On Winsock, we have to use SOCKET, so we're going to have to use it
   // everywhere.
-  #define SOCKET int
+  typedef int SOCKET
   // On Winsock, this constant is defined as ~0 (sockets are unsigned ints)
   static const int INVALID_SOCKET = -1;
 #else // winsock sockets
@@ -47,8 +49,6 @@
 
 //=======================================================================
 // All externally visible symbols should be defined in the name space.
-
-namespace atl {	namespace Sockets {
 
 /**
  *      This routine will write a block to a file descriptor.  It acts just

@@ -6,7 +6,7 @@
 #include <system_error>
 #include <math.h>
 #include <Timer.h>
-#include <Sockets.hpp>
+#include <CoreSocket.hpp>
 
 //--------------------------------------------------------------
 // Ensures that someone calls WSAStartup on Windows before using
