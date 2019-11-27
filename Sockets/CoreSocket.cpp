@@ -7,7 +7,9 @@
 #include <math.h>
 #include <Timer.h>
 #include <CoreSocket.hpp>
-
+#ifdef _WIN32
+#include "Ws2ipdef.h"
+#endif
 
 //--------------------------------------------------------------
 // Ensures that someone calls WSAStartup on Windows before using
@@ -948,7 +950,7 @@ int atl::CoreSocket::udp_request_lob_packet(
 }
 
 int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
-	const char* NIC_IP, int backlog, bool keepAlive, bool reuseAddr)
+	const char* NIC_IP, int backlog, bool reuseAddr, TCPOptions options)
 {
 	struct sockaddr_in listen_name; /* The listen socket binding name */
 	int listen_namelen;
@@ -970,7 +972,33 @@ int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
       perror("setsockopt(SO_REUSEADDR) failed");
     }
   }
-  if (keepAlive) {
+
+  // Set the socket options based on the parameter passed in.
+  if (options.keepCount >= 0) {
+    if (setsockopt(*listen_sock, IPPROTO_TCP, TCP_KEEPCNT, SOCK_CAST &options.keepCount,
+        sizeof(options.keepCount)) < 0) {
+      perror("setsockopt(TCP_KEEPCNT) failed");
+    }
+  }
+  if (options.keepIdle >= 0) {
+    if (setsockopt(*listen_sock, IPPROTO_TCP, TCP_KEEPIDLE, SOCK_CAST &options.keepIdle,
+        sizeof(options.keepIdle)) < 0) {
+      perror("setsockopt(TCP_KEEPIDLE) failed");
+    }
+  }
+  if (options.keepInterval >= 0) {
+    if (setsockopt(*listen_sock, IPPROTO_TCP, TCP_KEEPINTVL, SOCK_CAST &options.keepInterval,
+        sizeof(options.keepInterval)) < 0) {
+      perror("setsockopt(TCP_KEEPINTVL) failed");
+    }
+  }
+#ifndef _WIN32
+  if (setsockopt(*listen_sock, IPPROTO_TCP, TCP_USER_TIMEOUT, SOCK_CAST &options.userTimeout,
+      sizeof(options.userTimeout)) < 0) {
+    perror("setsockopt(TCP_USER_TIMEOUT) failed");
+  }
+#endif
+  if (options.keepAlive) {
     int enable = 1;
     if (setsockopt(*listen_sock, SOL_SOCKET, SO_KEEPALIVE, SOCK_CAST &enable, sizeof(enable)) < 0) {
       perror("setsockopt(SO_KEEPALIVE) failed");
@@ -1044,7 +1072,7 @@ int atl::CoreSocket::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
 }
 
 bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
-	const char* NICaddress, SOCKET *s, bool keepAlive)
+	const char* NICaddress, SOCKET *s, TCPOptions options)
 {
 	if (s == nullptr) {
 		fprintf(stderr, "connect_tcp_to: Null socket pointer\n");
@@ -1102,7 +1130,32 @@ bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
   /* Set the socket options */
 #if !defined(_WIN32_WCE) && !defined(__ANDROID__)
   {
-    if (keepAlive) {
+    // Set the socket options based on the parameter passed in.
+    if (options.keepCount >= 0) {
+      if (setsockopt(*s, IPPROTO_TCP, TCP_KEEPCNT, SOCK_CAST &options.keepCount,
+        sizeof(options.keepCount)) < 0) {
+        perror("setsockopt(TCP_KEEPCNT) failed");
+      }
+    }
+    if (options.keepIdle >= 0) {
+      if (setsockopt(*s, IPPROTO_TCP, TCP_KEEPIDLE, SOCK_CAST &options.keepIdle,
+        sizeof(options.keepIdle)) < 0) {
+        perror("setsockopt(TCP_KEEPIDLE) failed");
+      }
+    }
+    if (options.keepInterval >= 0) {
+      if (setsockopt(*s, IPPROTO_TCP, TCP_KEEPINTVL, SOCK_CAST &options.keepInterval,
+        sizeof(options.keepInterval)) < 0) {
+        perror("setsockopt(TCP_KEEPINTVL) failed");
+      }
+    }
+#ifndef _WIN32
+    if (setsockopt(*s, IPPROTO_TCP, TCP_USER_TIMEOUT, SOCK_CAST &options.userTimeout,
+      sizeof(options.userTimeout)) < 0) {
+      perror("setsockopt(TCP_USER_TIMEOUT) failed");
+    }
+#endif
+    if (options.keepAlive) {
       int enable = 1;
       if (setsockopt(*s, SOL_SOCKET, SO_KEEPALIVE, SOCK_CAST &enable, sizeof(enable)) < 0) {
         perror("setsockopt(SO_KEEPALIVE) failed");

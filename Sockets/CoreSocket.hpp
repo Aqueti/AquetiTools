@@ -217,6 +217,27 @@ int udp_request_lob_packet(
 	const int local_port, // TCP port on this machine
 	const char* NIC_IP = NULL);
 
+
+/// @brief Options passed to TCP socket-creation routines.
+class TCPOptions {
+public:
+  // These are the defaults for an Aqueti connection.
+  bool keepAlive = true;
+  int keepCount = 4;
+  int keepIdle = 20;
+  int keepInterval = 5;
+  unsigned userTimeout = 15000;
+
+  // These are the system defaults
+  void UseSystemDefaults() {
+    keepAlive = false;
+    keepCount = -1;
+    keepIdle = -1;
+    keepInterval = -1;
+    userTimeout = 0;
+  }
+};
+
 /**
  * This routine will get a TCP socket that is ready to accept connections.
  * That is, listen() has already been called on it.
@@ -228,7 +249,7 @@ int udp_request_lob_packet(
  */
 
 int get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
-	const char* NIC_IP = NULL, int backlog = 1000, bool keepAlive = true, bool reuseAddr = true);
+	const char* NIC_IP = NULL, int backlog = 1000, bool reuseAddr = true, TCPOptions options = TCPOptions());
 
 /**
  *   This function returns the host IP address in string form.  For example,
@@ -249,7 +270,7 @@ int getmyIP(char* myIPchar, unsigned maxlen,
 /// @param [in] NICaddress Name of the network card to use, can be obtained
 ///             by calling getmyIP() or set to NULL to listen on all IP addresses.
 bool connect_tcp_to(const char* addr, int port, const char *NICaddress, SOCKET *s,
-  bool keepAlive = true);
+  TCPOptions options = TCPOptions());
 
 int close_socket(SOCKET sock);
 
