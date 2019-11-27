@@ -27,7 +27,7 @@ namespace atl { namespace CoreSocket {
 
   // On Winsock, we have to use SOCKET, so we're going to have to use it
   // everywhere.
-  typedef int SOCKET
+  typedef int SOCKET;
   // On Winsock, INVALID_SOCKET is #defined as ~0 (sockets are unsigned ints)
   // We can't redefine it locally, so we have to switch to another name
   static const int BAD_SOCKET = -1;
