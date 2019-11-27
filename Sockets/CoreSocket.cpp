@@ -672,7 +672,7 @@ int atl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size
 	return static_cast<int>(sofar); /* All bytes read */
 }
 
-SOCKET atl::CoreSocket::open_socket(int type, unsigned short* portno,
+atl::CoreSocket::SOCKET atl::CoreSocket::open_socket(int type, unsigned short* portno,
 	const char* IPaddress)
 {
 	struct sockaddr_in name;
@@ -774,18 +774,18 @@ SOCKET atl::CoreSocket::open_socket(int type, unsigned short* portno,
 	return sock;
 }
 
-SOCKET atl::CoreSocket::open_udp_socket(unsigned short* portno, const char* IPaddress)
+atl::CoreSocket::SOCKET atl::CoreSocket::open_udp_socket(unsigned short* portno, const char* IPaddress)
 {
 	return open_socket(SOCK_DGRAM, portno, IPaddress);
 }
 
-SOCKET atl::CoreSocket::open_tcp_socket(unsigned short* portno,
+atl::CoreSocket::SOCKET atl::CoreSocket::open_tcp_socket(unsigned short* portno,
 	const char* NIC_IP)
 {
 	return open_socket(SOCK_STREAM, portno, NIC_IP);
 }
 
-SOCKET atl::CoreSocket::connect_udp_port(const char* machineName, int remotePort,
+atl::CoreSocket::SOCKET atl::CoreSocket::connect_udp_port(const char* machineName, int remotePort,
 	const char* NIC_IP)
 {
 	SOCKET udp_socket;
