@@ -24,6 +24,9 @@
 #include <netinet/in.h> // for htonl, htons
 #endif
 
+//=======================================================================
+// All externally visible symbols should be defined in the name space.
+
 namespace atl { namespace CoreSocket {
 
 //=======================================================================
@@ -68,9 +71,6 @@ namespace atl { namespace CoreSocket {
   // INVALID_SOCKET because Windows #defines it, so we pick another name.
   static const SOCKET BAD_SOCKET = INVALID_SOCKET;
 #endif
-
-//=======================================================================
-// All externally visible symbols should be defined in the name space.
 
 /**
  *      This routine will write a block to a file descriptor.  It acts just
@@ -228,7 +228,7 @@ int udp_request_lob_packet(
  */
 
 int get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
-	const char* NIC_IP = NULL);
+	const char* NIC_IP = NULL, bool keepAlive = true, bool reuseAddr = true);
 
 /**
  *   This function returns the host IP address in string form.  For example,
@@ -248,9 +248,18 @@ int getmyIP(char* myIPchar, unsigned maxlen,
 
 /// @param [in] NICaddress Name of the network card to use, can be obtained
 ///             by calling getmyIP() or set to NULL to listen on all IP addresses.
-bool connect_tcp_to(const char* addr, int port, const char *NICaddress, SOCKET *s);
+bool connect_tcp_to(const char* addr, int port, const char *NICaddress, SOCKET *s,
+  bool keepAlive = true);
 
 int close_socket(SOCKET sock);
+
+/// @brief Cause a TCP socket to accumulate data but not to send it.
+bool cork_tcp_socket(SOCKET sock);
+
+/// @brief Cause a TCP socket to send all accumulated data immediately.
+///
+/// On Windows, this has the side effect of enabling TCP_NODELAY on the socket.
+bool uncork_tcp_socket(SOCKET sock);
 
 /// @brief Convert types to and from network-standard byte order.
 double hton(double d);

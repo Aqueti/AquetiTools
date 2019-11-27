@@ -948,7 +948,7 @@ int atl::CoreSocket::udp_request_lob_packet(
 }
 
 int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
-	const char* NIC_IP)
+	const char* NIC_IP, bool keepAlive, bool reuseAddr)
 {
 	struct sockaddr_in listen_name; /* The listen socket binding name */
 	int listen_namelen;
@@ -964,7 +964,20 @@ int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
 		return -1;
 	}
 
-	if (listen(*listen_sock, 1)) {
+  if (reuseAddr) {
+    int enable = 1;
+    if (setsockopt(*listen_sock, SOL_SOCKET, SO_REUSEADDR, SOCK_CAST &enable, sizeof(enable)) < 0) {
+      perror("setsockopt(SO_REUSEADDR) failed");
+    }
+  }
+  if (keepAlive) {
+    int enable = 1;
+    if (setsockopt(*listen_sock, SOL_SOCKET, SO_KEEPALIVE, SOCK_CAST &enable, sizeof(enable)) < 0) {
+      perror("setsockopt(SO_KEEPALIVE) failed");
+    }
+  }
+  
+  if (listen(*listen_sock, 1)) {
 		fprintf(stderr, "get_a_TCP_socket: listen() failed.\n");
 		closeSocket(*listen_sock);
 		return (-1);
@@ -1005,8 +1018,8 @@ int atl::CoreSocket::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
 			return -1;
 		}
 #if !defined(_WIN32_WCE) && !defined(__ANDROID__)
-		{
-			struct protoent* p_entry;
+		{     
+      struct protoent* p_entry;
 			int nonzero = 1;
 
 			if ((p_entry = getprotobyname("TCP")) == NULL) {
@@ -1031,7 +1044,7 @@ int atl::CoreSocket::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
 }
 
 bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
-	const char* NICaddress, SOCKET *s)
+	const char* NICaddress, SOCKET *s, bool keepAlive)
 {
 	if (s == nullptr) {
 		fprintf(stderr, "connect_tcp_to: Null socket pointer\n");
@@ -1086,6 +1099,36 @@ bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
 		}
 	}
 
+  /* Set the socket options */
+#if !defined(_WIN32_WCE) && !defined(__ANDROID__)
+  {
+    if (keepAlive) {
+      int enable = 1;
+      if (setsockopt(*s, SOL_SOCKET, SO_KEEPALIVE, SOCK_CAST &enable, sizeof(enable)) < 0) {
+        perror("setsockopt(SO_KEEPALIVE) failed");
+      }
+    }
+
+    struct protoent* p_entry;
+    int nonzero = 1;
+
+    if ((p_entry = getprotobyname("TCP")) == NULL) {
+      fprintf(
+        stderr,
+        "connect_tcp_to: getprotobyname() failed.\n");
+      closeSocket(*s);
+      return false;
+    }
+
+    if (setsockopt(*s, p_entry->p_proto, TCP_NODELAY,
+      SOCK_CAST & nonzero, sizeof(nonzero)) == -1) {
+      perror("connect_tcp_to: setsockopt() failed");
+      closeSocket(*s);
+      return false;
+    }
+  }
+#endif
+
 #ifndef AQT_USE_WINSOCK_SOCKETS
 	client.sin_port = htons(port);
 #else
@@ -1116,34 +1159,76 @@ bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
 		return false;
 	}
 
-	/* Set the socket for TCP_NODELAY */
-#if !defined(_WIN32_WCE) && !defined(__ANDROID__)
-	{
-		struct protoent* p_entry;
-		int nonzero = 1;
-
-		if ((p_entry = getprotobyname("TCP")) == NULL) {
-			fprintf(
-				stderr,
-				"connect_tcp_to: getprotobyname() failed.\n");
-			closeSocket(*s);
-			return false;
-		}
-
-		if (setsockopt(*s, p_entry->p_proto, TCP_NODELAY,
-			SOCK_CAST & nonzero, sizeof(nonzero)) == -1) {
-			perror("connect_tcp_to: setsockopt() failed");
-			closeSocket(*s);
-			return false;
-		}
-	}
-#endif
 	return true;
 }
 
 int atl::CoreSocket::close_socket(SOCKET sock)
 {
 	return closeSocket(sock);
+}
+
+bool atl::CoreSocket::cork_tcp_socket(SOCKET sock)
+{
+  if (sock == BAD_SOCKET) {
+    fprintf(stderr, "cork_tcp_socket(): Bad socket\n");
+    return false;
+  }
+#ifdef _WIN32
+  // We don't have an cork function on Windows, so we disable TCP_NODELAY
+  // to try and convince it to keep data in buffers for awhile.
+  struct protoent* p_entry;
+
+  if ((p_entry = getprotobyname("TCP")) == NULL) {
+    fprintf(stderr, "cork_tcp_socket(): getprotobyname() failed.\n");
+    return false;
+  }
+  int zero = 0;
+  if (setsockopt(sock, p_entry->p_proto, TCP_NODELAY,
+    SOCK_CAST & zero, sizeof(zero)) == -1) {
+    perror("cork_tcp_socket(): setsockopt() failed");
+    return false;
+}
+#else
+  int enable = 1;
+  if (setsockopt(m_fd, IPPROTO_TCP, TCP_CORK, &enable, sizeof(enable)) < 0) {
+    perror("cork_tcp_socket(): failed");
+    return false;
+  }
+#endif
+  return true;
+}
+
+bool atl::CoreSocket::uncork_tcp_socket(SOCKET sock)
+{
+  if (sock == BAD_SOCKET) {
+    fprintf(stderr, "uncork_tcp_socket(): Bad socket\n");
+    return false;
+  }
+#ifdef _WIN32
+  // We don't have an uncork function on Windows, so we enable TCP_NODELAY
+  // and then send an empty packet to force all data to go.
+  struct protoent* p_entry;
+
+  if ((p_entry = getprotobyname("TCP")) == NULL) {
+    fprintf(stderr, "uncork_tcp_socket(): getprotobyname() failed.\n");
+    return false;
+  }
+  int nonzero = 1;
+  if (setsockopt(sock, p_entry->p_proto, TCP_NODELAY,
+    SOCK_CAST & nonzero, sizeof(nonzero)) == -1) {
+    perror("uncork_tcp_socket(): setsockopt() failed");
+    return false;
+  }
+  char buf[10];
+  send(sock, buf, 0, 0);
+#else
+  int enable = 0;
+  if (setsockopt(m_fd, IPPROTO_TCP, TCP_CORK, &enable, sizeof(enable)) < 0) {
+    perror("uncork_tcp_socket(): failed");
+    return false;
+  }
+#endif
+  return true;
 }
 
 // From this we get the variable "AQT_big_endian" set to true if the machine we
