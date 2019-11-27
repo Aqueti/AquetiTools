@@ -15,19 +15,25 @@
   #define AQT_USE_WINSOCK_SOCKETS
 #endif
 
+//=======================================================================
+// Architecture-dependent include files.
+
+#ifndef AQT_USE_WINSOCK_SOCKETS
+#include <sys/time.h> // for timeval, timezone, gettimeofday
+#include <sys/select.h> // for fd_set
+#include <netinet/in.h> // for htonl, htons
+#endif
+
 namespace atl { namespace CoreSocket {
 
 //=======================================================================
-// Architecture-dependent include files and definitions.
+// Architecture-dependent definitions.
 
 #ifndef AQT_USE_WINSOCK_SOCKETS
-	#include <sys/time.h> // for timeval, timezone, gettimeofday
-  #include <sys/select.h> // for fd_set
-  #include <netinet/in.h> // for htonl, htons
 
   // On Winsock, we have to use SOCKET, so we're going to have to use it
   // everywhere.
-  typedef int SOCKET
+  typedef int SOCKET;
   // On Winsock, INVALID_SOCKET is #defined as ~0 (sockets are unsigned ints)
   // We can't redefine it locally, so we have to switch to another name
   static const int BAD_SOCKET = -1;
