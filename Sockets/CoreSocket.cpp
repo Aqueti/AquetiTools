@@ -1190,7 +1190,7 @@ bool atl::CoreSocket::cork_tcp_socket(SOCKET sock)
 }
 #else
   int enable = 1;
-  if (setsockopt(m_fd, IPPROTO_TCP, TCP_CORK, &enable, sizeof(enable)) < 0) {
+  if (setsockopt(sock, IPPROTO_TCP, TCP_CORK, &enable, sizeof(enable)) < 0) {
     perror("cork_tcp_socket(): failed");
     return false;
   }
@@ -1223,7 +1223,7 @@ bool atl::CoreSocket::uncork_tcp_socket(SOCKET sock)
   send(sock, buf, 0, 0);
 #else
   int enable = 0;
-  if (setsockopt(m_fd, IPPROTO_TCP, TCP_CORK, &enable, sizeof(enable)) < 0) {
+  if (setsockopt(sock, IPPROTO_TCP, TCP_CORK, &enable, sizeof(enable)) < 0) {
     perror("uncork_tcp_socket(): failed");
     return false;
   }
