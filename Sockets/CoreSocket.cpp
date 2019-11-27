@@ -948,7 +948,7 @@ int atl::CoreSocket::udp_request_lob_packet(
 }
 
 int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
-	const char* NIC_IP, bool keepAlive, bool reuseAddr)
+	const char* NIC_IP, int backlog, bool keepAlive, bool reuseAddr)
 {
 	struct sockaddr_in listen_name; /* The listen socket binding name */
 	int listen_namelen;
@@ -977,7 +977,7 @@ int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
     }
   }
   
-  if (listen(*listen_sock, 1)) {
+  if (listen(*listen_sock, backlog)) {
 		fprintf(stderr, "get_a_TCP_socket: listen() failed.\n");
 		closeSocket(*listen_sock);
 		return (-1);

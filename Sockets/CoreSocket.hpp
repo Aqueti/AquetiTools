@@ -228,7 +228,7 @@ int udp_request_lob_packet(
  */
 
 int get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
-	const char* NIC_IP = NULL, bool keepAlive = true, bool reuseAddr = true);
+	const char* NIC_IP = NULL, int backlog = 1000, bool keepAlive = true, bool reuseAddr = true);
 
 /**
  *   This function returns the host IP address in string form.  For example,
