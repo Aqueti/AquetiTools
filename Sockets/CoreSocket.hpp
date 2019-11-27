@@ -15,7 +15,7 @@
   #define AQT_USE_WINSOCK_SOCKETS
 #endif
 
-namespace atl { namespace Sockets {
+namespace atl { namespace CoreSocket {
 
 //=======================================================================
 // Architecture-dependent include files and definitions.
@@ -28,8 +28,9 @@ namespace atl { namespace Sockets {
   // On Winsock, we have to use SOCKET, so we're going to have to use it
   // everywhere.
   typedef int SOCKET
-  // On Winsock, this constant is defined as ~0 (sockets are unsigned ints)
-  static const int INVALID_SOCKET = -1;
+  // On Winsock, INVALID_SOCKET is #defined as ~0 (sockets are unsigned ints)
+  // We can't redefine it locally, so we have to switch to another name
+  static const int BAD_SOCKET = -1;
 #else // winsock sockets
 	// These are a pair of horrible hacks that instruct Windows include
 	// files to (1) not define min() and max() in a way that messes up
@@ -39,12 +40,27 @@ namespace atl { namespace Sockets {
 	// change the way they behave.
 
 	#ifndef NOMINMAX
-	#define NOMINMAX
+    #define ATL_CORESOCKET_REPLACE_NOMINMAX
+	  #define NOMINMAX
 	#endif
 	#ifndef WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN
+    #define ATL_CORESOCKET_REPLACE_WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
 	#endif
 	#include <winsock2.h> // struct timeval is defined here
+  #ifdef ATL_CORESOCKET_REPLACE_NOMINMAX
+    #undef NOMINMAX
+  #endif
+  #ifdef ATL_CORESOCKET_REPLACE_WIN32_LEAN_AND_MEAN
+    #undef WIN32_LEAN_AND_MEAN
+  #endif
+
+  // Bring the SOCKET type into our namespace, basing it on the root namespace one.
+  typedef SOCKET SOCKET;
+
+  // Make a namespaced INVALID_SOCKET definition, which cannot be just
+  // INVALID_SOCKET because Windows #defines it, so we pick another name.
+  static const SOCKET BAD_SOCKET = INVALID_SOCKET;
 #endif
 
 //=======================================================================
@@ -222,7 +238,7 @@ int get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
 
 int getmyIP(char* myIPchar, unsigned maxlen,
 	const char* NIC_IP = NULL,
-	SOCKET incoming_socket = INVALID_SOCKET);
+	SOCKET incoming_socket = BAD_SOCKET);
 
 /// @param [in] NICaddress Name of the network card to use, can be obtained
 ///             by calling getmyIP() or set to NULL to listen on all IP addresses.

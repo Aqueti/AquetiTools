@@ -8,6 +8,7 @@
 #include <Timer.h>
 #include <CoreSocket.hpp>
 
+
 //--------------------------------------------------------------
 // Ensures that someone calls WSAStartup on Windows before using
 // any socket code.
@@ -203,8 +204,6 @@ int AQT_gettimeofday(timeval* tp, void* tzp)
 
 #endif
 
-using namespace atl::Sockets;
-
 #ifdef AQT_USE_WINSOCK_SOCKETS
 
 // A socket in Windows can not be closed like it can in unix-land
@@ -276,7 +275,7 @@ extern "C" {
 }
 #endif
 
-int atl::Sockets::getmyIP(char* myIPchar, unsigned maxlen,
+int atl::CoreSocket::getmyIP(char* myIPchar, unsigned maxlen,
 	const char* NIC_IP,
 	SOCKET incoming_socket)
 {
@@ -306,7 +305,7 @@ int atl::Sockets::getmyIP(char* myIPchar, unsigned maxlen,
 
 	// If we have a valid specified SOCKET, then look up its address and
 	// return it.
-	if (incoming_socket != INVALID_SOCKET) {
+	if (incoming_socket != BAD_SOCKET) {
 		struct sockaddr_in socket_name;
 		int socket_namelen = sizeof(socket_name);
 
@@ -378,7 +377,7 @@ int atl::Sockets::getmyIP(char* myIPchar, unsigned maxlen,
 	return 0;
 }
 
-int atl::Sockets::noint_select(int width, fd_set* readfds, fd_set* writefds,
+int atl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,
 	fd_set* exceptfds, struct timeval* timeout)
 {
 	fd_set tmpread, tmpwrite, tmpexcept;
@@ -466,7 +465,7 @@ int atl::Sockets::noint_select(int width, fd_set* readfds, fd_set* writefds,
 
 #ifndef AQT_USE_WINSOCK_SOCKETS
 
-int atl::Sockets::noint_block_write(int outfile, const char buffer[], size_t length)
+int atl::CoreSocket::noint_block_write(int outfile, const char buffer[], size_t length)
 {
 	int sofar = 0; /* How many characters sent so far */
 	int ret;       /* Return value from write() */
@@ -490,7 +489,7 @@ int atl::Sockets::noint_block_write(int outfile, const char buffer[], size_t len
 	return (sofar); /* All bytes written */
 }
 
-int atl::Sockets::noint_block_read(int infile, char buffer[], size_t length)
+int atl::CoreSocket::noint_block_read(int infile, char buffer[], size_t length)
 {
 	int sofar; /* How many we read so far */
 	int ret;   /* Return value from the read() */
@@ -523,7 +522,7 @@ int atl::Sockets::noint_block_read(int infile, char buffer[], size_t length)
 
 #else /* winsock sockets */
 
-int atl::Sockets::noint_block_write(SOCKET outsock, const char* buffer, size_t length)
+int atl::CoreSocket::noint_block_write(SOCKET outsock, const char* buffer, size_t length)
 {
 	int nwritten;
 	size_t sofar = 0;
@@ -542,7 +541,7 @@ int atl::Sockets::noint_block_write(SOCKET outsock, const char* buffer, size_t l
 	return static_cast<int>(sofar); /* All bytes written */
 }
 
-int atl::Sockets::noint_block_read(SOCKET insock, char* buffer, size_t length)
+int atl::CoreSocket::noint_block_read(SOCKET insock, char* buffer, size_t length)
 {
 	int nread;
 	size_t sofar = 0;
@@ -575,7 +574,7 @@ int atl::Sockets::noint_block_read(SOCKET insock, char* buffer, size_t length)
 
 #endif /* AQT_USE_WINSOCK_SOCKETS */
 
-int atl::Sockets::noint_block_read_timeout(SOCKET infile, char buffer[], size_t length,
+int atl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size_t length,
 	struct timeval* timeout)
 {
 	int ret; /* Return value from the read() */
@@ -673,7 +672,7 @@ int atl::Sockets::noint_block_read_timeout(SOCKET infile, char buffer[], size_t 
 	return static_cast<int>(sofar); /* All bytes read */
 }
 
-SOCKET atl::Sockets::open_socket(int type, unsigned short* portno,
+SOCKET atl::CoreSocket::open_socket(int type, unsigned short* portno,
 	const char* IPaddress)
 {
 	struct sockaddr_in name;
@@ -682,13 +681,13 @@ SOCKET atl::Sockets::open_socket(int type, unsigned short* portno,
 
 	// create an Internet socket of the appropriate type
 	SOCKET sock = socket(AF_INET, type, 0);
-	if (sock == INVALID_SOCKET) {
+	if (sock == BAD_SOCKET) {
 		fprintf(stderr, "open_socket: can't open socket.\n");
 #ifndef _WIN32_WCE
 		fprintf(stderr, "  -- Error %d (%s).\n", socket_error,
 			socket_error_to_chars(socket_error));
 #endif
-		return INVALID_SOCKET;
+		return BAD_SOCKET;
 	}
 
 	// Added by Eric Boren to address socket reconnectivity on the Android
@@ -724,7 +723,7 @@ SOCKET atl::Sockets::open_socket(int type, unsigned short* portno,
 			closeSocket(sock);
 			fprintf(stderr, "open_socket:  can't get %s host entry\n",
 				IPaddress);
-			return INVALID_SOCKET;
+			return BAD_SOCKET;
 		}
 	}
 
@@ -749,14 +748,14 @@ SOCKET atl::Sockets::open_socket(int type, unsigned short* portno,
 		fprintf(stderr, "  (This probably means that another application has "
 			"the port open already)\n");
 		closeSocket(sock);
-		return INVALID_SOCKET;
+		return BAD_SOCKET;
 	}
 
 	// Find out which port was actually bound
 	if (getsockname(sock, (struct sockaddr*) & name, GSN_CAST & namelen)) {
 		fprintf(stderr, "open_socket: cannot get socket name.\n");
 		closeSocket(sock);
-		return INVALID_SOCKET;
+		return BAD_SOCKET;
 	}
 	if (portno) {
 		*portno = ntohs(name.sin_port);
@@ -775,18 +774,18 @@ SOCKET atl::Sockets::open_socket(int type, unsigned short* portno,
 	return sock;
 }
 
-SOCKET atl::Sockets::open_udp_socket(unsigned short* portno, const char* IPaddress)
+SOCKET atl::CoreSocket::open_udp_socket(unsigned short* portno, const char* IPaddress)
 {
 	return open_socket(SOCK_DGRAM, portno, IPaddress);
 }
 
-SOCKET atl::Sockets::open_tcp_socket(unsigned short* portno,
+SOCKET atl::CoreSocket::open_tcp_socket(unsigned short* portno,
 	const char* NIC_IP)
 {
 	return open_socket(SOCK_STREAM, portno, NIC_IP);
 }
 
-SOCKET atl::Sockets::connect_udp_port(const char* machineName, int remotePort,
+SOCKET atl::CoreSocket::connect_udp_port(const char* machineName, int remotePort,
 	const char* NIC_IP)
 {
 	SOCKET udp_socket;
@@ -829,7 +828,7 @@ SOCKET atl::Sockets::connect_udp_port(const char* machineName, int remotePort,
 			fprintf(stderr,
 				"connect_udp_port: error finding host by name (%s).\n",
 				machineName);
-			return INVALID_SOCKET;
+			return BAD_SOCKET;
 		}
 	}
 #ifndef AQT_USE_WINSOCK_SOCKETS
@@ -841,7 +840,7 @@ SOCKET atl::Sockets::connect_udp_port(const char* machineName, int remotePort,
 	if (connect(udp_socket, (struct sockaddr*) & udp_name, udp_namelen)) {
 		fprintf(stderr, "connect_udp_port: can't bind udp socket.\n");
 		closeSocket(udp_socket);
-		return INVALID_SOCKET;
+		return BAD_SOCKET;
 	}
 
 	// Find out which port was actually bound
@@ -850,7 +849,7 @@ SOCKET atl::Sockets::connect_udp_port(const char* machineName, int remotePort,
 		GSN_CAST & udp_namelen)) {
 		fprintf(stderr, "connect_udp_port: cannot get socket name.\n");
 		closeSocket(udp_socket);
-		return INVALID_SOCKET;
+		return BAD_SOCKET;
 	}
 
 #ifdef VERBOSE3
@@ -866,7 +865,7 @@ SOCKET atl::Sockets::connect_udp_port(const char* machineName, int remotePort,
 	return udp_socket;
 }
 
-int atl::Sockets::get_local_socket_name(char* local_host, size_t max_length,
+int atl::CoreSocket::get_local_socket_name(char* local_host, size_t max_length,
 	const char* remote_host)
 {
 	const int remote_port = 3883;	// Quasi-random port number...
@@ -874,7 +873,7 @@ int atl::Sockets::get_local_socket_name(char* local_host, size_t max_length,
 	int udp_namelen = sizeof(udp_name);
 
 	SOCKET udp_socket = connect_udp_port(remote_host, remote_port, NULL);
-	if (udp_socket == INVALID_SOCKET) {
+	if (udp_socket == BAD_SOCKET) {
 		fprintf(stderr,
 			"get_local_socket_name: cannot connect_udp_port to %s.\n",
 			remote_host);
@@ -910,7 +909,7 @@ int atl::Sockets::get_local_socket_name(char* local_host, size_t max_length,
 	return ret;
 }
 
-int atl::Sockets::udp_request_lob_packet(
+int atl::CoreSocket::udp_request_lob_packet(
 	SOCKET udp_sock,      // Socket to use to send
 	const char*,         // Name of the machine to call
 	const int,            // UDP port on remote machine
@@ -948,7 +947,7 @@ int atl::Sockets::udp_request_lob_packet(
 	return 0;
 }
 
-int atl::Sockets::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
+int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
 	const char* NIC_IP)
 {
 	struct sockaddr_in listen_name; /* The listen socket binding name */
@@ -982,7 +981,7 @@ int atl::Sockets::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
 	return 0;
 }
 
-int atl::Sockets::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
+int atl::CoreSocket::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
 	double timeout)
 {
 	fd_set rfds;
@@ -1031,7 +1030,7 @@ int atl::Sockets::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
 	return 0; // Nobody called
 }
 
-bool atl::Sockets::connect_tcp_to(const char* addr, int port,
+bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
 	const char* NICaddress, SOCKET *s)
 {
 	if (s == nullptr) {
@@ -1142,7 +1141,7 @@ bool atl::Sockets::connect_tcp_to(const char* addr, int port,
 	return true;
 }
 
-int atl::Sockets::close_socket(SOCKET sock)
+int atl::CoreSocket::close_socket(SOCKET sock)
 {
 	return closeSocket(sock);
 }
@@ -1167,7 +1166,7 @@ static const bool AQT_big_endian = (AQT_char_data_for_endian_test[0] != 1);
 #include <endian.h>
 #endif
 
-double atl::Sockets::hton(double d)
+double atl::CoreSocket::hton(double d)
 {
 	if (!AQT_big_endian) {
 		double dSwapped;
@@ -1203,7 +1202,7 @@ double atl::Sockets::hton(double d)
 }
 
 // they are their own inverses, so ...
-double atl::Sockets::ntoh(double d) { return hton(d); }
+double atl::CoreSocket::ntoh(double d) { return hton(d); }
 
 // convert int64_t to/from network order
 // I have chosen big endian as the network order for double
@@ -1213,7 +1212,7 @@ double atl::Sockets::ntoh(double d) { return hton(d); }
 // to not just swap all of the bytes but also swap the two 4-byte
 // words to get things in the right order.
 
-int64_t atl::Sockets::hton(int64_t d)
+int64_t atl::CoreSocket::hton(int64_t d)
 {
 	if (!AQT_big_endian) {
 		int64_t dSwapped;
@@ -1249,4 +1248,4 @@ int64_t atl::Sockets::hton(int64_t d)
 }
 
 // they are their own inverses, so ...
-int64_t atl::Sockets::ntoh(int64_t d) { return hton(d); }
+int64_t atl::CoreSocket::ntoh(int64_t d) { return hton(d); }
