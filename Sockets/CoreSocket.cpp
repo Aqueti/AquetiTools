@@ -381,10 +381,26 @@ int atl::CoreSocket::getmyIP(char* myIPchar, unsigned maxlen,
 
 int atl::CoreSocket::portable_poll(struct pollfd *fds, size_t nfds, int timeout)
 {
-  int ret;
 #ifdef _WIN32
   /// @todo WSAPoll() is reported to be broken: https://daniel.haxx.se/blog/2012/10/10/wsapoll-is-broken/
-  ret = WSAPoll(fds, static_cast<ULONG>(nfds), timeout);
+  return WSAPoll(fds, static_cast<ULONG>(nfds), timeout);
+#else
+  return poll(fds, static_cast<nfds_t>(nfds), timeout);
+#endif
+}
+
+int atl::CoreSocket::noint_poll(struct pollfd *fds, size_t nfds, int timeout)
+{
+  // Use portable_poll() as a subtask and check its return values.
+  // Keep track of time independently so that we can modify the timeout
+  // value for later calls.
+
+  /// @todo Do not check for errors on Windows because it will not be stopped by
+  /// an interrupt.
+  /// @todo If the portable_poll() function does respond to signals on Windows after
+  /// it is repaired, then switch this test as appropriate.
+
+  /*
   if (ret < 0) {
     fprintf(stderr, "portable_poll(): Error: ");
     int e = WSAGetLastError();
@@ -405,25 +421,7 @@ int atl::CoreSocket::portable_poll(struct pollfd *fds, size_t nfds, int timeout)
       fprintf(stderr, "Unrecognized error code: %d\n", e);
     }
   }
-#else
-  ret = poll(fds, static_cast<nfds_t>(nfds), timeout);
-  if (ret < 0) {
-    perror("portable_poll(): Error");
-  }
-#endif
-  return ret;
-}
-
-int atl::CoreSocket::noint_poll(struct pollfd *fds, size_t nfds, int timeout)
-{
-#ifdef _WIN32
-  // WSAPoll does not return on an interrupt, so it is by its very nature noint.
-  return portable_poll(fds, nfds, timeout);
-#else
-  /// @todo This will become the path for all systems if portable_poll() is made to
-  /// return when an interrupt happens on Windows.
-  /// @todo
-#endif
+  */
 }
 
 int atl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,

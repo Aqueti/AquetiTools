@@ -116,9 +116,8 @@ int noint_select(int width, fd_set* readfds, fd_set* writefds,
  * one that will work on both.
  /// @return >0: The number of elements in fds that have a nonzero
  ///          revents member.  0: The timer expired.
- ///          <0: There was an error (the details will be printed to
- ///          stderr by the function and will not be obtainable using
- ///          perror() or WSAGetLastError().
+ ///          <0: There was an error (OS specific, obtainable using
+ ///          errno on non-Windows or WSAGetLastError() on Windows.
  */
 int portable_poll(struct pollfd *fds, size_t nfds, int timeout);
 
