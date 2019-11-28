@@ -379,6 +379,53 @@ int atl::CoreSocket::getmyIP(char* myIPchar, unsigned maxlen,
 	return 0;
 }
 
+int atl::CoreSocket::portable_poll(struct pollfd *fds, size_t nfds, int timeout)
+{
+  int ret;
+#ifdef _WIN32
+  /// @todo WSAPoll() is reported to be broken: https://daniel.haxx.se/blog/2012/10/10/wsapoll-is-broken/
+  ret = WSAPoll(fds, static_cast<ULONG>(nfds), timeout);
+  if (ret < 0) {
+    fprintf(stderr, "portable_poll(): Error: ");
+    int e = WSAGetLastError();
+    switch (e) {
+    case WSAENETDOWN:
+      fprintf(stderr, "The network subsystem has failed\n");
+      break;
+    case WSAEFAULT:
+      fprintf(stderr, "An exception occurred while reading user input parameters\n");
+      break;
+    case WSAEINVAL:
+      fprintf(stderr, "An invalid parameter was passed\n");
+      break;
+    case WSAENOBUFS:
+      fprintf(stderr, "The function was unable to allocate sufficient memory\n");
+      break;
+    default:
+      fprintf(stderr, "Unrecognized error code: %d\n", e);
+    }
+  }
+#else
+  ret = poll(fds, static_cast<nfds_t>(nfds), timeout);
+  if (ret < 0) {
+    perror("portable_poll(): Error");
+  }
+#endif
+  return ret;
+}
+
+int atl::CoreSocket::noint_poll(struct pollfd *fds, size_t nfds, int timeout)
+{
+#ifdef _WIN32
+  // WSAPoll does not return on an interrupt, so it is by its very nature noint.
+  return portable_poll(fds, nfds, timeout);
+#else
+  /// @todo This will become the path for all systems if portable_poll() is made to
+  /// return when an interrupt happens on Windows.
+  /// @todo
+#endif
+}
+
 int atl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,
 	fd_set* exceptfds, struct timeval* timeout)
 {
@@ -395,7 +442,7 @@ int atl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,
 	 * to keep track.  Also, the stop time is calculated so that
 		 * we can know when it is time to bail. */
 	if ((timeout != NULL) &&
-		((timeout->tv_sec != 0) || (timeout->tv_usec != 0))) {
+		  ((timeout->tv_sec != 0) || (timeout->tv_usec != 0))) {
 		timeout2 = *timeout;
 		timeout2ptr = &timeout2;
 		AQT_gettimeofday(&start, NULL);         /* Find start time */

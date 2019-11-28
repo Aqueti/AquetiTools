@@ -19,9 +19,10 @@
 // Architecture-dependent include files.
 
 #ifndef AQT_USE_WINSOCK_SOCKETS
-#include <sys/time.h> // for timeval, timezone, gettimeofday
+#include <sys/time.h>   // for timeval, timezone, gettimeofday
 #include <sys/select.h> // for fd_set
 #include <netinet/in.h> // for htonl, htons
+#include <poll.h>       // for poll()
 #endif
 
 //=======================================================================
@@ -108,6 +109,26 @@ int noint_block_read(SOCKET insock, char* buffer, size_t length);
  */
 int noint_select(int width, fd_set* readfds, fd_set* writefds,
 	fd_set* exceptfds, struct timeval* timeout);
+
+/**
+ *	This routine will perform a poll() call on non-Windows platforms
+ * and a WSAPoll() call on Windows.  It generalizes the size type to
+ * one that will work on both.
+ /// @return >0: The number of elements in fds that have a nonzero
+ ///          revents member.  0: The timer expired.
+ ///          <0: There was an error (the details will be printed to
+ ///          stderr by the function and will not be obtainable using
+ ///          perror() or WSAGetLastError().
+ */
+int portable_poll(struct pollfd *fds, size_t nfds, int timeout);
+
+/**
+ *	This routine will perform like a normal poll() call, but it will
+ * restart if it quit because of an interrupt.  This makes it more robust
+ * in its function, and allows this code to perform properly on systems that
+ * sends USER1 or other interrupts.
+ */
+int noint_poll(struct pollfd *fds, size_t nfds, int timeout);
 
 /**
  *   This routine will read in a block from the file descriptor.
