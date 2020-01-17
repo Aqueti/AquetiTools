@@ -147,7 +147,6 @@ if(type_lower MATCHES "debug")
 endif(type_lower MATCHES "debug")
 
 find_package(Threads REQUIRED)
-find_package(JsonBox CONFIG REQUIRED)
 
 list( APPEND ATOOL_HEADERS 
     Timer/Timer.h
@@ -250,13 +249,14 @@ add_library( AquetiTools STATIC
 )
 
 target_link_libraries( AquetiTools
-    JsonBox
     Threads::Threads
 )
 
 list(APPEND TARGET_LIST AquetiTools )
 
 if(BUILD_TESTS)
+    find_package(JsonBox CONFIG REQUIRED)
+
    #Make a dedicated test library
    add_library( AquetiTools_test STATIC
       test/AquetiToolsTest.cpp
@@ -272,6 +272,7 @@ if(BUILD_TESTS)
       test/FileIOTest.cpp
    )
    target_link_libraries( AquetiTools_test
+        JsonBox
       AquetiTools
    )
 
