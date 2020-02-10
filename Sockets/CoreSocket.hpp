@@ -16,18 +16,31 @@
 #endif
 
 //=======================================================================
-// Architecture-dependent include files and definitions.
+// Architecture-dependent include files.
 
 #ifndef AQT_USE_WINSOCK_SOCKETS
-	#include <sys/time.h> // for timeval, timezone, gettimeofday
-  #include <sys/select.h> // for fd_set
-  #include <netinet/in.h> // for htonl, htons
+#include <sys/time.h>   // for timeval, timezone, gettimeofday
+#include <sys/select.h> // for fd_set
+#include <netinet/in.h> // for htonl, htons
+#include <poll.h>       // for poll()
+#endif
+
+//=======================================================================
+// All externally visible symbols should be defined in the name space.
+
+namespace atl { namespace CoreSocket {
+
+//=======================================================================
+// Architecture-dependent definitions.
+
+#ifndef AQT_USE_WINSOCK_SOCKETS
 
   // On Winsock, we have to use SOCKET, so we're going to have to use it
   // everywhere.
-  #define SOCKET int
-  // On Winsock, this constant is defined as ~0 (sockets are unsigned ints)
-  static const int INVALID_SOCKET = -1;
+  typedef int SOCKET;
+  // On Winsock, INVALID_SOCKET is #defined as ~0 (sockets are unsigned ints)
+  // We can't redefine it locally, so we have to switch to another name
+  static const int BAD_SOCKET = -1;
 #else // winsock sockets
 	// These are a pair of horrible hacks that instruct Windows include
 	// files to (1) not define min() and max() in a way that messes up
@@ -37,18 +50,28 @@
 	// change the way they behave.
 
 	#ifndef NOMINMAX
-	#define NOMINMAX
+    #define ATL_CORESOCKET_REPLACE_NOMINMAX
+	  #define NOMINMAX
 	#endif
 	#ifndef WIN32_LEAN_AND_MEAN
-	#define WIN32_LEAN_AND_MEAN
+    #define ATL_CORESOCKET_REPLACE_WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
 	#endif
 	#include <winsock2.h> // struct timeval is defined here
+  #ifdef ATL_CORESOCKET_REPLACE_NOMINMAX
+    #undef NOMINMAX
+  #endif
+  #ifdef ATL_CORESOCKET_REPLACE_WIN32_LEAN_AND_MEAN
+    #undef WIN32_LEAN_AND_MEAN
+  #endif
+
+  // Bring the SOCKET type into our namespace, basing it on the root namespace one.
+  typedef SOCKET SOCKET;
+
+  // Make a namespaced INVALID_SOCKET definition, which cannot be just
+  // INVALID_SOCKET because Windows #defines it, so we pick another name.
+  static const SOCKET BAD_SOCKET = INVALID_SOCKET;
 #endif
-
-//=======================================================================
-// All externally visible symbols should be defined in the name space.
-
-namespace atl {	namespace Sockets {
 
 /**
  *      This routine will write a block to a file descriptor.  It acts just
@@ -86,6 +109,25 @@ int noint_block_read(SOCKET insock, char* buffer, size_t length);
  */
 int noint_select(int width, fd_set* readfds, fd_set* writefds,
 	fd_set* exceptfds, struct timeval* timeout);
+
+/**
+ *	This routine will perform a poll() call on non-Windows platforms
+ * and a WSAPoll() call on Windows.  It generalizes the size type to
+ * one that will work on both.
+ /// @return >0: The number of elements in fds that have a nonzero
+ ///          revents member.  0: The timer expired.
+ ///          <0: There was an error (OS specific, obtainable using
+ ///          errno on non-Windows or WSAGetLastError() on Windows.
+ */
+int portable_poll(struct pollfd *fds, size_t nfds, int timeout);
+
+/**
+ *	This routine will perform like a normal poll() call, but it will
+ * restart if it quit because of an interrupt.  This makes it more robust
+ * in its function, and allows this code to perform properly on systems that
+ * sends USER1 or other interrupts.
+ */
+int noint_poll(struct pollfd *fds, size_t nfds, int timeout);
 
 /**
  *   This routine will read in a block from the file descriptor.
@@ -195,6 +237,27 @@ int udp_request_lob_packet(
 	const int local_port, // TCP port on this machine
 	const char* NIC_IP = NULL);
 
+
+/// @brief Options passed to TCP socket-creation routines.
+class TCPOptions {
+public:
+  // These are the defaults for an Aqueti connection.
+  bool keepAlive = true;
+  int keepCount = 4;
+  int keepIdle = 20;
+  int keepInterval = 5;
+  unsigned userTimeout = 15000;
+
+  // These are the system defaults
+  void UseSystemDefaults() {
+    keepAlive = false;
+    keepCount = -1;
+    keepIdle = -1;
+    keepInterval = -1;
+    userTimeout = 0;
+  }
+};
+
 /**
  * This routine will get a TCP socket that is ready to accept connections.
  * That is, listen() has already been called on it.
@@ -206,7 +269,7 @@ int udp_request_lob_packet(
  */
 
 int get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
-	const char* NIC_IP = NULL);
+	const char* NIC_IP = NULL, int backlog = 1000, bool reuseAddr = true, TCPOptions options = TCPOptions());
 
 /**
  *   This function returns the host IP address in string form.  For example,
@@ -222,13 +285,22 @@ int get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
 
 int getmyIP(char* myIPchar, unsigned maxlen,
 	const char* NIC_IP = NULL,
-	SOCKET incoming_socket = INVALID_SOCKET);
+	SOCKET incoming_socket = BAD_SOCKET);
 
 /// @param [in] NICaddress Name of the network card to use, can be obtained
 ///             by calling getmyIP() or set to NULL to listen on all IP addresses.
-bool connect_tcp_to(const char* addr, int port, const char *NICaddress, SOCKET *s);
+bool connect_tcp_to(const char* addr, int port, const char *NICaddress, SOCKET *s,
+  TCPOptions options = TCPOptions());
 
 int close_socket(SOCKET sock);
+
+/// @brief Cause a TCP socket to accumulate data but not to send it.
+bool cork_tcp_socket(SOCKET sock);
+
+/// @brief Cause a TCP socket to send all accumulated data immediately.
+///
+/// On Windows, this has the side effect of enabling TCP_NODELAY on the socket.
+bool uncork_tcp_socket(SOCKET sock);
 
 /// @brief Convert types to and from network-standard byte order.
 double hton(double d);

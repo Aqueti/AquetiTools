@@ -160,10 +160,10 @@ set(Timer_SRC
 
 include_directories( Sockets )
 set(Sockets_SRC
-   Sockets/Sockets.cpp
+   Sockets/CoreSocket.cpp
 )
 list( APPEND ATOOL_HEADERS
-   Sockets/Sockets.hpp
+   Sockets/CoreSocket.hpp
 )
 
 include_directories( Thread )
