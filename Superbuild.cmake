@@ -41,17 +41,30 @@ macro(add_external_project MYNAME LOCATION MASTER DEPENDS ARGS)
 endmacro(add_external_project)
 
 if( USE_SUPERBUILD ) 
-   add_external_project(JsonBox dependencies/JsonBox OFF "" "")
+    if (BUILD_TESTS) 
+        add_external_project(JsonBox dependencies/JsonBox OFF "" "")
+    endif()
 endif()
 
 #AquetiTools
-#This depedns on JsonBox only if JsonBox is defined
-ExternalProject_Add(AquetiTools
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}
-  BUILD_ALWAYS 1
-  CMAKE_ARGS ${cmake_common_args} 
-  INSTALL_DIR ${CMAKE_BINARY_DIR}/INSTALL
-  LOG_INSTALL 1
-  DEPENDS JsonBox submodule_init
-)
+#This depedns on JsonBox only if we are building tests
+if (BUILD_TESTS) 
+    ExternalProject_Add(AquetiTools
+      SOURCE_DIR ${CMAKE_SOURCE_DIR}
+      BUILD_ALWAYS 1
+      CMAKE_ARGS ${cmake_common_args} 
+      INSTALL_DIR ${CMAKE_BINARY_DIR}/INSTALL
+      LOG_INSTALL 1
+      DEPENDS JsonBox submodule_init
+    )
+else()
+    ExternalProject_Add(AquetiTools
+      SOURCE_DIR ${CMAKE_SOURCE_DIR}
+      BUILD_ALWAYS 1
+      CMAKE_ARGS ${cmake_common_args} 
+      INSTALL_DIR ${CMAKE_BINARY_DIR}/INSTALL
+      LOG_INSTALL 1
+      DEPENDS submodule_init
+    )
+endif()
 

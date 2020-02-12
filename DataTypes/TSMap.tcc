@@ -9,7 +9,6 @@
 #include <map>
 #include <mutex>
 #include <vector>
-#include "JsonBox.h"
 
 #include "shared_mutex.h"
 #include <atomic>

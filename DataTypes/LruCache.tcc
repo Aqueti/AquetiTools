@@ -49,7 +49,6 @@ public:
     using Q::size;
     using Q::set_max_size;
     using Q::get_max_size;
-    friend JsonBox::Value testLruCache(unsigned int numThreads, bool printFlag, bool assertFlag);
 
 protected:
     typedef typename Q::QNode QNode;      //<! Defining QNode

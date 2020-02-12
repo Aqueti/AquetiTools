@@ -16,6 +16,7 @@
 #include <thread>
 #include <iostream>
 #include <mutex>
+#include <execinfo.h>
 
 namespace atl {
 

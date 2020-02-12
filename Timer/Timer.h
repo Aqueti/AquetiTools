@@ -15,7 +15,6 @@
 #include <stdint.h>
 #include <string>
 #include <sstream>
-#include <JsonBox.h>
 
 namespace atl
 {
