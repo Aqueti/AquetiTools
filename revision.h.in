@@ -1,9 +1,9 @@
 #include <iostream>
 #pragma once
 
-namespace atl
+namespace acl
 {
-   const std::string VERSION = "@AquetiTools_VERSION@_@VERSION_TAG@";
+   const std::string VERSION = "@acl_VERSION@_@VERSION_TAG@";
    const std::string GIT_BRANCH = "@GIT_BRANCH@";
    const std::string GIT_COMMIT_HASH = "@GIT_COMMIT_HASH@";
    const std::string BUILD_DATE = "@BUILD_DATE@_@BUILD_TIME@";

@@ -10,7 +10,7 @@
 
 #include "ThreadWorker.h"
 
-namespace atl {
+namespace acl {
 
 ThreadWorker::ThreadWorker(std::function<void()> f)
 {
@@ -37,4 +37,4 @@ void ThreadWorker::mainLoop()
     }
 }
 
-} //end namespace atl
+} //end namespace acl

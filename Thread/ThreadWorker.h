@@ -13,7 +13,7 @@
 #include <mutex>
 #include "Thread.h"
 
-namespace atl {
+namespace acl {
 
 class ThreadWorker : private Thread
 {
@@ -34,4 +34,4 @@ class ThreadWorker : private Thread
         std::function<void()> m_mainLoopFunction = nullptr;
 };
 
-} //end namespace atl
+} //end namespace acl

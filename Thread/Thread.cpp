@@ -14,7 +14,7 @@
 
 std::ofstream threadTest;
 
-namespace atl
+namespace acl
 {
 
 Thread::Thread() : m_running(false) {}

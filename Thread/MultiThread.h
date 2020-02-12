@@ -8,7 +8,7 @@
 #include <vector>
 #include <map>
 
-namespace atl
+namespace acl
 {
 
 class MultiThread : public Thread

@@ -2,14 +2,13 @@ cmake_minimum_required(VERSION 2.8.12)
 
 cmake_policy(SET CMP0048 NEW)
 
-project(AquetiTools VERSION "0.0.0.1" )
+project(acl VERSION "0.0.0.1" )
 ############################################################
 # Configuration Step
 ############################################################
 
 #General build options
 option( BUILD_STATIC_LIB "Compile the library statically (off for dynamic)" ON )
-option( BUILD_TESTS "Build test executables" ON )
 option( USE_SUPERBUILD "Build all dependencies in SUPERBUILD mode" ON)
 
 # Doxygen support
@@ -184,13 +183,13 @@ list( APPEND ATOOL_HEADERS
    Thread/TaskManager.tcc
 )
 
-include_directories( DataTypes )
-set( DataTypes_SRC
+include_directories( DataStructures )
+set( DataStructures_SRC
 )
 list( APPEND ATOOL_HEADERS
-   DataTypes/LruCache.tcc
-   DataTypes/TSMap.tcc
-   DataTypes/TSQueue.tcc
+   DataStructures/LruCache.tcc
+   DataStructures/TSMap.tcc
+   DataStructures/TSQueue.tcc
 )
 
 include_directories( Math ) 
@@ -214,16 +213,16 @@ set( Mutex_SRC
 )
 list(APPEND ATOOL_HEADERS
    Mutex/shared_mutex.h
-   Mutex/AtlMutexWrap.h
+   Mutex/AclMutexWrap.h
 )
 
 
-include_directories( IDGenerator )
-set( IDGenerator_SRC
-    IDGenerator/IDGenerator.cpp
+include_directories( RandomIDGenerator )
+set( RandomIDGenerator_SRC
+    RandomIDGenerator/RandomIDGenerator.cpp
 )
 list( APPEND ATOOL_HEADERS
-    IDGenerator/IDGenerator.hpp
+    RandomIDGenerator/RandomIDGenerator.hpp
 )
 
 include_directories( FileIO )
@@ -236,64 +235,22 @@ list( APPEND ATOOL_HEADERS
 
 
 
-add_library( AquetiTools STATIC  
+add_library( acl STATIC  
    ${Timer_SRC}
    ${Thread_SRC}
    ${Mutex_SRC}
-   ${DataTypes_SRC}
+   ${DataStructures_SRC}
    ${Tools_SRC}
-   ${IDGenerator_SRC}
+   ${RandomIDGenerator_SRC}
    ${FileIO_SRC}
-   ${AqtError_SRC}
    ${Sockets_SRC}
 )
 
-target_link_libraries( AquetiTools
+target_link_libraries( acl
     Threads::Threads
 )
 
-list(APPEND TARGET_LIST AquetiTools )
-
-if(BUILD_TESTS)
-    find_package(JsonBox CONFIG REQUIRED)
-
-   #Make a dedicated test library
-   add_library( AquetiTools_test STATIC
-      test/AquetiToolsTest.cpp
-      test/TimerTest.cpp
-      test/ThreadTest.cpp
-      test/MultiThreadTest.cpp
-      test/ThreadPoolTest.cpp
-      test/LruCacheTest.cpp
-      test/TSQueueTest.cpp
-      test/TSMapTest.cpp
-      test/TaskManagerTest.cpp
-      test/StringToolsTest.cpp
-      test/FileIOTest.cpp
-   )
-   target_link_libraries( AquetiTools_test
-        JsonBox
-      AquetiTools
-   )
-
-   list(APPEND TARGET_LIST AquetiTools_test )
-
-   list(APPEND ATOOL_HEADERS test/AquetiToolsTest.h )
-
-   #Add AquetiTools test as an executavble
-   add_executable( testAquetiTools
-     test/testAquetiTools.cpp
-   )
-   TARGET_LINK_LIBRARIES(testAquetiTools
-      AquetiTools_test
-   )
-   list(APPEND TARGET_LIST testAquetiTools )
-
-   #Add AquetiTools test as an executavble
-   #   add_executable( testPolyfit
-   #       Math/testPolyfit.cpp
-   #       )
-endif()
+list(APPEND TARGET_LIST acl )
 
 
 #############################################
@@ -301,7 +258,7 @@ endif()
 # This sections initiates the build of the  components in th TARGET_LIST. 
 # Each component
 #############################################
-configure_file(${CMAKE_SOURCE_DIR}/AquetiToolsConfig.cmake.in
+configure_file(${CMAKE_SOURCE_DIR}/aclConfig.cmake.in
                ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
                @ONLY)
 
@@ -311,11 +268,11 @@ install(TARGETS ${TARGET_LIST} EXPORT ${PROJECT_NAME}
    RUNTIME DESTINATION bin COMPONENT lib
    LIBRARY DESTINATION lib${LIB_SUFFIX} COMPONENT lib
    ARCHIVE DESTINATION lib${LIB_SUFFIX} COMPONENT lib
-   INCLUDES DESTINATION include/atl
-   PUBLIC_HEADER DESTINATION include/atl
+   INCLUDES DESTINATION include/acl
+   PUBLIC_HEADER DESTINATION include/acl
 )
 
-install( FILES ${ATOOL_HEADERS} DESTINATION include/atl)
+install( FILES ${ATOOL_HEADERS} DESTINATION include/acl)
 
 install(FILES ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         DESTINATION lib${LIB_SUFFIX}/cmake)

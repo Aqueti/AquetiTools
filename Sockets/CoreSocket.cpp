@@ -14,7 +14,7 @@
 //--------------------------------------------------------------
 // Ensures that someone calls WSAStartup on Windows before using
 // any socket code.
-#if defined(AQT_USE_WINSOCK_SOCKETS)
+#if defined(ACL_USE_WINSOCK_SOCKETS)
 class WSAStart {
 public:
 	WSAStart() {
@@ -31,7 +31,7 @@ public:
 static WSAStart startUp;
 #endif
 
-#if defined(AQT_USE_WINSOCK_SOCKETS)
+#if defined(ACL_USE_WINSOCK_SOCKETS)
 /* from HP-UX */
 struct timezone {
 	int tz_minuteswest; /* minutes west of Greenwich */
@@ -44,21 +44,21 @@ struct timezone {
 // that Windows doesn't implement gettimeofday(), nor does it
 // define "struct timezone", although Winsock.h does define
 // "struct timeval".  The painful solution has been to define a
-// AQT_gettimeofday() function that takes a void * as a second
+// ACL_gettimeofday() function that takes a void * as a second
 // argument (the timezone) and have all TimeWarp code call this function
 // rather than gettimeofday().  On non-WINSOCK implementations,
-// we alias AQT_gettimeofday() right back to gettimeofday(), so
+// we alias ACL_gettimeofday() right back to gettimeofday(), so
 // that we are calling the system routine.  On Windows, we will
-// be using AQT_gettimofday().
+// be using ACL_gettimofday().
 
-#if (!defined(AQT_USE_WINSOCK_SOCKETS))
+#if (!defined(ACL_USE_WINSOCK_SOCKETS))
 // If we're using std::chrono, then we implement a new
-// AQT_gettimeofday() on top of it in a platform-independent
+// ACL_gettimeofday() on top of it in a platform-independent
 // manner.  Otherwise, we just use the system call.
 #ifndef USE_STD_CHRONO
-#define AQT_gettimeofday gettimeofday
+#define ACL_gettimeofday gettimeofday
 #else
-int AQT_gettimeofday(struct timeval* tp,
+int ACL_gettimeofday(struct timeval* tp,
 	void* tzp = NULL);
 #endif
 #else // winsock sockets
@@ -152,7 +152,7 @@ static struct timeval high_resolution_time_to_system_time(
 					fractional_post_secs.time_since_epoch())
 				.count());
 
-			hr_offset = atl::TimevalDiff(post_time, high_time);
+			hr_offset = acl::TimevalDiff(post_time, high_time);
 
 			// We've found our offset ... re-use it from here on.
 			hr_offset_determined = true;
@@ -160,10 +160,10 @@ static struct timeval high_resolution_time_to_system_time(
 	}
 
 	// The offset has been determined, by us or someone else.  Apply it.
-	return atl::TimevalSum(hi_res_time, hr_offset);
+	return acl::TimevalSum(hi_res_time, hr_offset);
 }
 
-int AQT_gettimeofday(timeval* tp, void* tzp)
+int ACL_gettimeofday(timeval* tp, void* tzp)
 {
 	// If we have nothing to fill in, don't try.
 	if (tp == NULL) {
@@ -206,7 +206,7 @@ int AQT_gettimeofday(timeval* tp, void* tzp)
 
 #endif
 
-#ifdef AQT_USE_WINSOCK_SOCKETS
+#ifdef ACL_USE_WINSOCK_SOCKETS
 
 // A socket in Windows can not be closed like it can in unix-land
 #define closeSocket closesocket
@@ -219,7 +219,7 @@ static std::string WSA_number_to_string(int err)
 	return std::system_category().message(err);
 }
 #define socket_error_to_chars(x) (WSA_number_to_string(x)).c_str()
-#define AQT_EINTR WSAEINTR
+#define ACL_EINTR WSAEINTR
 
 #else
 #include <errno.h> // for errno, EINTR
@@ -228,7 +228,7 @@ static std::string WSA_number_to_string(int err)
 
 #define socket_error errno
 #define socket_error_to_chars(x) strerror(x)
-#define AQT_EINTR EINTR
+#define ACL_EINTR EINTR
 
 #include <arpa/inet.h>  // for inet_addr
 #include <netinet/in.h> // for sockaddr_in, ntohl, in_addr, etc
@@ -241,15 +241,15 @@ static std::string WSA_number_to_string(int err)
 
 #endif
 
-#ifndef AQT_USE_WINSOCK_SOCKETS
+#ifndef ACL_USE_WINSOCK_SOCKETS
 #include <sys/wait.h> // for waitpid, WNOHANG
 #ifndef __CYGWIN__
 #include <netinet/tcp.h> // for TCP_NODELAY
 #endif                   /* __CYGWIN__ */
-#endif                   /* AQT_USE_WINSOCK_SOCKETS */
+#endif                   /* ACL_USE_WINSOCK_SOCKETS */
 
 // cast fourth argument to setsockopt()
-#ifdef AQT_USE_WINSOCK_SOCKETS
+#ifdef ACL_USE_WINSOCK_SOCKETS
 #define SOCK_CAST (char *)
 #else
 #ifdef sparc
@@ -277,7 +277,7 @@ extern "C" {
 }
 #endif
 
-int atl::CoreSocket::getmyIP(char* myIPchar, unsigned maxlen,
+int acl::CoreSocket::getmyIP(char* myIPchar, unsigned maxlen,
 	const char* NIC_IP,
 	SOCKET incoming_socket)
 {
@@ -379,7 +379,7 @@ int atl::CoreSocket::getmyIP(char* myIPchar, unsigned maxlen,
 	return 0;
 }
 
-int atl::CoreSocket::portable_poll(struct pollfd *fds, size_t nfds, int timeout)
+int acl::CoreSocket::portable_poll(struct pollfd *fds, size_t nfds, int timeout)
 {
 #ifdef _WIN32
   /// @todo WSAPoll() is reported to be broken: https://daniel.haxx.se/blog/2012/10/10/wsapoll-is-broken/
@@ -389,7 +389,7 @@ int atl::CoreSocket::portable_poll(struct pollfd *fds, size_t nfds, int timeout)
 #endif
 }
 
-int atl::CoreSocket::noint_poll(struct pollfd *fds, size_t nfds, int timeout)
+int acl::CoreSocket::noint_poll(struct pollfd *fds, size_t nfds, int timeout)
 {
   // Use portable_poll() as a subtask and check its return values.
   // Keep track of time independently so that we can modify the timeout
@@ -424,7 +424,7 @@ int atl::CoreSocket::noint_poll(struct pollfd *fds, size_t nfds, int timeout)
   */
 }
 
-int atl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,
+int acl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,
 	fd_set* exceptfds, struct timeval* timeout)
 {
 	fd_set tmpread, tmpwrite, tmpexcept;
@@ -443,7 +443,7 @@ int atl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,
 		  ((timeout->tv_sec != 0) || (timeout->tv_usec != 0))) {
 		timeout2 = *timeout;
 		timeout2ptr = &timeout2;
-		AQT_gettimeofday(&start, NULL);         /* Find start time */
+		ACL_gettimeofday(&start, NULL);         /* Find start time */
 		stop = TimevalSum(start, *timeout); /* Find stop time */
 	}
 	else {
@@ -476,13 +476,13 @@ int atl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,
 		ret = select(width, &tmpread, &tmpwrite, &tmpexcept, timeout2ptr);
 		if (ret >= 0) { /* We are done if timeout or found some */
 			done = 1;
-		} else if (socket_error != AQT_EINTR) { /* Done if non-intr error */
+		} else if (socket_error != ACL_EINTR) { /* Done if non-intr error */
 			done = 1;
 		} else if ((timeout != NULL) &&
 			((timeout->tv_sec != 0) || (timeout->tv_usec != 0))) {
 
 			/* Interrupt happened.  Find new time timeout value */
-			AQT_gettimeofday(&now, NULL);
+			ACL_gettimeofday(&now, NULL);
 			if (TimevalGreater(now, stop)) { /* Past stop time */
 				done = 1;
 			}
@@ -510,9 +510,9 @@ int atl::CoreSocket::noint_select(int width, fd_set* readfds, fd_set* writefds,
 	return (ret);
 }
 
-#ifndef AQT_USE_WINSOCK_SOCKETS
+#ifndef ACL_USE_WINSOCK_SOCKETS
 
-int atl::CoreSocket::noint_block_write(int outfile, const char buffer[], size_t length)
+int acl::CoreSocket::noint_block_write(int outfile, const char buffer[], size_t length)
 {
 	int sofar = 0; /* How many characters sent so far */
 	int ret;       /* Return value from write() */
@@ -523,7 +523,7 @@ int atl::CoreSocket::noint_block_write(int outfile, const char buffer[], size_t 
 		sofar += ret;
 
 		/* Ignore interrupted system calls - retry */
-		if ((ret == -1) && (socket_error == AQT_EINTR)) {
+		if ((ret == -1) && (socket_error == ACL_EINTR)) {
 			ret = 1;    /* So we go around the loop again */
 			sofar += 1; /* Restoring it from above -1 */
 		}
@@ -536,7 +536,7 @@ int atl::CoreSocket::noint_block_write(int outfile, const char buffer[], size_t 
 	return (sofar); /* All bytes written */
 }
 
-int atl::CoreSocket::noint_block_read(int infile, char buffer[], size_t length)
+int acl::CoreSocket::noint_block_read(int infile, char buffer[], size_t length)
 {
 	int sofar; /* How many we read so far */
 	int ret;   /* Return value from the read() */
@@ -555,7 +555,7 @@ int atl::CoreSocket::noint_block_read(int infile, char buffer[], size_t length)
 		sofar += ret;
 
 		/* Ignore interrupted system calls - retry */
-		if ((ret == -1) && (socket_error == AQT_EINTR)) {
+		if ((ret == -1) && (socket_error == ACL_EINTR)) {
 			ret = 1;    /* So we go around the loop again */
 			sofar += 1; /* Restoring it from above -1 */
 		}
@@ -569,7 +569,7 @@ int atl::CoreSocket::noint_block_read(int infile, char buffer[], size_t length)
 
 #else /* winsock sockets */
 
-int atl::CoreSocket::noint_block_write(SOCKET outsock, const char* buffer, size_t length)
+int acl::CoreSocket::noint_block_write(SOCKET outsock, const char* buffer, size_t length)
 {
 	int nwritten;
 	size_t sofar = 0;
@@ -588,7 +588,7 @@ int atl::CoreSocket::noint_block_write(SOCKET outsock, const char* buffer, size_
 	return static_cast<int>(sofar); /* All bytes written */
 }
 
-int atl::CoreSocket::noint_block_read(SOCKET insock, char* buffer, size_t length)
+int acl::CoreSocket::noint_block_read(SOCKET insock, char* buffer, size_t length)
 {
 	int nread;
 	size_t sofar = 0;
@@ -619,9 +619,9 @@ int atl::CoreSocket::noint_block_read(SOCKET insock, char* buffer, size_t length
 	return static_cast<int>(sofar); /* All bytes read */
 }
 
-#endif /* AQT_USE_WINSOCK_SOCKETS */
+#endif /* ACL_USE_WINSOCK_SOCKETS */
 
-int atl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size_t length,
+int acl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size_t length,
 	struct timeval* timeout)
 {
 	int ret; /* Return value from the read() */
@@ -646,7 +646,7 @@ int atl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size
 		((timeout->tv_sec != 0) || (timeout->tv_usec != 0))) {
 		timeout2 = *timeout;
 		timeout2ptr = &timeout2;
-		AQT_gettimeofday(&start, NULL);         /* Find start time */
+		ACL_gettimeofday(&start, NULL);         /* Find start time */
 		stop = TimevalSum(start, *timeout); /* Find stop time */
 	} else {
 		timeout2ptr = timeout;
@@ -679,7 +679,7 @@ int atl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size
 
 		/* See what time it is now and how long we have to go */
 		if (timeout2ptr) {
-			AQT_gettimeofday(&now, NULL);
+			ACL_gettimeofday(&now, NULL);
 			if (TimevalGreater(now, stop)) { /* Timeout! */
 				return static_cast<int>(sofar);
 			} else {
@@ -692,12 +692,12 @@ int atl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size
 			continue;
 		}
 
-#ifndef AQT_USE_WINSOCK_SOCKETS
+#ifndef ACL_USE_WINSOCK_SOCKETS
 		ret = read(infile, buffer + sofar, length - sofar);
 		sofar += ret;
 
 		/* Ignore interrupted system calls - retry */
-		if ((ret == -1) && (socket_error == AQT_EINTR)) {
+		if ((ret == -1) && (socket_error == ACL_EINTR)) {
 			ret = 1;    /* So we go around the loop again */
 			sofar += 1; /* Restoring it from above -1 */
 		}
@@ -711,7 +711,7 @@ int atl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size
 #endif
 
 	} while ((ret > 0) && (sofar < length));
-#ifndef AQT_USE_WINSOCK_SOCKETS
+#ifndef ACL_USE_WINSOCK_SOCKETS
 	if (ret == -1) return (-1); /* Error during read */
 #endif
 	if (ret == 0) return (-1); /* EOF reached */
@@ -719,7 +719,7 @@ int atl::CoreSocket::noint_block_read_timeout(SOCKET infile, char buffer[], size
 	return static_cast<int>(sofar); /* All bytes read */
 }
 
-atl::CoreSocket::SOCKET atl::CoreSocket::open_socket(int type, unsigned short* portno,
+acl::CoreSocket::SOCKET acl::CoreSocket::open_socket(int type, unsigned short* portno,
 	const char* IPaddress)
 {
 	struct sockaddr_in name;
@@ -821,18 +821,18 @@ atl::CoreSocket::SOCKET atl::CoreSocket::open_socket(int type, unsigned short* p
 	return sock;
 }
 
-atl::CoreSocket::SOCKET atl::CoreSocket::open_udp_socket(unsigned short* portno, const char* IPaddress)
+acl::CoreSocket::SOCKET acl::CoreSocket::open_udp_socket(unsigned short* portno, const char* IPaddress)
 {
 	return open_socket(SOCK_DGRAM, portno, IPaddress);
 }
 
-atl::CoreSocket::SOCKET atl::CoreSocket::open_tcp_socket(unsigned short* portno,
+acl::CoreSocket::SOCKET acl::CoreSocket::open_tcp_socket(unsigned short* portno,
 	const char* NIC_IP)
 {
 	return open_socket(SOCK_STREAM, portno, NIC_IP);
 }
 
-atl::CoreSocket::SOCKET atl::CoreSocket::connect_udp_port(const char* machineName, int remotePort,
+acl::CoreSocket::SOCKET acl::CoreSocket::connect_udp_port(const char* machineName, int remotePort,
 	const char* NIC_IP)
 {
 	SOCKET udp_socket;
@@ -878,7 +878,7 @@ atl::CoreSocket::SOCKET atl::CoreSocket::connect_udp_port(const char* machineNam
 			return BAD_SOCKET;
 		}
 	}
-#ifndef AQT_USE_WINSOCK_SOCKETS
+#ifndef ACL_USE_WINSOCK_SOCKETS
 	udp_name.sin_port = htons(remotePort);
 #else
 	udp_name.sin_port = htons((u_short)remotePort);
@@ -912,7 +912,7 @@ atl::CoreSocket::SOCKET atl::CoreSocket::connect_udp_port(const char* machineNam
 	return udp_socket;
 }
 
-int atl::CoreSocket::get_local_socket_name(char* local_host, size_t max_length,
+int acl::CoreSocket::get_local_socket_name(char* local_host, size_t max_length,
 	const char* remote_host)
 {
 	const int remote_port = 3883;	// Quasi-random port number...
@@ -956,7 +956,7 @@ int atl::CoreSocket::get_local_socket_name(char* local_host, size_t max_length,
 	return ret;
 }
 
-int atl::CoreSocket::udp_request_lob_packet(
+int acl::CoreSocket::udp_request_lob_packet(
 	SOCKET udp_sock,      // Socket to use to send
 	const char*,         // Name of the machine to call
 	const int,            // UDP port on remote machine
@@ -994,7 +994,7 @@ int atl::CoreSocket::udp_request_lob_packet(
 	return 0;
 }
 
-int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
+int acl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
 	const char* NIC_IP, int backlog, bool reuseAddr, TCPOptions options)
 {
 	struct sockaddr_in listen_name; /* The listen socket binding name */
@@ -1067,7 +1067,7 @@ int atl::CoreSocket::get_a_TCP_socket(SOCKET* listen_sock, int* listen_portnum,
 	return 0;
 }
 
-int atl::CoreSocket::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
+int acl::CoreSocket::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
 	double timeout)
 {
 	fd_set rfds;
@@ -1116,7 +1116,7 @@ int atl::CoreSocket::poll_for_accept(SOCKET listen_sock, SOCKET* accept_sock,
 	return 0; // Nobody called
 }
 
-bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
+bool acl::CoreSocket::connect_tcp_to(const char* addr, int port,
 	const char* NICaddress, SOCKET *s, TCPOptions options)
 {
 	if (s == nullptr) {
@@ -1227,14 +1227,14 @@ bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
   }
 #endif
 
-#ifndef AQT_USE_WINSOCK_SOCKETS
+#ifndef ACL_USE_WINSOCK_SOCKETS
 	client.sin_port = htons(port);
 #else
 	client.sin_port = htons((u_short)port);
 #endif
 
 	if (connect(*s, (struct sockaddr*) & client, sizeof(client)) < 0) {
-#ifdef AQT_USE_WINSOCK_SOCKETS
+#ifdef ACL_USE_WINSOCK_SOCKETS
 		fprintf(stderr, "connect_tcp_to: Could not connect "
 			"to machine %d.%d.%d.%d port %d\n",
 			(int)(client.sin_addr.S_un.S_un_b.s_b1),
@@ -1260,12 +1260,12 @@ bool atl::CoreSocket::connect_tcp_to(const char* addr, int port,
 	return true;
 }
 
-int atl::CoreSocket::close_socket(SOCKET sock)
+int acl::CoreSocket::close_socket(SOCKET sock)
 {
 	return closeSocket(sock);
 }
 
-bool atl::CoreSocket::cork_tcp_socket(SOCKET sock)
+bool acl::CoreSocket::cork_tcp_socket(SOCKET sock)
 {
   if (sock == BAD_SOCKET) {
     fprintf(stderr, "cork_tcp_socket(): Bad socket\n");
@@ -1296,7 +1296,7 @@ bool atl::CoreSocket::cork_tcp_socket(SOCKET sock)
   return true;
 }
 
-bool atl::CoreSocket::uncork_tcp_socket(SOCKET sock)
+bool acl::CoreSocket::uncork_tcp_socket(SOCKET sock)
 {
   if (sock == BAD_SOCKET) {
     fprintf(stderr, "uncork_tcp_socket(): Bad socket\n");
@@ -1329,14 +1329,14 @@ bool atl::CoreSocket::uncork_tcp_socket(SOCKET sock)
   return true;
 }
 
-// From this we get the variable "AQT_big_endian" set to true if the machine we
+// From this we get the variable "ACL_big_endian" set to true if the machine we
 // are
 // on is big endian and to false if it is little endian.
 
-static const int AQT_int_data_for_endian_test = 1;
-static const char* AQT_char_data_for_endian_test =
-static_cast<const char*>(static_cast<const void*>((&AQT_int_data_for_endian_test)));
-static const bool AQT_big_endian = (AQT_char_data_for_endian_test[0] != 1);
+static const int ACL_int_data_for_endian_test = 1;
+static const char* ACL_char_data_for_endian_test =
+static_cast<const char*>(static_cast<const void*>((&ACL_int_data_for_endian_test)));
+static const bool ACL_big_endian = (ACL_char_data_for_endian_test[0] != 1);
 
 // convert double to/from network order
 // I have chosen big endian as the network order for double
@@ -1349,9 +1349,9 @@ static const bool AQT_big_endian = (AQT_char_data_for_endian_test[0] != 1);
 #include <endian.h>
 #endif
 
-double atl::CoreSocket::hton(double d)
+double acl::CoreSocket::hton(double d)
 {
-	if (!AQT_big_endian) {
+	if (!ACL_big_endian) {
 		double dSwapped;
 		char* pchSwapped = (char*)& dSwapped;
 		char* pchOrig = (char*)& d;
@@ -1385,7 +1385,7 @@ double atl::CoreSocket::hton(double d)
 }
 
 // they are their own inverses, so ...
-double atl::CoreSocket::ntoh(double d) { return hton(d); }
+double acl::CoreSocket::ntoh(double d) { return hton(d); }
 
 // convert int64_t to/from network order
 // I have chosen big endian as the network order for double
@@ -1395,9 +1395,9 @@ double atl::CoreSocket::ntoh(double d) { return hton(d); }
 // to not just swap all of the bytes but also swap the two 4-byte
 // words to get things in the right order.
 
-int64_t atl::CoreSocket::hton(int64_t d)
+int64_t acl::CoreSocket::hton(int64_t d)
 {
-	if (!AQT_big_endian) {
+	if (!ACL_big_endian) {
 		int64_t dSwapped;
 		char* pchSwapped = (char*)& dSwapped;
 		char* pchOrig = (char*)& d;
@@ -1431,4 +1431,4 @@ int64_t atl::CoreSocket::hton(int64_t d)
 }
 
 // they are their own inverses, so ...
-int64_t atl::CoreSocket::ntoh(int64_t d) { return hton(d); }
+int64_t acl::CoreSocket::ntoh(int64_t d) { return hton(d); }

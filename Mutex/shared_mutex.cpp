@@ -8,7 +8,7 @@
 #include "helgrind.h"
 #endif //USE_HELGRIND
 
-namespace atl
+namespace acl
 {
 
     shared_mutex::~shared_mutex()

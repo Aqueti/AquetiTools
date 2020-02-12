@@ -6,9 +6,9 @@
 
 #include <mutex>
 #include <atomic>
-#include "AtlMutexWrap.h"
+#include "AclMutexWrap.h"
 
-namespace atl
+namespace acl
 {
     /**
      * @class shared_mutex
@@ -19,8 +19,8 @@ namespace atl
     {
         private:
 #ifdef DEBUG_CACHE
-			AtlMutex m_read;
-			AtlMutex m_mutex;
+			AclMutex m_read;
+			AclMutex m_mutex;
 #else
             std::mutex m_read; //!< Brief readers
             std::mutex m_mutex;  //!< Brief member fields for mutext

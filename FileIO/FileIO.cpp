@@ -25,7 +25,7 @@
 #include "FileIO.h"
 
 
-namespace atl
+namespace acl
 {
 namespace filesystem
 {
@@ -131,7 +131,7 @@ bool _create_directory( std::string dirname )
    bool remove( std::string name)
    {
       //Break name into a array
-      //std::vector<std::string> pathVect = atl::stringParser(name, "/");
+      //std::vector<std::string> pathVect = acl::stringParser(name, "/");
       //
       //std::string newPath = "";
       //for( uint64_t i = 0; i < pathVect.size(); i++ ) {

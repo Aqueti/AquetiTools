@@ -22,7 +22,7 @@
 
 #define DEFAULT_MAX_SIZE SIZE_MAX
 
-namespace atl
+namespace acl
 {
 
 /**

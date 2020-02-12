@@ -1,5 +1,5 @@
 /**
-*  \file AtlMutexWrap.h
+*  \file AclMutexWrap.h
 *  \brief 
 *  \author Drew Perkins
 *  \version 
@@ -18,7 +18,7 @@
 #include <mutex>
 #include <execinfo.h>
 
-namespace atl {
+namespace acl {
 
 /**
 *  \brief mutex wrapper to print when acquired and released
@@ -71,11 +71,11 @@ public:
 	}
 
 	MutexWrap(){
-		std::cout << "constructing atl mutex wrap " << (uint64_t)this << std::endl;
+		std::cout << "constructing acl mutex wrap " << (uint64_t)this << std::endl;
 	}
 
 	~MutexWrap(){
-		std::cout << "destroying atl mutex wrap " << (uint64_t)this << std::endl;
+		std::cout << "destroying acl mutex wrap " << (uint64_t)this << std::endl;
 	}
 
 	void printTrace()
@@ -97,9 +97,9 @@ public:
 
 
 
-typedef MutexWrap<std::recursive_mutex> AtlRecursiveMutex;
-typedef MutexWrap<std::mutex> AtlMutex;
+typedef MutexWrap<std::recursive_mutex> AclRecursiveMutex;
+typedef MutexWrap<std::mutex> AclMutex;
 
-} // namespace atl
+} // namespace acl
 
 

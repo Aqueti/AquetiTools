@@ -1,8 +1,8 @@
 /******************************************************************************
  *
- * \file IDGenerator.cpp
+ * \file RandomIDGenerator.cpp
  * \author Andrew Ferg
- * \brief Class methods for IDGenerator
+ * \brief Class methods for RandomIDGenerator
  *
  * Copyright Aqueti 2018
  * Distributed under the Boost Software License, Version 1.0.
@@ -11,16 +11,18 @@
  *
  *****************************************************************************/
 
-#include "IDGenerator.hpp"
+#include <random>
+#include "Timer.h"
+#include "RandomIDGenerator.hpp"
 
-namespace atl {
+namespace acl {
 
-std::string IDGenerator::genAlphanumericString(unsigned int len)
+std::string RandomIDGenerator::genAlphanumericString(unsigned int len)
 {
     std::string alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     //std::uniform_int_distribution<int> d(0, alphabet.size() - 1);
     //std::random_device rd;
-    std::srand(atl::getUsecTime()); //use current time as seed for RNG
+    std::srand(acl::getUsecTime()); //use current time as seed for RNG
 
     std::string str;
     int pos;
@@ -34,12 +36,12 @@ std::string IDGenerator::genAlphanumericString(unsigned int len)
     return str;
 }
 
-std::string IDGenerator::genNumericString(unsigned int len)
+std::string RandomIDGenerator::genNumericString(unsigned int len)
 {
     std::string alphabet = "0123456789";
     //std::uniform_int_distribution<int> d(0, alphabet.size() - 1);
     //std::random_device rd;
-    std::srand(atl::getUsecTime()); //use current time as seed for RNG
+    std::srand(acl::getUsecTime()); //use current time as seed for RNG
 
     std::string str;
     int pos;
@@ -53,7 +55,7 @@ std::string IDGenerator::genNumericString(unsigned int len)
     return str;
 }
 
-uint64_t IDGenerator::genUint64()
+uint64_t RandomIDGenerator::genUint64()
 {
     std::random_device rd;
     std::default_random_engine generator(rd());
@@ -61,4 +63,4 @@ uint64_t IDGenerator::genUint64()
     return distribution(generator);
 }
 
-}//end namespace atl
+}//end namespace acl

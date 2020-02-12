@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-PROJECT(AquetiTools)
+PROJECT(acl)
 
 #specifies a list of source files to be compiled
 set( BASE_SOURCES 

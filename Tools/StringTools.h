@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 
-namespace atl
+namespace acl
 {
   /**
    * \brief Function that parses a string based on a delimiter

@@ -5,20 +5,20 @@
 // Figure out whether we're using Windows sockets or not.
 
 // let's start with a clean slate
-#undef AQT_USE_WINSOCK_SOCKETS
+#undef ACL_USE_WINSOCK_SOCKETS
 
 // Does cygwin use winsock sockets or unix sockets?  Define this before
 // compiling the library if you want it to use WINSOCK sockets.
 //#define CYGWIN_USES_WINSOCK_SOCKETS
 
 #if defined(_WIN32) && (!defined(__CYGWIN__) || defined(CYGWIN_USES_WINSOCK_SOCKETS))
-  #define AQT_USE_WINSOCK_SOCKETS
+  #define ACL_USE_WINSOCK_SOCKETS
 #endif
 
 //=======================================================================
 // Architecture-dependent include files.
 
-#ifndef AQT_USE_WINSOCK_SOCKETS
+#ifndef ACL_USE_WINSOCK_SOCKETS
 #include <sys/time.h>   // for timeval, timezone, gettimeofday
 #include <sys/select.h> // for fd_set
 #include <netinet/in.h> // for htonl, htons
@@ -28,12 +28,12 @@
 //=======================================================================
 // All externally visible symbols should be defined in the name space.
 
-namespace atl { namespace CoreSocket {
+namespace acl { namespace CoreSocket {
 
 //=======================================================================
 // Architecture-dependent definitions.
 
-#ifndef AQT_USE_WINSOCK_SOCKETS
+#ifndef ACL_USE_WINSOCK_SOCKETS
 
   // On Winsock, we have to use SOCKET, so we're going to have to use it
   // everywhere.
@@ -50,18 +50,18 @@ namespace atl { namespace CoreSocket {
 	// change the way they behave.
 
 	#ifndef NOMINMAX
-    #define ATL_CORESOCKET_REPLACE_NOMINMAX
+    #define ACL_CORESOCKET_REPLACE_NOMINMAX
 	  #define NOMINMAX
 	#endif
 	#ifndef WIN32_LEAN_AND_MEAN
-    #define ATL_CORESOCKET_REPLACE_WIN32_LEAN_AND_MEAN
+    #define ACL_CORESOCKET_REPLACE_WIN32_LEAN_AND_MEAN
     #define WIN32_LEAN_AND_MEAN
 	#endif
 	#include <winsock2.h> // struct timeval is defined here
-  #ifdef ATL_CORESOCKET_REPLACE_NOMINMAX
+  #ifdef ACL_CORESOCKET_REPLACE_NOMINMAX
     #undef NOMINMAX
   #endif
-  #ifdef ATL_CORESOCKET_REPLACE_WIN32_LEAN_AND_MEAN
+  #ifdef ACL_CORESOCKET_REPLACE_WIN32_LEAN_AND_MEAN
     #undef WIN32_LEAN_AND_MEAN
   #endif
 

@@ -12,16 +12,16 @@
 **/  
 
 #include <mutex>
-#include "AtlMutexWrap.h"
+#include "AclMutexWrap.h"
 #include "shared_mutex.h"
 
-using namespace atl;
+using namespace acl;
 
 int test()
 {
 
 	std::cout << "testing std::mutex wrap" << std::endl;
-	AtlMutex m;
+	AclMutex m;
 	m.lock();
 	m.unlock();
 	std::cout << std::endl << std::endl;
@@ -35,7 +35,7 @@ int test()
 
 
 	std::cout << "testing recursive mutex wrap" << std::endl;
-	AtlRecursiveMutex r;
+	AclRecursiveMutex r;
 	r.lock();
 	r.unlock();
 	std::cout << std::endl << std::endl;
@@ -43,12 +43,12 @@ int test()
 
 	{
 		std::cout << "testing lock guard on std::mutex wrap" << std::endl;
-		std::lock_guard<AtlMutex> g(m);
+		std::lock_guard<AclMutex> g(m);
 		std::cout << std::endl << std::endl;
 	}
 	{
 		std::cout << "testing lock guard on recursiv mutex wrap" << std::endl;
-		std::lock_guard<AtlRecursiveMutex> g(r);
+		std::lock_guard<AclRecursiveMutex> g(r);
 		std::cout << "lock guard recursive" << std::endl;
 		std::cout << std::endl << std::endl;
 	}
